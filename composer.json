@@ -15,7 +15,7 @@
     "minimum-stability": "dev",
     "autoload":{
         "psr-4":{
-            "lang\\poster\\":"src/lang/poster"
+            "Kkokk\\LangPoster\\":"src/"
         }
     }
 }
