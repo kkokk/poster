@@ -1,0 +1,21 @@
+{
+    "name": "lang/poster",
+    "description": "PHP生成海报",
+    "type": "project",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lang",
+            "email": "732853989@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload":{
+        "psr-4":{
+            "lang\\poster\\":"src/lang/poster"
+        }
+    }
+}
