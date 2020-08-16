@@ -7,7 +7,7 @@ namespace Kkokk\LangPoster;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-14 17:53:53
+ * @Last Modified time: 2020-08-16 19:54:03
  */
 use Kkokk\LangPoster\Exception\SystemException;
 use Kkokk\LangPoster\Interfaces\MyPoster;
@@ -17,11 +17,15 @@ use Kkokk\LangPoster\Lang\PosterAbstract;//
 class PosterManager 
 {
     public $Poster;
+    public static $options = "";
     /** @var Connector */
     protected static $connector;
 
-	public function __construct()
+	public function __construct($options=[])
 	{
+        if (!empty($options)) {
+            self::$options = $options;
+        }
         // $this->Poster = new Poster;
 	}
 
@@ -91,9 +95,9 @@ class PosterManager
                 throw new SystemException("the class name does not exist . class : {$type}");
             }
 
-            self::$connector = new $className($options);
+            self::$connector = new $className(self::$options);
         }
-        return self::$connector[$name];
+        return self::$connector;
     }
 
     /**
@@ -104,6 +108,7 @@ class PosterManager
      */
     private function create_(string $method, array $params)
     {   
+
         return call_user_func_array([self::buildConnector(),$method], $params);
     }
 }

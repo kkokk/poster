@@ -5,7 +5,7 @@ namespace Kkokk\LangPoster\Interfaces;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-14 16:24:35
+ * @Last Modified time: 2020-08-16 12:41:00
  */
 
 interface MyPoster{
@@ -15,8 +15,10 @@ interface MyPoster{
 	 * @param  string
 	 * @return [type]
 	 */
-	public function buildIm($w,$h,array $rgba=[255,255,255,127],$alpha=false);
-	public function buildImage($src,$type='normal',$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0);
-	public function buildText(array $param);
+	public function buildIm($w,$h,$rgba=[],$alpha=false);
+	public function buildImDst($src,$w=0,$h=0,$rgba=[],$alpha=false);
+	public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal');
+	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='');
 	public function getPoster();
+	public function setPoster();
 }
