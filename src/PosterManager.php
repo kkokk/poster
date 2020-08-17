@@ -7,7 +7,7 @@ namespace Kkokk\Poster;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 14:06:33
+ * @Last Modified time: 2020-08-17 16:06:37
  */
 use Kkokk\Poster\Exception\SystemException;
 use Kkokk\Poster\Interfaces\MyPoster;

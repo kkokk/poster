@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 15:48:29
+ * @Last Modified time: 2020-08-17 16:30:37
  */
 
 try {
@@ -102,10 +102,10 @@ try {
 	// ->getPoster();
 
 	//给图片添加水印
-	$PosterManager = new PosterManager();
-	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
-	->getPoster();
+	// $PosterManager = new PosterManager();
+	// $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
+	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
+	// ->getPoster();
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

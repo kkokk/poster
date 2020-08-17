@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 14:06:19
+ * @Last Modified time: 2020-08-17 16:29:06
  */
 
 /**
@@ -40,31 +40,32 @@ abstract class PosterAbstract
 
 	public function __construct($params = [])
 	{	
+        if (!empty($params)) $params = [$params];
 		if (isset($params) && isset($params[0])) {
 			$params[0] = str_replace(['\\','/'], "\\", $params[0]);
 			
-			if (strripos($params[0],".")!==false) {
-				
-				if (strripos($params[0],"\\")!==false) {
+			if (strripos($params[0],"\\")!==false) {
 
-					$this->pathname = substr($params[0], 0,strripos($params[0],"\\"));
+                $this->pathname = substr($params[0], 0,strripos($params[0],"\\"));
 
-					$this->filename = substr($params[0], strripos($params[0],"\\")+1);
+                $this->filename = substr($params[0], strripos($params[0],"\\")+1);
 
-				}else{
-					$this->filename = $params[0];
-				}
+            }else{
+                $this->filename = $params[0];
+            }
 
 
-				$this->type = substr($params[0], strripos($params[0],".")+1);
+            if (strripos($this->filename,".")!==false) {
 
-				if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
+                $this->type = substr($this->filename, strripos($this->filename,".")+1);
 
-					throw new PosterException('The file naming format is incorrect');
-				}
-			}else{
-				$this->filename = $this->filename;
-			}
+                if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
+
+                    throw new PosterException('The file naming format is incorrect');
+                }
+            }else{
+                $this->filename = $this->filename;
+            }
 
 			
 
@@ -85,7 +86,7 @@ abstract class PosterAbstract
 	 */
 	protected function getData()
 	{	
-
+        if (empty($this->type)) $this->type='png';
 		return $this->returnImage($this->type);
 	}
 
@@ -324,7 +325,7 @@ abstract class PosterAbstract
         }
 
         # 处理目标 x 轴
-        if ($dst_x=='center') {
+        if ($dst_x === 'center') {
 
             $dst_x = ceil(($this->im_w - $bgWidth) / 2);
 
@@ -348,7 +349,7 @@ abstract class PosterAbstract
         }
 
         # 处理目标 y 轴
-        if ($dst_y=='center') {
+        if ($dst_y === 'center') {
             $dst_y = ceil(($this->im_h - $bgHight) / 2);
         }elseif (is_numeric($dst_y)&&$dst_y<0) {
 
