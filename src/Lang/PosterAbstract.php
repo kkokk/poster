@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 17:36:39
+ * @Last Modified time: 2020-08-17 17:54:33
  */
 
 /**
@@ -110,7 +110,7 @@ abstract class PosterAbstract
 
 		if (!isset($this->im)||empty($this->im)) throw new PosterException('没有创建任何资源');
 
-		$this->dirExists($this->path.$this->pathname);
+		$this->dirExists($this->pathname);
 		if (strripos($this->filename,".")===false) {
 			$this->filename = $this->filename.'.'.$this->type;
 		}
