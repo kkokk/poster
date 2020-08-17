@@ -5,7 +5,7 @@ namespace Kkokk\LangPoster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 23:04:17
+ * @Last Modified time: 2020-08-17 13:56:52
  */
 
 use Kkokk\LangPoster\Exception\PosterException;
@@ -159,7 +159,7 @@ class Base
 	/**
 	 * 创建指定图片为画布 宽高，颜色，透明的画布
 	 */
-	protected function ImDst($source,$w,$h,$rgba,$alpha){
+	protected function ImDst($source,$w,$h){
 
 
 		if (!is_file($source)) {
@@ -188,6 +188,7 @@ class Base
 			$circle_new       = $this->createIm($w, $h,[255, 255, 255, 127],$alpha=true);
 			imagecopyresized($circle_new, $cut,0, 0,0, 0,$w, $h, $bgWidth, $bgHight);
             $cut = $circle_new;
+            // $this->destroyImage($circle_new);
         }else{
         	$this->im_w = $bgWidth;
 			$this->im_h = $bgHight;
@@ -316,6 +317,48 @@ class Base
             default:
                 # code...
                 break;
+        }
+        # 处理目标 x 轴
+        if ($dst_x=='center') {
+
+            $dst_x = ceil(($this->im_w - $bgWidth) / 2);
+
+        }elseif (is_numeric($dst_x)&&$dst_x<0) {
+
+        	$dst_x = ceil($this->im_w+$dst_x);
+
+        }elseif (strpos($dst_x, "%")!==false) {
+
+        	if (substr($dst_x, 0,strpos($dst_x, "%"))<0) {
+
+        		$dst_x = ceil($this->im_w+($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100));
+
+        	}else{
+
+        		$dst_x = ceil($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100);
+
+        	}
+        	
+
+        }
+
+        # 处理目标 y 轴
+        if ($dst_y=='center') {
+            $dst_y = ceil(($this->im_h - $bgHight) / 2);
+        }elseif (is_numeric($dst_y)&&$dst_y<0) {
+
+        	$dst_y = ceil($this->im_h+$dst_y);
+
+        }elseif (strpos($dst_y, "%")!==false) {
+
+        	if (substr($dst_y, 0,strpos($dst_y, "%"))<0) {
+
+        		$dst_y = ceil($this->im_h+(($this->im_h * substr($dst_y, 0,strpos($dst_y, "%")))/100));
+
+        	}else{
+        		$dst_y = ceil($this->im_h * substr($dst_y, 0,strpos($dst_y, "%"))/100);
+        	}
+        	
         }
 
         //整合海报

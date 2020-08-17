@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 23:21:44
+ * @Last Modified time: 2020-08-17 14:00:15
  */
 
 try {
@@ -40,8 +40,8 @@ try {
 	 * @Author   lang
 	 * @DateTime 2020-08-14T20:52:41+0800
 	 * @param    [string]                 $src   [description] 路径，支持网络图片（带http或https）
-	 * @param    number                   $dst_x [description] 目标x轴
-	 * @param    number                   $dst_y [description] 目标y轴
+	 * @param    number                   $dst_x [description] 目标x轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
+	 * @param    number                   $dst_y [description] 目标y轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
 	 * @param    number                   $src_x [description] 图片x轴
 	 * @param    number                   $src_y [description] 图片y轴
 	 * @param    number                   $src_w [description] 图片自定义宽
@@ -80,10 +80,10 @@ try {
 	// ->getPoster();
 	
 	//给图片添加水印
-	$result = PosterManager::poster()
-	->buildImDst(__DIR__.'/test.jpeg',600,800)
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,0,0,false)
-	->getPoster();
+	// $result = PosterManager::poster()
+	// ->buildImDst(__DIR__.'/test.jpeg')
+	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','-20%','-20%',0,0,0,0,false)
+	// ->getPoster();
 
 	# 实例化调用 
 	// 合成图片
@@ -102,10 +102,10 @@ try {
 	// ->getPoster();
 
 	//给图片添加水印
-	// $PosterManager = new PosterManager();
-	// $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg',600,800)
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,0,0,true)
-	// ->getPoster();
+	$PosterManager = new PosterManager();
+	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
+	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
+	->getPoster();
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

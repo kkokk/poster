@@ -6,7 +6,7 @@ use Kkokk\LangPoster\Lang\PosterAbstract;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:49:51
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 19:54:54
+ * @Last Modified time: 2020-08-17 10:10:05
  */
 /**
  * 
@@ -41,8 +41,8 @@ class AbstractTest extends PosterAbstract
 	 * @param    boolean                  $alpha [description]
 	 * @return   [type]                          [description]
 	 */
-	public function buildImDst($src,$w=0,$h=0,$rgba=[],$alpha=false){
-		$this->ImDst($src,$w,$h,$rgba,$alpha);
+	public function buildImDst($src,$w=0,$h=0){
+		$this->ImDst($src,$w,$h);
 		return $this;
 	}
 	

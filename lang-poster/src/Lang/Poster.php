@@ -5,7 +5,7 @@ namespace Kkokk\LangPoster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 15:57:29
+ * @Last Modified time: 2020-08-17 09:52:35
  */
 use Kkokk\LangPoster\InterFaces\MyPoster;
 
@@ -41,8 +41,8 @@ class Poster extends Base implements MyPoster
 	 * @param    boolean                  $alpha [description]
 	 * @return   [type]                          [description]
 	 */
-	public function buildImDst($src,$w=0,$h=0,$rgba=[],$alpha=false){
-		$this->ImDst($src,$w,$h,$rgba,$alpha);
+	public function buildImDst($src,$w=0,$h=0){
+		$this->ImDst($src,$w,$h);
 		return $this;
 	}
 

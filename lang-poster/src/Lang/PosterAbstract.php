@@ -5,7 +5,7 @@ namespace Kkokk\LangPoster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 20:03:18
+ * @Last Modified time: 2020-08-17 13:57:56
  */
 
 /**
@@ -19,7 +19,7 @@ abstract class PosterAbstract
 	protected $im_h;
 	protected $pathname = 'poster';
 	protected $filename;
-	protected $type     = 'png';
+	protected $type     = '';
 	protected $path;
 	protected $source;
 	protected $font_family = __DIR__.'/../style/simkai.ttf';
@@ -32,6 +32,7 @@ abstract class PosterAbstract
 	];
 	protected $options = [];
 	abstract public function buildIm($w,$h,$rgba=[],$alpha=false);
+	abstract public function buildImDst($src,$w=0,$h=0);
 	abstract public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal');
 	abstract public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='');
 	abstract public function getPoster();
@@ -39,37 +40,37 @@ abstract class PosterAbstract
 
 	public function __construct($params = [])
 	{	
-		if (!is_array($params)) $params = [$params];
-		if (isset($params) && !empty($params[0])) {
+		if (isset($params) && isset($params[0])) {
 			$params[0] = str_replace(['\\','/'], "\\", $params[0]);
-
-			if (strripos($params[0],"\\")!==false) {
-
-				$this->pathname = substr($params[0], 0,strripos($params[0],"\\"));
-
-				$this->filename = substr($params[0], strripos($params[0],"\\")+1);
-
-			}else{
-				$this->filename = $params[0];
-			}
 			
 			if (strripos($params[0],".")!==false) {
 				
+				if (strripos($params[0],"\\")!==false) {
+
+					$this->pathname = substr($params[0], 0,strripos($params[0],"\\"));
+
+					$this->filename = substr($params[0], strripos($params[0],"\\")+1);
+
+				}else{
+					$this->filename = $params[0];
+				}
+
+
 				$this->type = substr($params[0], strripos($params[0],".")+1);
 
-				if (!in_array($this->type, ['jpg','png','gif','wbmp'])) {
+				if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
 
 					throw new PosterException('The file naming format is incorrect');
 				}
 			}else{
-				$this->filename = $this->filename.'.'.$this->type;
+				$this->filename = $this->filename;
 			}
 
 			
 
         }else{
         	if (empty($this->filename)) {
-	        	$this->filename = time().'.'.$this->type;
+	        	$this->filename = time();
 	        }
         }
 
@@ -84,6 +85,7 @@ abstract class PosterAbstract
 	 */
 	protected function getData()
 	{	
+
 		return $this->returnImage($this->type);
 	}
 
@@ -94,9 +96,9 @@ abstract class PosterAbstract
 	 */
 	protected function setData()
 	{	
+
 		return $this->setImage($this->type);
 	}
-
 	/**
 	 * 返回图片流或者图片
 	 * @Author lang
@@ -105,18 +107,19 @@ abstract class PosterAbstract
 	 */
 	protected function returnImage($type){
 
-		if (isset($this->pathname) && !empty($this->pathname)) {
+		if (!isset($this->im)||empty($this->im)) throw new PosterException('没有创建任何资源');
 
-			$this->dirExists($this->pathname);	
-			$this->poster_type[$type]($this->im,$this->pathname.'\\'.$this->filename);
-
-			# 释放资源
-			// $this->destroyImage($this->im);
-
-			return ['url'=>$this->pathname.'/'.$this->filename];
+		$this->dirExists($this->pathname);
+		if (strripos($this->filename,".")===false) {
+			$this->filename = $this->filename.'.'.$this->type;
 		}
-		header('Content-Type: image/'.$type);
-		return $this->poster_type[$type]($this->im);
+		$this->poster_type[$type]($this->im,$this->pathname.'\\'.$this->filename);
+
+		# 释放资源
+		// $this->destroyImage($this->im);
+
+		return ['url'=>$this->pathname.'/'.$this->filename];
+		
 	}
 
 	/**
@@ -133,7 +136,6 @@ abstract class PosterAbstract
 
 		throw new PosterException('没有找到源文件');
 	}
-
 	/**
 	 * @Author lang
 	 * @Date   2020-08-14T15:32:04+0800
@@ -161,7 +163,7 @@ abstract class PosterAbstract
 	/**
 	 * 创建指定图片为画布 宽高，颜色，透明的画布
 	 */
-	protected function ImDst($source,$w,$h,$rgba,$alpha){
+	protected function ImDst($source,$w,$h){
 
 
 		if (!is_file($source)) {
@@ -190,6 +192,7 @@ abstract class PosterAbstract
 			$circle_new       = $this->createIm($w, $h,[255, 255, 255, 127],$alpha=true);
 			imagecopyresized($circle_new, $cut,0, 0,0, 0,$w, $h, $bgWidth, $bgHight);
             $cut = $circle_new;
+            // $this->destroyImage($circle_new);
         }else{
         	$this->im_w = $bgWidth;
 			$this->im_h = $bgHight;
@@ -261,11 +264,10 @@ abstract class PosterAbstract
         }else{
             $path = "";
         }
-		
 
         list($Width, $Hight, $bgType) = @getimagesize($path.$src);
         $bgType = image_type_to_extension($bgType, false);
-        
+
         if ($bgType=='gif') {
         	$pic = imagecreatefromstring(file_get_contents($path.$src));
         }else{
@@ -274,7 +276,6 @@ abstract class PosterAbstract
         	$pic = @$fun($path.$src);
         }
         
-
         $bgWidth = !empty($src_w)?$src_w:$Width;
         $bgHight = !empty($src_h)?$src_h:$Hight;
 
@@ -322,12 +323,56 @@ abstract class PosterAbstract
                 break;
         }
 
+        # 处理目标 x 轴
+        if ($dst_x=='center') {
+
+            $dst_x = ceil(($this->im_w - $bgWidth) / 2);
+
+        }elseif (is_numeric($dst_x)&&$dst_x<0) {
+
+        	$dst_x = ceil($this->im_w+$dst_x);
+
+        }elseif (strpos($dst_x, "%")!==false) {
+
+        	if (substr($dst_x, 0,strpos($dst_x, "%"))<0) {
+
+        		$dst_x = ceil($this->im_w+($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100));
+
+        	}else{
+
+        		$dst_x = ceil($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100);
+
+        	}
+        	
+
+        }
+
+        # 处理目标 y 轴
+        if ($dst_y=='center') {
+            $dst_y = ceil(($this->im_h - $bgHight) / 2);
+        }elseif (is_numeric($dst_y)&&$dst_y<0) {
+
+        	$dst_y = ceil($this->im_h+$dst_y);
+
+        }elseif (strpos($dst_y, "%")!==false) {
+
+        	if (substr($dst_y, 0,strpos($dst_y, "%"))<0) {
+
+        		$dst_y = ceil($this->im_h+(($this->im_h * substr($dst_y, 0,strpos($dst_y, "%")))/100));
+
+        	}else{
+        		$dst_y = ceil($this->im_h * substr($dst_y, 0,strpos($dst_y, "%"))/100);
+        	}
+        	
+        }
+
         //整合海报
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
 
         if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);       
         if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new);       
 	}
+
 
 	protected function CopyMergeImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha=false,$type='normal'){
 		if (strpos($src,"http")===false) {
@@ -404,7 +449,7 @@ abstract class PosterAbstract
         if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);       
         if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new); 
 	}
-	
+
 	protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family=''){
 
 		$font_family = !empty($font_family)?$this->path.$font_family:$this->font_family;
