@@ -44,8 +44,8 @@ PHP 海报生成
 	 * @param    number                   $src_y [ 图片y轴 ] 
 	 * @param    number                   $src_w [ 图片自定义宽 ] 
 	 * @param    number                   $src_h [ 图片自定义高 ] 
-	 * @param    string                   $type  [ 图片变形类型 'normal' 正常形状 'circle' 圆形 ] 
 	 * @param    boolean                  $alpha [ 是否透明 是 true ] 
+     * @param    string                   $type  [ 图片变形类型 'normal' 正常形状 'circle' 圆形 ] 
 	 * @return   array                           [ 返回相对路径,数组 ] 
 
 4.   * [buildText 合成文字] 

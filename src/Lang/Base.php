@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 16:26:29
+ * @Last Modified time: 2020-08-17 17:34:39
  */
 
 use Kkokk\Poster\Exception\PosterException;
@@ -105,11 +105,11 @@ class Base
 
 		if (!isset($this->im)||empty($this->im)) throw new PosterException('没有创建任何资源');
 
-		$this->dirExists($this->pathname);
+		$this->dirExists($this->path.$this->pathname);
 		if (strripos($this->filename,".")===false) {
 			$this->filename = $this->filename.'.'.$this->type;
 		}
-		$this->poster_type[$type]($this->im,$this->pathname.'\\'.$this->filename);
+		$this->poster_type[$type]($this->im,$this->path.$this->pathname.'\\'.$this->filename);
 
 		# 释放资源
 		// $this->destroyImage($this->im);
@@ -219,6 +219,7 @@ class Base
 	 */
 	protected function createColor($cut,$rgba=[255,255,255,127]){
 
+        if (empty($rgba)) $rgba=[255,255,255,127];
 		if (count($rgba)!=4) throw new PosterException('The length is 4');
 		foreach ($rgba as $k => $value) {
 			if(!is_int($rgba[$k])){
@@ -238,7 +239,8 @@ class Base
 	 */
 	protected function createColorText($cut,$rgba=[255,255,255,1]){
 
-		if (count($rgba)!=4) throw new PosterException('The text rgba length is 4');
+        if (empty($rgba)) $rgba=[255,255,255,1];
+		if (count($rgba)<4) throw new PosterException('The text rgba length is 4');
 		foreach ($rgba as $k => $value) {
 			if(!is_int($rgba[$k])){
 				throw new PosterException('The text value must be an integer');
