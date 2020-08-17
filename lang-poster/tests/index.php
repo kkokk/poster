@@ -1,7 +1,7 @@
 <?php
 namespace Kkokk\Tests;
-use Kkokk\LangPoster\Exception\Exception;
-use Kkokk\LangPoster\PosterManager;
+use Kkokk\Poster\Exception\Exception;
+use Kkokk\Poster\PosterManager;
 
 require '../vendor/autoload.php';
 /**
@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 14:00:15
+ * @Last Modified time: 2020-08-17 14:06:54
  */
 
 try {

@@ -10,7 +10,7 @@ class ComposerStaticInitac0ffa9fda72336fb249b05ef897f4d1
         'K' => 
         array (
             'Kkokk\\Tests\\' => 12,
-            'Kkokk\\LangPoster\\' => 17,
+            'Kkokk\\Poster\\' => 13,
         ),
     );
 
@@ -19,7 +19,7 @@ class ComposerStaticInitac0ffa9fda72336fb249b05ef897f4d1
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
-        'Kkokk\\LangPoster\\' => 
+        'Kkokk\\Poster\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

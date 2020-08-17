@@ -1,13 +1,13 @@
 <?php
-namespace Kkokk\LangPoster\Lang;
+namespace Kkokk\Poster\Lang;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 09:52:35
+ * @Last Modified time: 2020-08-17 14:06:14
  */
-use Kkokk\LangPoster\InterFaces\MyPoster;
+use Kkokk\Poster\InterFaces\MyPoster;
 
 /**
  * 执行

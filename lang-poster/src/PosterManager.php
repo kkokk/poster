@@ -1,5 +1,5 @@
 <?php
-namespace Kkokk\LangPoster;
+namespace Kkokk\Poster;
 
 /**
  * PHP海报生成，添加水印
@@ -7,12 +7,12 @@ namespace Kkokk\LangPoster;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-16 19:54:03
+ * @Last Modified time: 2020-08-17 14:06:33
  */
-use Kkokk\LangPoster\Exception\SystemException;
-use Kkokk\LangPoster\Interfaces\MyPoster;
-use Kkokk\LangPoster\Lang\Poster;//
-use Kkokk\LangPoster\Lang\PosterAbstract;//
+use Kkokk\Poster\Exception\SystemException;
+use Kkokk\Poster\Interfaces\MyPoster;
+use Kkokk\Poster\Lang\Poster;//
+use Kkokk\Poster\Lang\PosterAbstract;//
 
 class PosterManager 
 {

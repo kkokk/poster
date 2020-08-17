@@ -1,7 +1,7 @@
 <?php
 declare (strict_types=1);//严格模式
 
-namespace Kkokk\LangPoster\Exception;
+namespace Kkokk\Poster\Exception;
 use Throwable;
 
 if (interface_exists(Throwable::class)) {

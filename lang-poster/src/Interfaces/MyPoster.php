@@ -1,11 +1,11 @@
 <?php
-namespace Kkokk\LangPoster\Interfaces;
+namespace Kkokk\Poster\Interfaces;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 09:52:45
+ * @Last Modified time: 2020-08-17 14:05:58
  */
 
 interface MyPoster{

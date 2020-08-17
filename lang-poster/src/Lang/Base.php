@@ -1,14 +1,14 @@
 <?php
-namespace Kkokk\LangPoster\Lang;
+namespace Kkokk\Poster\Lang;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 13:56:52
+ * @Last Modified time: 2020-08-17 14:06:06
  */
 
-use Kkokk\LangPoster\Exception\PosterException;
+use Kkokk\Poster\Exception\PosterException;
 
 /**
  * 

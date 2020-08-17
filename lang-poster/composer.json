@@ -1,5 +1,5 @@
 {
-    "name": "kkokk/langposter",
+    "name": "kkokk/poster",
     "description": "PHP生成海报",
     "type": "project",
     "require": {
@@ -15,7 +15,7 @@
     "minimum-stability": "dev",
     "autoload":{
         "psr-4":{
-            "Kkokk\\LangPoster\\":"src/"
+            "Kkokk\\Poster\\":"src/"
         }
     },
     "autoload-dev": {
