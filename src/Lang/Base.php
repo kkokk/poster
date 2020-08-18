@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-18 10:23:45
+ * @Last Modified time: 2020-08-18 12:13:20
  */
 
 use Kkokk\Poster\Exception\PosterException;
@@ -109,7 +109,7 @@ class Base
 		if (strripos($this->filename,".")===false) {
 			$this->filename = $this->filename.'.'.$this->type;
 		}
-		$this->poster_type[$type]($this->im,$this->path.$this->pathname.'\\'.$this->filename);
+		$this->poster_type[$type]($this->im,$this->path.$this->pathname.'/'.$this->filename);
 
 		# 释放资源
 		// $this->destroyImage($this->im);
