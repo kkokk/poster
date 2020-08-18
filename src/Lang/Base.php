@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 17:54:23
+ * @Last Modified time: 2020-08-18 10:28:35
  */
 
 use Kkokk\Poster\Exception\PosterException;
@@ -37,13 +37,13 @@ class Base
 	public function __construct($params = [])
 	{	
 		if (isset($params) && isset($params[0])) {
-			$params[0] = str_replace(['\\','/'], "\\", $params[0]);
+			$params[0] = str_replace(['\\','/'], "/", $params[0]);
 			
-            if (strripos($params[0],"\\")!==false) {
+            if (strripos($params[0],"/")!==false) {
 
-                $this->pathname = substr($params[0], 0,strripos($params[0],"\\"));
+                $this->pathname = substr($params[0], 0,strripos($params[0],"/"));
 
-                $this->filename = substr($params[0], strripos($params[0],"\\")+1);
+                $this->filename = substr($params[0], strripos($params[0],"/")+1);
 
             }else{
                 $this->filename = $params[0];
