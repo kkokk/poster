@@ -1,17 +1,15 @@
-# kkokk
+# kkokk\poster
 
 #### 介绍
-PHP 海报生成
+PHP 图片合成、生成海报、图片添加水印
 
-#### 软件架构
-软件架构说明
-
+#### authors
+lang
+732853989@qq.com
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  composer require kkokk\poster
 
 #### 使用说明
 
@@ -55,8 +53,8 @@ PHP 海报生成
 	 * @param    integer                  $dst_x       [description] 
 	 * @param    integer                  $dst_y       [description]
 	 * @param    integer                  $font        [ 字体大小 ] 
-	 * @param    array                    $rgba        [description] 
-	 * @param    integer                  $max_w       [ 最大换行高度 ] 
+	 * @param    array                    $rgba        [ 颜色rbga ] 
+	 * @param    integer                  $max_w       [ 最大换行宽度 ] 
 	 * @param    string                   $font_family [ 字体，可不填，有默认 (相对路径为项目根目录) ]
 	 * @return   [type]                                [description]
 
@@ -70,31 +68,48 @@ PHP 海报生成
 	 * @Date   2020-08-17T15:55:31+0800
 
 #### 静态调用
+	use Kkokk\Poster\PosterManager;
+	use Kkokk\Poster\Exception\Exception;
 	# 合成图片
-	$result = PosterManager::poster('poster/poster_user')
-	->buildIm(638,826,[255,255,255,127],false)
-	->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
-	->buildText('苏轼','center',477,16,[51, 51, 51, 1])
-	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
-	->buildText('长按识别',497,720,15,[153, 153, 153, 1])
-	->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
-	->getPoster();
-	# 给图片添加水印
-	$result = PosterManager::poster()
-	->buildImDst(__DIR__.'/test.jpeg')
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','-20%','-20%',0,0,0,0,false)
-	->getPoster();
-
+	try {
+		$result = PosterManager::poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
+		->buildIm(638,826,[255,255,255,127],false)
+		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
+		->buildText('苏轼','center',477,16,[51, 51, 51, 1])
+		->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
+		->buildText('长按识别',497,720,15,[153, 153, 153, 1])
+		->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
+		->getPoster();
+		# 给图片添加水印
+		$result = PosterManager::poster() //给指定图片添加水印，这里为空就好
+		->buildImDst(__DIR__.'/test.jpeg')
+		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg','-20%','-20%',0,0,0,0,false)
+		->setPoster();
+	} catch (Exception $e){
+		echo $e->getMessage();
+	}
 #### 实例化调用
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
+	use Kkokk\Poster\PosterManager;
+	use Kkokk\Poster\Exception\Exception;
+	# 合成图片
+	try {
+		$PosterManager = new PosterManager('poster/poster_user'); //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
+		$result = $PosterManager->buildIm(638,826,[255,255,255,127],false)
+		->buildIm(638,826,[255,255,255,127],false)
+		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
+		->buildText('苏轼','center',477,16,[51, 51, 51, 1])
+		->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
+		->buildText('长按识别',497,720,15,[153, 153, 153, 1])
+		->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
+		->getPoster();
+		# 给图片添加水印
+		$PosterManager = new PosterManager(); //给指定图片添加水印，这里为空就好
+		$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
+		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg','center','-20%',0,0,0,0,true)
+		->setPoster();
+	} catch (Exception $e){
+		echo $e->getMessage();
+	}
 #### 码云特技
 
 1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
