@@ -1,4 +1,4 @@
-# kkokk\poster
+# poster
 
 #### 介绍
 PHP 图片合成、生成海报、图片添加水印
