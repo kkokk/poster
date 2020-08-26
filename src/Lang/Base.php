@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-18 12:13:48
+ * @Last Modified time: 2020-08-26 17:34:40
  */
 
 use Kkokk\Poster\Exception\PosterException;
@@ -451,6 +451,8 @@ class Base
 	}
 
 	protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family=''){
+
+        if(empty($content)) return true;
 
 		$font_family = !empty($font_family)?$this->path.$font_family:$this->font_family;
 

@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 17:54:33
+ * @Last Modified time: 2020-08-26 17:34:58
  */
 
 /**
@@ -454,7 +454,7 @@ abstract class PosterAbstract
 	}
 
 	protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family=''){
-
+        if(empty($content)) return true;
 		$font_family = !empty($font_family)?$this->path.$font_family:$this->font_family;
 
 		$color    = $this->createColorText($this->im,$rgba);
