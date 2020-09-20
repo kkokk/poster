@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-26 17:34:58
+ * @Last Modified time: 2020-09-20 22:13:53
  */
 
 /**
@@ -75,7 +75,8 @@ abstract class PosterAbstract
 	        }
         }
 
-		$this->path     = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT'].'/')?:__DIR__.'/../../tests/';
+		$this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
+        $this->path = $this->path?$this->path.'/':__DIR__.'/../../tests/';
 
 	}
 

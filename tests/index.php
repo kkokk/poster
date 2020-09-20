@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 16:43:13
+ * @Last Modified time: 2020-09-20 22:14:20
  */
 
 try {
@@ -83,29 +83,29 @@ try {
 	// $result = PosterManager::poster()
 	// ->buildImDst(__DIR__.'/test.jpeg')
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','-20%','-20%',0,0,0,0,false)
-	// ->getPoster();
+	// ->setPoster();
 
 	# 实例化调用 
 	// 合成图片
-	// $PosterManager = new PosterManager('poster/poster_user');
-	// $result = $PosterManager->buildIm(638,826,[255,255,255,127],false)
-	// ->buildIm(638,826,[255,255,255,127],false)
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-	// ->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
-	// ->buildText('苏轼','center',477,16,[51, 51, 51, 1])
-	// ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
-	// ->buildText('长按识别',497,720,15,[153, 153, 153, 1])
-	// ->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
-	// ->getPoster();
+	$PosterManager = new PosterManager('poster/poster_user');
+	$result = $PosterManager->buildIm(638,826,[255,255,255,127],false)
+	->buildIm(638,826,[255,255,255,127],false)
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
+	->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
+	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
+	->buildText('苏轼','center',477,16,[51, 51, 51, 1])
+	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
+	->buildText('长按识别',497,720,15,[153, 153, 153, 1])
+	->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
+	->getPoster();
 
 	//给图片添加水印
-	$PosterManager = new PosterManager();
-	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
-	->getPoster();
+	// $PosterManager = new PosterManager();
+	// $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
+	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
+	// ->setPoster();
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-26 17:34:40
+ * @Last Modified time: 2020-09-20 22:13:48
  */
 
 use Kkokk\Poster\Exception\PosterException;
@@ -70,7 +70,8 @@ class Base
 	        }
         }
 
-		$this->path     = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT'].'/')?:__DIR__.'/../../tests/';
+		$this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
+        $this->path = $this->path?$this->path.'/':__DIR__.'/../../tests/';
 
 	}
 
