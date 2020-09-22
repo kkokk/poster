@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-20 22:13:48
+ * @Last Modified time: 2020-09-22 11:30:35
  */
 
 use Kkokk\Poster\Exception\PosterException;

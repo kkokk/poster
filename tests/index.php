@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-20 22:14:20
+ * @Last Modified time: 2020-09-22 11:30:59
  */
 
 try {
@@ -87,7 +87,7 @@ try {
 
 	# 实例化调用 
 	// 合成图片
-	$PosterManager = new PosterManager('poster/poster_user');
+	$PosterManager = new PosterManager();
 	$result = $PosterManager->buildIm(638,826,[255,255,255,127],false)
 	->buildIm(638,826,[255,255,255,127],false)
 	->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')

@@ -1,11 +1,12 @@
 <?php
 namespace Kkokk\Poster\Lang;
+use Kkokk\Poster\Exception\PosterException;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-20 22:13:53
+ * @Last Modified time: 2020-09-22 11:30:26
  */
 
 /**
@@ -98,7 +99,7 @@ abstract class PosterAbstract
 	 */
 	protected function setData()
 	{	
-
+        if (empty($this->type)) $this->type='png';
 		return $this->setImage($this->type);
 	}
 	/**
@@ -133,7 +134,7 @@ abstract class PosterAbstract
 	protected function setImage($type){
 		if (isset($this->source) && !empty($this->source)) {
 
-			return $this->poster_type[$type]($this->im,$this->source);
+			return $this->poster_type[$type]($this->im,$this->source); 
 		}
 
 		throw new PosterException('没有找到源文件');
