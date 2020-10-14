@@ -99,7 +99,7 @@ lang
 	use Kkokk\Poster\Exception\Exception;
 	# 合成图片
 	try {
-		$result = PosterManager::poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
+		$result = PosterManager::Poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
 		->buildIm(638,826,[255,255,255,127],false)
 		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
 		->buildText('苏轼','center',477,16,[51, 51, 51, 1])
@@ -109,12 +109,12 @@ lang
 		->buildQr('http://www.baidu.com',37,692,0,0,4,1)
 		->getPoster();
 		# 给图片添加水印
-		$result = PosterManager::poster() //给指定图片添加水印，这里为空就好
+		$result = PosterManager::Poster() //给指定图片添加水印，这里为空就好
 		->buildImDst(__DIR__.'/test.jpeg')
 		->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg','-20%','-20%',0,0,0,0,false)
 		->setPoster();
 		# 生成二维码
-		$result = PosterManager::poster()->Qr('http://www.baidu.com','poster/1.png');
+		$result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	} catch (Exception $e){
 		echo $e->getMessage();
 	}
