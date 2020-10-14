@@ -9,7 +9,9 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-22 11:30:59
+ * @Last Modified time: 2020-10-14 14:53:07
+
+
  */
 
 try {
@@ -50,6 +52,21 @@ try {
 	 * @param    boolean                  $alpha [description] 是否透明 是 true
 	 * @return   array                           [description] 返回相对路径,数组
 	 */
+	
+	/**
+	 * [buildQr description] 合成二维码
+	 * @Author lang
+	 * @Date   2020-10-14T12:14:06+0800
+	 * @param  [type]                   $text   [内容]
+	 * @param  integer                  $dst_x  [目标位置x] 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
+	 * @param  integer                  $dst_y  [目标位置y] 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
+	 * @param  integer                  $src_x  [图片x轴]
+	 * @param  integer                  $src_y  [图片y轴]
+	 * @param  integer                  $size   [大小]
+	 * @param  integer                  $margin [百变大小]
+	 * @return [type]                           [description]
+	 */
+	
 	/**
 	 * [buildText description] 合成文字
 	 * @Author   lang
@@ -77,6 +94,7 @@ try {
 	// ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
 	// ->buildText('长按识别',497,720,15,[153, 153, 153, 1])
 	// ->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
+	// ->buildQr('http://www.baidu.com','20%','20%',0,0,8,2)
 	// ->getPoster();
 	
 	//给图片添加水印
@@ -94,11 +112,11 @@ try {
 	->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
 	->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
 	->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
 	->buildText('苏轼','center',477,16,[51, 51, 51, 1])
 	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
 	->buildText('长按识别',497,720,15,[153, 153, 153, 1])
 	->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
+	->buildQr('http://www.baidu.com',37,692,0,0,4,1)
 	->getPoster();
 
 	//给图片添加水印
@@ -106,6 +124,27 @@ try {
 	// $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
 	// ->setPoster();
+	 
+	//生成二维码
+	/**
+	 * [Qr description]
+     * @Author lang
+     * @Date   2020-10-14T10:59:28+0800
+     * @param  [type]                   $text         [二维码包含的内容，可以是链接、文字、json字符串等等]
+     * @param  [type]                   $outfile      [默认为false，不生成文件，只将二维码图片返回输出；否则需要给出存放生成二维码图片的文件名及路径]
+     * @param  [type]                   $level        [容错级别，默认为L]
+     *      可传递的值分别是L(QR_ECLEVEL_L，7%)、M(QR_ECLEVEL_M，15%)、Q(QR_ECLEVEL_Q，25%)、H(QR_ECLEVEL_H，30%)。
+     *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
+     * @param  [type]                   $size         [控制生成图片的大小，默认为4]
+     * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
+     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @return [type]                                 [description]
+	 */
+	# 静态调用
+	// $result = PosterManager::poster()->Qr('http://www.baidu.com','poster/1.png');
+	# 实例化调用
+	// $PosterManager = new PosterManager();
+	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

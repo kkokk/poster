@@ -6,7 +6,7 @@ use Kkokk\Poster\Lang\PosterAbstract;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:49:51
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-22 10:48:51
+ * @Last Modified time: 2020-10-14 14:44:55
  */
 /**
  * 
@@ -86,6 +86,43 @@ class AbstractTest extends PosterAbstract
 		
 		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family);
 		return $this;
+	}
+
+	/**
+	 * [buildQr description] 合成二维码
+	 * @Author lang
+	 * @Date   2020-10-14T12:14:06+0800
+	 * @param  [type]                   $text   [内容]
+	 * @param  integer                  $dst_x  [目标位置x]
+	 * @param  integer                  $dst_y  [目标位置y]
+	 * @param  integer                  $src_x  [自身位置x]
+	 * @param  integer                  $src_y  [自身位置y]
+	 * @param  integer                  $size   [大小]
+	 * @param  integer                  $margin [百变大小]
+	 * @return [type]                           [description]
+	 */
+	public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$size=4,$margin=1){
+		$this->CopyQr($text,$size,$margin,$dst_x,$dst_y,$src_x,$src_y);
+		return $this;
+	}
+
+	/**
+	 * [Qr description]
+     * @Author lang
+     * @Date   2020-10-14T10:59:28+0800
+     * @param  [type]                   $text         [二维码包含的内容，可以是链接、文字、json字符串等等]
+     * @param  [type]                   $outfile      [默认为false，不生成文件，只将二维码图片返回输出；否则需要给出存放生成二维码图片的文件名及路径]
+     * @param  [type]                   $level        [容错级别，默认为L]
+     *      可传递的值分别是L(QR_ECLEVEL_L，7%)、M(QR_ECLEVEL_M，15%)、Q(QR_ECLEVEL_Q，25%)、H(QR_ECLEVEL_H，30%)。
+     *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
+     * @param  [type]                   $size         [控制生成图片的大小，默认为4]
+     * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
+     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @return []                                     [description]
+	 */
+	public function Qr($text,$outfile=false,$level='L',$size=4,$margin=1,$saveandprint=0)
+	{
+		return $this->creatQr($text,$outfile,$level,$size,$margin,$saveandprint);
 	}
 
 	/**

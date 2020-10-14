@@ -1,12 +1,13 @@
 <?php
 namespace Kkokk\Poster\Lang;
+require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
 use Kkokk\Poster\Exception\PosterException;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-09-22 11:30:26
+ * @Last Modified time: 2020-10-14 14:45:15
  */
 
 /**
@@ -36,6 +37,8 @@ abstract class PosterAbstract
 	abstract public function buildImDst($src,$w=0,$h=0);
 	abstract public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal');
 	abstract public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='');
+    abstract public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$size=4,$margin=1);
+    abstract public function Qr($text,$outfile=false,$level='L',$size=4,$margin=1,$saveandprint=0);
 	abstract public function getPoster();
 	abstract public function setPoster();
 
@@ -493,6 +496,92 @@ abstract class PosterAbstract
 
         imagettftext ($this->im, $font, 0, $dst_x, $dst_y+$font, $color, $font_family, $contents);
 	}
+
+    /**
+     * [CopyQr description]
+     * @Author lang
+     * @Date   2020-10-14T14:40:51+0800
+     * @param  [type]                   $text   [description]
+     * @param  [type]                   $size   [description]
+     * @param  [type]                   $margin [description]
+     * @param  [type]                   $dst_x  [description]
+     * @param  [type]                   $dst_y  [description]
+     * @param  [type]                   $src_x  [description]
+     * @param  [type]                   $src_y  [description]
+     */
+    protected function CopyQr($text,$size,$margin,$dst_x,$dst_y,$src_x,$src_y){
+        
+        $result = \QRcode::re_png($text,$size,$margin);
+        $bgWidth = imagesx($result);
+        $bgHight = imagesy($result);
+        # 处理目标 x 轴
+        if ($dst_x === 'center') {
+
+            $dst_x = ceil(($this->im_w - $bgWidth) / 2);
+
+        }elseif (is_numeric($dst_x)&&$dst_x<0) {
+
+            $dst_x = ceil($this->im_w+$dst_x);
+
+        }elseif (strpos($dst_x, "%")!==false) {
+
+            if (substr($dst_x, 0,strpos($dst_x, "%"))<0) {
+
+                $dst_x = ceil($this->im_w+($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100));
+
+            }else{
+
+                $dst_x = ceil($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100);
+
+            }
+            
+
+        }
+
+        # 处理目标 y 轴
+        if ( $dst_y === 'center') {
+
+            $dst_y = ceil(($this->im_h - $bgHight) / 2);
+        }elseif (is_numeric($dst_y)&&$dst_y<0) {
+            t;
+
+            $dst_y = ceil($this->im_h+$dst_y);
+
+        }elseif (strpos($dst_y, "%")!==false) {
+            
+            if (substr($dst_y, 0,strpos($dst_y, "%"))<0) {
+
+                $dst_y = ceil($this->im_h+(($this->im_h * substr($dst_y, 0,strpos($dst_y, "%")))/100));
+
+            }else{
+                $dst_y = ceil($this->im_h * substr($dst_y, 0,strpos($dst_y, "%"))/100);
+            }
+            
+        }
+         //整合海报
+        imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
+    }
+
+    /**
+     * [creatQr description]
+     * @Author lang
+     * @Date   2020-10-14T10:59:28+0800
+     * @param  [type]                   $text         [二维码包含的内容，可以是链接、文字、json字符串等等]
+     * @param  [type]                   $outfile      [默认为false，不生成文件，只将二维码图片返回输出；否则需要给出存放生成二维码图片的文件名及路径]
+     * @param  [type]                   $level        [容错级别，默认为L]
+     *      可传递的值分别是L(QR_ECLEVEL_L，7%)、M(QR_ECLEVEL_M，15%)、Q(QR_ECLEVEL_Q，25%)、H(QR_ECLEVEL_H，30%)。
+     *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
+     * @param  [type]                   $size         [控制生成图片的大小，默认为4]
+     * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
+     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @return []                                     [description]
+     */
+    protected function creatQr($text,$outfile,$level,$size,$margin,$saveandprint){
+        if ($outfile) {
+            $outfile = $this->path.$outfile;
+        }
+        return \QRcode::png($text,$outfile,$level,$size,$margin,$saveandprint);
+    }
 
 	/**
 	 * 释放资源
