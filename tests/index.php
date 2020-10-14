@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-10-14 14:53:07
+ * @Last Modified time: 2020-10-14 15:48:05
 
 
  */
@@ -83,7 +83,7 @@ try {
 	
 	# 静态调用
 	// 合成图片
-	// $result = PosterManager::poster('poster/poster_user')
+	// $result = PosterManager::Poster('poster/poster_user')
 	// ->buildIm(638,826,[255,255,255,127],false)
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
@@ -141,7 +141,7 @@ try {
      * @return [type]                                 [description]
 	 */
 	# 静态调用
-	// $result = PosterManager::poster()->Qr('http://www.baidu.com','poster/1.png');
+	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
 	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
