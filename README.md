@@ -9,9 +9,9 @@ lang
 
 #### 安装教程
 
-1.  composer require kkokk\poster
+1.  composer require kkokk/poster
 
-2.  composer update kkokk\poster
+2.  composer update kkokk/poster
 
 #### 使用说明
 
