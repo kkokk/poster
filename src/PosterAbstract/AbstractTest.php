@@ -6,7 +6,7 @@ use Kkokk\Poster\Lang\PosterAbstract;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:49:51
  * @Last Modified by:   lang
- * @Last Modified time: 2020-10-14 14:44:55
+ * @Last Modified time: 2020-12-11 18:46:21
  */
 /**
  * 
@@ -101,8 +101,8 @@ class AbstractTest extends PosterAbstract
 	 * @param  integer                  $margin [百变大小]
 	 * @return [type]                           [description]
 	 */
-	public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$size=4,$margin=1){
-		$this->CopyQr($text,$size,$margin,$dst_x,$dst_y,$src_x,$src_y);
+	public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$size=4,$margin=1){
+		$this->CopyQr($text,$size,$margin,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h);
 		return $this;
 	}
 
