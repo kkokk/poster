@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:07:58
  * @Last Modified by:   lang
- * @Last Modified time: 2020-10-14 15:50:25
+ * @Last Modified time: 2021-01-13 16:57:46
 
 
  */
@@ -116,7 +116,7 @@ try {
 	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
 	->buildText('长按识别',497,720,15,[153, 153, 153, 1])
 	->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
-	->buildQr('http://www.baidu.com',37,692,0,0,4,1)
+	->buildQr('http://www.baidu.com',37,692,0,0,0,0,4,1)
 	->getPoster();
 
 	//给图片添加水印
