@@ -16,11 +16,11 @@ lang
 #### 使用说明
 
 1.   *
-	 [buildIm 创建画布] 
-	 $w     [ 画布宽 ] 
-	 $h     [ 画布高 ] 
-	 $rgba  [ 颜色rbga，[255,255,255,1] ] 
-	 $alpha [ 是否透明，是：true ] 
+	 * [buildIm 创建画布] 
+	 * $w     [ 画布宽 ] 
+	 * $h     [ 画布高 ] 
+	 * $rgba  [ 颜色rbga，[255,255,255,1] ] 
+	 * $alpha [ 是否透明，是：true ] 
 	 
 2.   * [buildImDst 创建指定图片为画布] 
 	 * [source]                   $src   [ 图像资源 ] 
