@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2020-12-11 18:42:10
+ * @Last Modified time: 2021-09-06 14:55:47
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -450,7 +450,7 @@ class Base
         if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new); 
     }
 
-    protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family=''){
+    protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family='',$weight=1){
 
         if(empty($content)) return true;
 
@@ -488,7 +488,9 @@ class Base
             $dst_x = ceil(($this->im_w - $fontBox[2]) / 2);
         }
 
-        imagettftext ($this->im, $font, 0, $dst_x, $dst_y+$font, $color, $font_family, $contents);
+        for ($i=0; $i < $weight; $i++) { 
+            imagettftext ($this->im, $font, 0, $dst_x, $dst_y+$font, $color, $font_family, $contents);
+        }
     }
 
     /**
