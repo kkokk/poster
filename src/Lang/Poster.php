@@ -5,7 +5,8 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2020-12-11 18:42:16
+ * @Last Modified time: 2021-09-08 10:25:49
+ * 接口模式
  */
 use Kkokk\Poster\Interfaces\MyPoster;
 
@@ -69,6 +70,29 @@ class Poster extends Base implements MyPoster
 	}
 
 	/**
+	 * buildImageArr 批量合成图片
+	 * @Author lang
+	 * @Date   2021-09-06T14:37:26+0800
+	 * @param  array                    $arr 单个合成图片的所有参数组合成数组，
+	 * @return [type]                        [description]
+	 */
+	public function buildImageMany($arr = [])
+	{	
+		foreach ($arr as $key => $value) {
+			$value['dst_x'] = $value['dst_x']??0;
+			$value['dst_y'] = $value['dst_y']??0;
+			$value['src_x'] = $value['src_x']??0;
+			$value['src_y'] = $value['src_y']??0;
+			$value['src_w'] = $value['src_w']??0;
+			$value['src_h'] = $value['src_h']??0;
+			$value['alpha'] = $value['alpha']??false;
+			$value['type']  = $value['type']??'normal';
+			$this->CopyImage($value['src'],$value['dst_x'],$value['dst_y'],$value['src_x'],$value['src_y'],$value['src_w'],$value['src_h'],$value['alpha'],$value['type']);
+		}
+		return $this;
+	}
+
+	/**
 	 * [buildText description] 合成文字
 	 * @Author   lang
 	 * @DateTime 2020-08-14T22:09:20+0800
@@ -79,12 +103,35 @@ class Poster extends Base implements MyPoster
 	 * @param    array                    $rgba        [description]
 	 * @param    integer                  $max_w       [description]
 	 * @param    string                   $font_family [description]
+	 * @param    integer                  $weight      粗细
 	 * @return   [type]                                [description]
 	 */
-	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='')
+	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1)
 	{
 
-		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family);
+		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight);
+		return $this;
+	}
+
+	/**
+	 * [buildTextArr 批量合成文字
+	 * @Author lang
+	 * @Date   2021-09-06T14:35:54+0800
+	 * @param  array                    $arr 单个合成的所有字段，键值对
+	 * @return [type]                        [description]
+	 */
+	public function buildTextMany($arr = [])
+	{
+		foreach ($arr as $key => $value) {
+			$value['dst_x'] = $value['dst_x']??0;
+			$value['dst_y'] = $value['dst_y']??0;
+			$value['font']  = $value['font']??0;
+			$value['rgba']  = $value['rgba']??[];
+			$value['max_w'] = $value['max_w']??0;
+			$value['font_family'] = $value['font_family']??'';
+			$value['weight']  = $value['weight']??1;
+			$this->CopyText($value['content'],$value['dst_x'],$value['dst_y'],$value['font'],$value['rgba'],$value['max_w'],$value['font_family'],$value['weight']);
+		}
 		return $this;
 	}
 
@@ -103,6 +150,21 @@ class Poster extends Base implements MyPoster
 	 */
 	public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$size=4,$margin=1){
 		$this->CopyQr($text,$size,$margin,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h);
+		return $this;
+	}
+
+	public function buildQrMany($arr = []){
+		foreach ($arr as $key => $value) {
+			$value['dst_x']  = $value['dst_x']??0;
+			$value['dst_y']  = $value['dst_y']??0;
+			$value['src_x']  = $value['src_x']??0;
+			$value['src_y']  = $value['src_y']??[];
+			$value['src_w']  = $value['src_w']??0;
+			$value['src_h']  = $value['src_h']??0;
+			$value['size']   = $value['size']??4;
+			$value['margin'] = $value['margin']??1;
+			$this->CopyQr($value['text'],$value['size'],$value['margin'],$value['dst_x'],$value['dst_y'],$value['src_x'],$value['src_y'],$value['src_w'],$value['src_h']);
+		}
 		return $this;
 	}
 	/**

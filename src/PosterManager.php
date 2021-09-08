@@ -7,7 +7,7 @@ namespace Kkokk\Poster;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2020-08-17 14:06:33
+ * @Last Modified time: 2021-09-08 10:23:08
  */
 use Kkokk\Poster\Exception\SystemException;
 use Kkokk\Poster\Interfaces\MyPoster;
@@ -89,7 +89,7 @@ class PosterManager
 
         if (!isset(self::$connector)) {
 
-            $className = false !== strpos($type, '\\') ? $type :  __NAMESPACE__.'\\PosterAbstract\\' .$type;
+            $className = false !== strpos($type, '\\') ? $type :  __NAMESPACE__.'\\Lang\\' .$type;
 
             if (!class_exists($className)) {
                 throw new SystemException("the class name does not exist . class : {$type}");
