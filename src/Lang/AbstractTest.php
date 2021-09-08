@@ -1,12 +1,12 @@
 <?php
-namespace Kkokk\Poster\PosterAbstract;
-use Kkokk\Poster\Lang\PosterAbstract;
+namespace Kkokk\Poster\Lang;
+use Kkokk\Poster\Abstracts\PosterAbstract;
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:49:51
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-06 14:55:16
+ * @Last Modified time: 2021-09-08 10:31:06
  */
 /**
  * 

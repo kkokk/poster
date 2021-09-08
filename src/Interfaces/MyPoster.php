@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Interfaces;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 10:38:17
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-06 14:55:30
+ * @Last Modified time: 2021-09-06 14:46:42
  */
 
 interface MyPoster{

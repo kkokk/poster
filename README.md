@@ -39,9 +39,15 @@ lang
 	 * @param number                   $src_w  图片自定义宽，默认原宽  
 	 * @param number                   $src_h  图片自定义高，默认原高  
 	 * @param boolean                  $alpha  是否透明，true：是  
-      * @param string                   $type   图片变形类型，正常形状：'normal'，圆形：'circle'   
+     * @param string                   $type   图片变形类型，正常形状：'normal'，圆形：'circle'   
 
-4.   * buildQr description 合成二维码
+4.   * buildImageMany 批量合成图片
+     * 二维数组，格式对应单个合成图片
+     *      [
+                ['src'=>'','dst_x'=>'','dst_y'=>'','src_x'=>'','src_y'=>'','src_w'=>'','src_h'=>'','alpha'=>'','type'=>'']
+            ]
+        
+5.   * buildQr 合成二维码
 	 * @param string                   $text    内容，例如：http://www.520yummy.com 
 	 * @param integer                  $dst_x   画布位置x 特殊值 center 居中 支持百分比20% 支持自定义  支持正负  
 	 * @param integer                  $dst_y   画布位置y 特殊值 center 居中 支持百分比20% 支持自定义  支持正负  
@@ -52,7 +58,13 @@ lang
 	 * @param integer                  $size    大小，默认4 
 	 * @param integer                  $margin  百变大小，默认1 
 
-5.   * buildText 合成文字 
+6.   * buildQrMany 合成二维码
+	 * 二维数组，格式对应单个合成二维码
+	 *      [
+	            ['text'=>'','dst_x'=>'','dst_y'=>'','src_x'=>'','src_y'=>'','src_w'=>'','src_h'=>'','size'=>'','margin'=>'']
+	        ]
+
+7.   * buildText 合成文字 
 	 * @param string                   $content      文字内容
 	 * @param integer                  $dst_x        画布位置x，默认0  
 	 * @param integer                  $dst_y        画布位置y，默认0 
@@ -61,12 +73,18 @@ lang
 	 * @param integer                  $max_w        最大换行宽度，默认0  
 	 * @param string                   $font_family  字体，可不填，有默认 (相对路径为项目根目录) 
 
-6.   * getPoster 获取合成后图片文件地址
+8.   * buildTextMany 合成文字 
+	 * 二维数组，格式对应单个合成文字
+	 *      [   
+	            ['content'=>'','dst_x'=>'','dst_y'=>'','font'=>'','rgba'=>'','max_w'=>'','font_family'=>'']
+	        ]
+
+9.   * getPoster 获取合成后图片文件地址
 	 * @param @return   array                   返回文件地址 
 
-7.   * setPoster 处理图片，需要传原图片
+10.   * setPoster 处理图片，需要传原图片
 
-8.   * Qr 生成二维码
+11.   * Qr 生成二维码
      * @param string                   $text          二维码包含的内容，可以是链接、文字、json字符串等等 
      * @param boolean|string           $outfile       默认为false，不生成文件，只将二维码图片返回输出；否则需要给出存放生成二维码图片的文件名及路径 
      * @param string                   $level         容错级别，默认为L， 可传递的值分别是L(QR_ECLEVEL_L，7%)、M(QR_ECLEVEL_M，15%)、Q(QR_ECLEVEL_Q，25%)、H(QR_ECLEVEL_H，30%)。这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别  

@@ -5,7 +5,8 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-06 14:54:41
+ * @Last Modified time: 2021-09-08 10:25:49
+ * 接口模式
  */
 use Kkokk\Poster\Interfaces\MyPoster;
 
