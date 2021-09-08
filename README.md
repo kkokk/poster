@@ -58,7 +58,7 @@ lang
 	 * @param integer                  $size    大小，默认4 
 	 * @param integer                  $margin  百变大小，默认1 
 
-6.   * buildQrMany 合成二维码
+6.   * buildQrMany 批量合成二维码
 	 * 二维数组，格式对应单个合成二维码
 	 *      [
 	            ['text'=>'','dst_x'=>'','dst_y'=>'','src_x'=>'','src_y'=>'','src_w'=>'','src_h'=>'','size'=>'','margin'=>'']
@@ -73,7 +73,7 @@ lang
 	 * @param integer                  $max_w        最大换行宽度，默认0  
 	 * @param string                   $font_family  字体，可不填，有默认 (相对路径为项目根目录) 
 
-8.   * buildTextMany 合成文字 
+8.   * buildTextMany 批量合成文字 
 	 * 二维数组，格式对应单个合成文字
 	 *      [   
 	            ['content'=>'','dst_x'=>'','dst_y'=>'','font'=>'','rgba'=>'','max_w'=>'','font_family'=>'']
