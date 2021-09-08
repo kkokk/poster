@@ -72,11 +72,12 @@ lang
 	 * @param array                    $rgba         颜色rbga，255,255,255,1]  
 	 * @param integer                  $max_w        最大换行宽度，默认0  
 	 * @param string                   $font_family  字体，可不填，有默认 (相对路径为项目根目录) 
+	 * @param int                      $weight       字体粗细 0
 
 8.   * buildTextMany 批量合成文字 
 	 * 二维数组，格式对应单个合成文字
 	 *      [   
-	            ['content'=>'','dst_x'=>'','dst_y'=>'','font'=>'','rgba'=>'','max_w'=>'','font_family'=>'']
+	            ['content'=>'','dst_x'=>'','dst_y'=>'','font'=>'','rgba'=>'','max_w'=>'','font_family'=>'','weight'=>0]
 	        ]
 
 9.   * getPoster 获取合成后图片文件地址
