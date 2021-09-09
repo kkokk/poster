@@ -6,7 +6,7 @@ use Kkokk\Poster\Abstracts\PosterAbstract;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:49:51
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-08 10:31:06
+ * @Last Modified time: 2021-09-09 10:35:19
  */
 /**
  * 
@@ -104,10 +104,10 @@ class AbstractTest extends PosterAbstract
 	 * @param    string                   $font_family [description]
 	 * @return   [type]                                [description]
 	 */
-	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1)
+	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1,$space=0)
 	{
 		
-		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight);
+		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight,$space);
 		return $this;
 	}
 

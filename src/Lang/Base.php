@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-08 10:54:48
+ * @Last Modified time: 2021-09-09 10:19:35
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -450,11 +450,11 @@ class Base
         if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new); 
 	}
 
-	protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family='',$weight=1){
+	protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family='',$weight=1,$space=0){
 
         $font = ($font*3)/4; // px 转化为 pt
 
-        if(empty($content)) return true;
+        if($content=='') return true;
 
 		$font_family = !empty($font_family)?$this->path.$font_family:$this->font_family;
 
@@ -496,10 +496,31 @@ class Base
             }
         }
 
+        # 自定义间距
+        if($space>0){
 
-        for ($i=0; $i < $weight; $i++) { 
-            imagettftext ($this->im, $font, 0, $dst_x+($i*0.25), $dst_y+$font+($i*0.25), $color, $font_family, $contents);
+            $dst_x_old = $dst_x;
+            for ($j=0; $j < mb_strlen($contents); $j++) { 
+                
+                if(mb_substr($contents, $j, 1)=="\n"){
+                    $dst_x = $dst_x_old;
+                    $dst_y += 2 * $font;
+                    continue;
+                }
+                for ($i=0; $i < $weight; $i++) { 
+                    imagettftext ($this->im, $font, 0, $dst_x+($i*0.25), $dst_y+$font+($i*0.25), $color, $font_family, mb_substr($contents, $j, 1));
+                }
+                $dst_x += $space;
+            }
+
+
+        }else{
+            for ($i=0; $i < $weight; $i++) { 
+                imagettftext ($this->im, $font, 0, $dst_x+($i*0.25), $dst_y+$font+($i*0.25), $color, $font_family, $contents);
+            }
         }
+
+        
 	}
 
     /**

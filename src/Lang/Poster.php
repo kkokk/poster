@@ -5,7 +5,7 @@ namespace Kkokk\Poster\Lang;
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:18:03
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-08 10:25:49
+ * @Last Modified time: 2021-09-09 10:33:59
  * 接口模式
  */
 use Kkokk\Poster\Interfaces\MyPoster;
@@ -35,11 +35,11 @@ class Poster extends Base implements MyPoster
 	 * [buildImDst description] 创建指定图片为画布
 	 * @Author   lang
 	 * @DateTime 2020-08-15T11:14:48+0800
-	 * @param    [src]                    $src   [description] 图像资源
-	 * @param    integer                  $w     [description]
-	 * @param    integer                  $h     [description]
-	 * @param    array                    $rgba  [description]
-	 * @param    boolean                  $alpha [description]
+	 * @param    [src]                    $src   图像资源
+	 * @param    integer                  $w     宽
+	 * @param    integer                  $h     高
+	 * @param    array                    $rgba  颜色[255,255,255,1]
+	 * @param    boolean                  $alpha 是否透明
 	 * @return   [type]                          [description]
 	 */
 	public function buildImDst($src,$w=0,$h=0){
@@ -51,16 +51,16 @@ class Poster extends Base implements MyPoster
 	 * [buildImage description] 合成图片
 	 * @Author   lang
 	 * @DateTime 2020-08-14T20:56:54+0800
-	 * @param    [type]                   $src   [description]
-	 * @param    integer                  $dst_x [description]
-	 * @param    integer                  $dst_y [description]
-	 * @param    integer                  $src_x [description]
-	 * @param    integer                  $src_y [description]
-	 * @param    integer                  $src_w [description]
-	 * @param    integer                  $src_h [description]
-	 * @param    string                   $type  [description]
-	 * @param    boolean                  $alpha [description] 透明
-	 * @return   [type]                          [description]
+	 * @param    string                   $src   图像资源
+	 * @param    integer                  $dst_x 从画布x轴开始绘制
+	 * @param    integer                  $dst_y 从画布y轴开始绘制
+	 * @param    integer                  $src_x 从自身x轴开始绘制
+	 * @param    integer                  $src_y 从自身y轴开始绘制
+	 * @param    integer                  $src_w 自定义宽度
+	 * @param    integer                  $src_h 自定义高度
+	 * @param    boolean                  $alpha 透明 true
+	 * @param    string                   $type  不改变形状normal 圆形circle
+	 * @return   [type]                          
 	 */
 	public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal')
 	{
@@ -96,20 +96,21 @@ class Poster extends Base implements MyPoster
 	 * [buildText description] 合成文字
 	 * @Author   lang
 	 * @DateTime 2020-08-14T22:09:20+0800
-	 * @param    [type]                   $content     [description]
-	 * @param    integer                  $dst_x       [description]
-	 * @param    integer                  $dst_y       [description]
-	 * @param    integer                  $font        [description]
-	 * @param    array                    $rgba        [description]
-	 * @param    integer                  $max_w       [description]
-	 * @param    string                   $font_family [description]
+	 * @param    [type]                   $content     文字内容
+	 * @param    integer                  $dst_x       x轴位置
+	 * @param    integer                  $dst_y       y轴位置
+	 * @param    integer                  $font        字体大小
+	 * @param    array                    $rgba        颜色
+	 * @param    integer                  $max_w       自定义换行宽度
+	 * @param    string                   $font_family 字体
 	 * @param    integer                  $weight      粗细
+	 * @param    integer                  $space       字间距
 	 * @return   [type]                                [description]
 	 */
-	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1)
+	public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1,$space=0)
 	{
 
-		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight);
+		$this->CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight,$space);
 		return $this;
 	}
 
@@ -130,7 +131,8 @@ class Poster extends Base implements MyPoster
 			$value['max_w'] = $value['max_w']??0;
 			$value['font_family'] = $value['font_family']??'';
 			$value['weight']  = $value['weight']??1;
-			$this->CopyText($value['content'],$value['dst_x'],$value['dst_y'],$value['font'],$value['rgba'],$value['max_w'],$value['font_family'],$value['weight']);
+			$value['space']  = $value['space']??0;
+			$this->CopyText($value['content'],$value['dst_x'],$value['dst_y'],$value['font'],$value['rgba'],$value['max_w'],$value['font_family'],$value['weight'],$value['space']);
 		}
 		return $this;
 	}
@@ -153,6 +155,13 @@ class Poster extends Base implements MyPoster
 		return $this;
 	}
 
+	/**
+	 * buildQrMany 批量合成二维码
+	 * @Author lang
+	 * @Date   2021-09-09T10:33:24+0800
+	 * @param  array                    $arr 参数与合成二维码对应
+	 * @return [type]                        [description]
+	 */
 	public function buildQrMany($arr = []){
 		foreach ($arr as $key => $value) {
 			$value['dst_x']  = $value['dst_x']??0;
