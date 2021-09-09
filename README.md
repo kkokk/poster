@@ -87,9 +87,9 @@ lang
 9.   * getPoster 获取合成后图片文件地址
 	 * @param @return   array                   返回文件地址 
 
-10.   * setPoster 处理图片，需要传原图片
+10.  * setPoster 处理图片，需要传原图片
 
-11.   * Qr 生成二维码
+11.  * Qr 生成二维码
      * @param string                   $text          二维码包含的内容，可以是链接、文字、json字符串等等 
      * @param boolean|string           $outfile       默认为false，不生成文件，只将二维码图片返回输出；否则需要给出存放生成二维码图片的文件名及路径 
      * @param string                   $level         容错级别，默认为L， 可传递的值分别是L(QR_ECLEVEL_L，7%)、M(QR_ECLEVEL_M，15%)、Q(QR_ECLEVEL_Q，25%)、H(QR_ECLEVEL_H，30%)。这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别  
