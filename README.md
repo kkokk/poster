@@ -50,12 +50,12 @@ $poster->buildIm($w,$h,$rgba,$alpha); # 创建画布
 
 参数说明
 
-| 变量   | 类型    | 必填 | 注释                     |
-| ------ | ------- | ---- | ------------------------ |
-| $w     | number  | 是   | 画布宽                   |
-| $h     | number  | 是   | 画布高                   |
-| $rgba  | array   | 否   | 颜色rbga,[255,255,255,1] |
-| $alpha | boolean | 否   | 是否透明，是：true       |
+| 变量  | 类型    | 必填 | 注释                     |
+| ----- | ------- | ---- | ------------------------ |
+| w     | number  | 是   | 画布宽                   |
+| h     | number  | 是   | 画布高                   |
+| rgba  | array   | 否   | 颜色rbga,[255,255,255,1] |
+| alpha | boolean | 否   | 是否透明，是：true       |
 
 ##### **创建指定图片为画布**
 
@@ -65,13 +65,13 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 
 参数说明
 
-| 变量   | 类型    | 必填 | 注释                      |
-| ------ | ------- | ---- | ------------------------- |
-| $src   | source  | 是   | 图像资源                  |
-| $w     | number  | 否   | 画布宽，默认原图宽        |
-| $h     | number  | 否   | 画布高，默认原图高        |
-| $rgba  | array   | 否   | 颜色rbga，[255,255,255,1] |
-| $alpha | boolean | 否   | 是否透明，默认false       |
+| 变量  | 类型    | 必填 | 注释                      |
+| ----- | ------- | ---- | ------------------------- |
+| src   | source  | 是   | 图像资源                  |
+| w     | number  | 否   | 画布宽，默认原图宽        |
+| h     | number  | 否   | 画布高，默认原图高        |
+| rgba  | array   | 否   | 颜色rbga，[255,255,255,1] |
+| alpha | boolean | 否   | 是否透明，默认false       |
 
 ##### **合成图片**
 
@@ -81,17 +81,17 @@ $poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type)
 
 参数说明
 
-| 变量   | 类型           | 必填 | 注释                                                         |
-| ------ | -------------- | ---- | ------------------------------------------------------------ |
-| $src   | string         | 是   | 路径，支持网络图片（带http或https）                          |
-| $dst_x | number\|string | 否   | 目标x轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| $dst_y | number\|string | 否   | 目标y轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| $src_x | number         | 否   | 图片x轴，默认0                                               |
-| $src_y | number         | 否   | 图片y轴，默认0                                               |
-| $src_w | number         | 否   | 图片自定义宽，默认原宽                                       |
-| $src_h | number         | 否   | 图片自定义高，默认原高                                       |
-| $alpha | boolean        | 否   | 是否透明，true：是                                           |
-| $type  | string         | 否   | 图片变形类型，正常形状：'normal'，圆形：'circle' ，默认normal |
+| 变量  | 类型           | 必填 | 注释                                                         |
+| ----- | -------------- | ---- | ------------------------------------------------------------ |
+| src   | string         | 是   | 路径，支持网络图片（带http或https）                          |
+| dst_x | number\|string | 否   | 目标x轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| dst_y | number\|string | 否   | 目标y轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| src_x | number         | 否   | 图片x轴，默认0                                               |
+| src_y | number         | 否   | 图片y轴，默认0                                               |
+| src_w | number         | 否   | 图片自定义宽，默认原宽                                       |
+| src_h | number         | 否   | 图片自定义高，默认原高                                       |
+| alpha | boolean        | 否   | 是否透明，true：是                                           |
+| type  | string         | 否   | 图片变形类型，正常形状：'normal'，圆形：'circle' ，默认normal |
 
 ##### **批量合成图片**
 
@@ -122,17 +122,17 @@ $poster->buildQr($text,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$size,$margin);
 
 参数说明
 
-| 变量    | 类型           | 必填 | 注释                                                         |
-| ------- | -------------- | ---- | ------------------------------------------------------------ |
-| $text   | string         | 是   | 内容，例如：http://www.520yummy.com                          |
-| $dst_x  | number\|string | 否   | 画布位置x 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| $dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| $src_x  | number         | 否   | 图片x轴，默认0                                               |
-| $src_y  | number         | 否   | 图片y轴，默认0                                               |
-| $src_w  | number         | 否   | 图片自定义宽，默认原宽                                       |
-| $src_h  | number         | 否   | 图片自定义高，默认原高                                       |
-| $alpha  | integer        | 否   | 大小，默认4                                                  |
-| $margin | integer        | 否   | 白边大小，默认1                                              |
+| 变量   | 类型           | 必填 | 注释                                                         |
+| ------ | -------------- | ---- | ------------------------------------------------------------ |
+| text   | string         | 是   | 内容，例如：http://www.520yummy.com                          |
+| dst_x  | number\|string | 否   | 画布位置x 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| src_x  | number         | 否   | 图片x轴，默认0                                               |
+| src_y  | number         | 否   | 图片y轴，默认0                                               |
+| src_w  | number         | 否   | 图片自定义宽，默认原宽                                       |
+| src_h  | number         | 否   | 图片自定义高，默认原高                                       |
+| alpha  | integer        | 否   | 大小，默认4                                                  |
+| margin | integer        | 否   | 白边大小，默认1                                              |
 
 ##### **批量合成二维码**
 
@@ -163,17 +163,17 @@ $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weigh
 
 参数说明
 
-| 变量         | 类型                  | 必填 | 注释                                                         |
-| ------------ | --------------------- | ---- | ------------------------------------------------------------ |
-| $content     | string                | 是   | 内容，例如：http://www.520yummy.com                          |
-| $dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5] |
-| $dst_y       | number                | 否   | 画布位置y，默认0                                             |
-| $font        | number                | 否   | 字体大小，默认16                                             |
-| $rgba        | number                | 否   | 颜色rbga，[255,255,255,1]                                    |
-| $max_w       | number                | 否   | 最大换行宽度，默认0不换行。达到换行宽度自动换行              |
-| $font_family | number                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
-| $weight      | integer               | 否   | 字体粗细 默认字体大小                                        |
-| $space       | integer               | 否   | 字体间距 默认无                                              |
+| 变量        | 类型                  | 必填 | 注释                                                         |
+| ----------- | --------------------- | ---- | ------------------------------------------------------------ |
+| content     | string                | 是   | 内容，例如：http://www.520yummy.com                          |
+| dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5] |
+| dst_y       | number                | 否   | 画布位置y，默认0                                             |
+| font        | number                | 否   | 字体大小，默认16                                             |
+| rgba        | number                | 否   | 颜色rbga，[255,255,255,1]                                    |
+| max_w       | number                | 否   | 最大换行宽度，默认0不换行。达到换行宽度自动换行              |
+| font_family | number                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
+| weight      | integer               | 否   | 字体粗细 默认字体大小                                        |
+| space       | integer               | 否   | 字体间距 默认无                                              |
 
 ##### 批量合成文字
 
