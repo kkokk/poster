@@ -85,6 +85,17 @@ class Base
 		return $this->returnImage($this->type);
 	}
 
+    /**
+     * @Author lang
+     * @Date   2020-08-14T14:06:27+0800
+     * @return [type]
+     */
+    protected function getStream()
+    {
+        if (empty($this->type)) $this->type='png';
+        return $this->returnImage($this->type,false);
+    }
+
 	/**
 	 * [setData description]
 	 * @Author   lang
@@ -101,20 +112,21 @@ class Base
 	 * @Date   2020-08-14T14:29:57+0800
 	 * @return [type]
 	 */
-	protected function returnImage($type){
+	protected function returnImage($type,$outfile=true){
 
 		if (!isset($this->im)||empty($this->im)) throw new PosterException('没有创建任何资源');
 
-		$this->dirExists($this->pathname);
-		if (strripos($this->filename,".")===false) {
-			$this->filename = $this->filename.'.'.$this->type;
-		}
-		$this->poster_type[$type]($this->im,$this->path.$this->pathname.'/'.$this->filename);
+		if($outfile){
+            $this->dirExists($this->pathname);
+            if (strripos($this->filename,".")===false) {
+                $this->filename = $this->filename.'.'.$this->type;
+            }
+            $this->poster_type[$type]($this->im,$this->path.$this->pathname.'/'.$this->filename);
 
-		# 释放资源
-		// $this->destroyImage($this->im);
+            return ['url'=>$this->pathname.'/'.$this->filename];
+        }
 
-		return ['url'=>$this->pathname.'/'.$this->filename];
+        $this->poster_type[$type]($this->im);
 		
 	}
 
@@ -162,9 +174,9 @@ class Base
 	protected function ImDst($source,$w,$h){
 
 
-		if (!is_file($source)) {
-            throw new PosterException('水印图像不存在');
-        }
+//		if (!is_file($source)) {
+//            throw new PosterException('水印图像不存在');
+//        }
         $this->source = $source;
         //获取水印图像信息
         $info = @getimagesize($source);

@@ -206,6 +206,13 @@ class Poster extends Base implements MyPoster
 		return $this->getData();
 	}
 
+    /**
+     *
+     */
+    public function stream(){
+        return $this->getStream();
+    }
+
 	/**
 	 * [setPoster description] 处理当前图片
 	 * @Author   lang

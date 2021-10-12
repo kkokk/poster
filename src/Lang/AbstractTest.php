@@ -196,6 +196,17 @@ class AbstractTest extends PosterAbstract
 		return $this->getData();
 	}
 
+    /**
+     * [getPoster description] 返回文件流
+     * @Author   lang
+     * @DateTime 2020-08-16T15:45:57+0800
+     * @return   [type]   [description]
+     */
+    public function stream(){
+
+        return $this->getStream();
+    }
+
 	/**
 	 * [setPoster description] 处理当前图片
 	 * @Author   lang

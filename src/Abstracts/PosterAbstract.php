@@ -28,6 +28,7 @@ abstract class PosterAbstract extends Base
     abstract public function Qr($text,$outfile=false,$level='L',$size=4,$margin=1,$saveandprint=0);
 	abstract public function getPoster();
 	abstract public function setPoster();
+	abstract public function stream();
 
 	public function __construct($params = [])
 	{	

@@ -26,4 +26,5 @@ interface MyPoster{
 	public function Qr($text,$outfile=false,$level='L',$size=4,$margin=1,$saveandprint=0);
 	public function getPoster();
 	public function setPoster();
+    public function stream();
 }
