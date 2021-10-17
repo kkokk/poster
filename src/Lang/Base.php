@@ -128,7 +128,7 @@ class Base
 
             return ['url'=>$this->pathname.'/'.$this->filename];
         }
-
+        header('Content-Type:Image/'.$this->type);
         $this->poster_type[$type]($this->im);
 		
 	}
