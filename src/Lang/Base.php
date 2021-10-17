@@ -34,7 +34,10 @@ class Base
 
 
 	public function __construct($params = [])
-	{	
+	{
+        if(!empty($params) && !is_array($params)){
+            $params = [$params];
+        }
 		if (isset($params) && isset($params[0])) {
 			$params[0] = str_replace(['\\','/'], "/", $params[0]);
 			
@@ -51,7 +54,7 @@ class Base
 
 			if (strripos($this->filename,".")!==false) {
 
-				$this->type = substr($this->filename, strripos($this->filename,".")+1);
+				$this->type = $this->type = strtolower(strrev(explode(".", strrev($this->filename))[0]));
 
 				if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
 
