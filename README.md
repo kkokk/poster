@@ -2,7 +2,7 @@
 
 #### 介绍
 
-基于gd库、phparcode
+基于gd库、phpqrcode
 
 PHP海报生成插件，极速生成方便快捷。
 
