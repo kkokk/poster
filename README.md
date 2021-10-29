@@ -31,6 +31,10 @@ lang
 
 文档地址：http://www.520yummy.com/composer/poster/doc.html
 
+演示效果
+
+![输入图片说明](http://img.520yummy.com/images/2/2021/10/pUUkoy7776pu4766Yqs7K3SKj7J77u.png "在这里输入图片标题")
+
 演示地址：暂无
 
 ​	生成签到日历海报、邀请海报
