@@ -602,7 +602,6 @@ class Base
 
             $dst_y = ceil(($this->im_h - $bgHight) / 2);
         }elseif (is_numeric($dst_y)&&$dst_y<0) {
-            t;
 
             $dst_y = ceil($this->im_h+$dst_y);
 
