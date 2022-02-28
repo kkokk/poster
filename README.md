@@ -45,7 +45,7 @@ lang
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
 
-$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径和文件名
+$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径（项目根目录的相对路径）和文件名
 ```
 
 ##### **创建画布** 
