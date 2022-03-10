@@ -2,6 +2,8 @@
 
 #### 介绍
 
+基于gd库、phpqrcode
+
 PHP海报生成插件，极速生成方便快捷。
 
 快速生成海报、生成签到日、生成二维码、合成二维码、图片添加水印
@@ -29,17 +31,21 @@ lang
 
 文档地址：http://www.520yummy.com/composer/poster/doc.html
 
+演示效果
+
+![输入图片说明](https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large "在这里输入图片标题")
+
 演示地址：暂无
 
-​   生成签到日历海报、邀请海报
+​	生成签到日历海报、邀请海报
 
-##### **引用海报生成类**
+##### **引用海报类**
 
 ```php
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
 
-$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径和文件名
+$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径（项目根目录的相对路径）和文件名
 ```
 
 ##### **创建画布** 
@@ -216,6 +222,16 @@ $poster->setPoster(); # 处理图片，需要传原图片
 
 返回说明：处理原图片资源，无返回。
 
+##### 输出图片流
+
+```php
+$poster->stream(); # 输出图片流
+```
+
+参数说明：无。
+
+返回说明：返回文件流，可输出到浏览器或img标签。
+
 ##### 生成二维码
 
 ```php
@@ -244,28 +260,28 @@ use Kkokk\Poster\Exception\Exception;
 # 合成图片
 try {
     $addImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
-    $result = PosterManager::Poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
-    ->buildIm(638,826,[255,255,255,127],false)
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-    ->buildImage($addImage,253,326,0,0,131,131,false,'circle')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-    ->buildText('苏 轼','center',477,16,[51, 51, 51,1])
-    ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
-    ->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
-    ->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
-    ->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
-    ->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
-    ->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
-    ->buildText('长按识别',497,720,15,[53, 153, 153, 1])
-    ->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
-    ->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
-    ->getPoster();
+	$result = PosterManager::Poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
+	->buildIm(638,826,[255,255,255,127],false)
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
+	->buildImage($addImage,253,326,0,0,131,131,false,'circle')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
+	->buildText('苏 轼','center',477,16,[51, 51, 51,1])
+	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
+	->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
+	->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
+	->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
+	->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
+	->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
+	->buildText('长按识别',497,720,15,[53, 153, 153, 1])
+	->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
+	->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
+	->getPoster();
 
-    # 批量合成
-    $buildImageManyArr = [
-        [
-            'src' => 'https://test.acyapi.51acy.com/wechat/poster/top_bg.png'
+	# 批量合成
+	$buildImageManyArr = [
+		[
+        	'src' => 'https://test.acyapi.51acy.com/wechat/poster/top_bg.png'
         ],
         [
             'src' => 'https://test.acyapi.51acy.com/wechat/poster/half_circle.png',
@@ -288,9 +304,9 @@ try {
             'dst_x' => 0,
             'dst_y' => 655
         ]
-    ];
-    $buildTextManyArr  = [
-        [
+	];
+	$buildTextManyArr  = [
+		[
             'content'=> '苏轼',
             'dst_x' => 'center',
             'dst_y' => 477,
@@ -389,10 +405,10 @@ try {
             'weight' => 1,
             'space'=>20
         ]
-    ];
-    $buildQrManyArr    = [
-        [
-            'text'=>'http://www.520yummy.com',
+	];
+	$buildQrManyArr    = [
+		[
+			'text'=>'http://www.520yummy.com',
             'dst_x'=>37,
             'dst_y'=>692,
             'src_x'=>0,
@@ -401,9 +417,9 @@ try {
             'src_h'=>0,
             'size'=>4,
             'margin'=>1
-        ],
-        [
-            'text'=>'http://www.520yummy.com',
+		],
+		[
+			'text'=>'http://www.520yummy.com',
             'dst_x'=>74,
             'dst_y'=>692,
             'src_x'=>0,
@@ -412,27 +428,27 @@ try {
             'src_h'=>0,
             'size'=>4,
             'margin'=>1
-        ]
-    ];
+		]
+	];
 
-    $result = PosterManager::Poster('poster/poster_user')
-    ->buildIm(638,826,[255,255,255,127],false)
-    ->buildImageMany($buildImageManyArr)
-    ->buildTextMany($buildImageManyArr)
-    ->buildQrMany($buildQrManyArr)
-    ->getPoster();
+	$result = PosterManager::Poster('poster/poster_user')
+	->buildIm(638,826,[255,255,255,127],false)
+	->buildImageMany($buildImageManyArr)
+	->buildTextMany($buildImageManyArr)
+	->buildQrMany($buildQrManyArr)
+	->getPoster();
     
     # 给图片添加水印
     $setImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
-    $result = PosterManager::Poster() //给指定图片添加水印，这里为空就好
-    ->buildImDst(__DIR__.'/test.jpeg')
-    ->buildImage($setImage,'-20%','-20%',0,0,0,0,false)
-    ->setPoster();
+	$result = PosterManager::Poster() //给指定图片添加水印，这里为空就好
+	->buildImDst(__DIR__.'/test.jpeg')
+	->buildImage($setImage,'-20%','-20%',0,0,0,0,false)
+	->setPoster();
 
-    # 生成二维码
-    $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
+	# 生成二维码
+	$result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 } catch (Exception $e){
-    echo $e->getMessage();
+	echo $e->getMessage();
 }
 ```
 
@@ -443,36 +459,36 @@ use Kkokk\Poster\Exception\Exception;
 # 合成图片
 try {
     $addImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
-    $PosterManager = new PosterManager('poster/poster_user'); //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
-    $result = $PosterManager->buildIm(638,826,255,255,255,1]27,false)
-    ->buildIm(638,826,[255,255,255,127],false)
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-    ->buildImage($addImage,253,326,0,0,131,131,false,'circle')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-    ->buildText('苏 轼','center',477,16,[51, 51, 51,1])
-    ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
-    ->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
-    ->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
-    ->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
-    ->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
-    ->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
-    ->buildText('长按识别',497,720,15,[53, 153, 153, 1])
-    ->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
-    ->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
-    ->getPoster();
+	$PosterManager = new PosterManager('poster/poster_user'); //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
+	$result = $PosterManager->buildIm(638,826,255,255,255,1]27,false)
+	->buildIm(638,826,[255,255,255,127],false)
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
+	->buildImage($addImage,253,326,0,0,131,131,false,'circle')
+	->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
+	->buildText('苏 轼','center',477,16,[51, 51, 51,1])
+	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
+	->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
+	->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
+	->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
+	->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
+	->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
+	->buildText('长按识别',497,720,15,[53, 153, 153, 1])
+	->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
+	->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
+	->getPoster();
 
-    # 给图片添加水印
+	# 给图片添加水印
     $setImage = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg';
-    $PosterManager = new PosterManager(); //给指定图片添加水印，这里为空就好
-    $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
-    ->buildImage($setImage,'center','-20%',0,0,0,0,true)
-    ->setPoster();
+	$PosterManager = new PosterManager(); //给指定图片添加水印，这里为空就好
+	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
+	->buildImage($setImage,'center','-20%',0,0,0,0,true)
+	->setPoster();
 
-    # 生成二维码
-    $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
+	# 生成二维码
+	$result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
 
 } catch (Exception $e){
-    echo $e->getMessage();
+	echo $e->getMessage();
 }
 ```
