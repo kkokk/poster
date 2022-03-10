@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2022-03-10 17:51:46
+ * @Last Modified time: 2022-03-10 17:58:41
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -668,6 +668,7 @@ class Base
      */
     protected function creatQr($text,$outfile,$level,$size,$margin,$saveandprint){
         if ($outfile) {
+            $this->setPath($outfile);
             $outfile = $this->path.$outfile;
         }
         return \QRcode::png($text,$outfile,$level,$size,$margin,$saveandprint);
