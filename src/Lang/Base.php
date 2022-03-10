@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2022-03-10 17:12:45
+ * @Last Modified time: 2022-03-10 17:40:49
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -84,7 +84,12 @@ class Base
      */
     private function setPath($pathFileName){
         // 绝对路径 or 相对路径
-        $absolute = stripos($pathFileName,"/")===0?:false;
+        // 区分WIN系统绝对路径
+        if(stripos(PHP_OS,"WIN")!==false){
+            $absolute = $pathFileName[1]===':'?:false;
+        }else{
+            $absolute = stripos($pathFileName,'/')===0?:false;
+        }
         $this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
         $this->path = $absolute?'':($this->path?$this->path.'/':__DIR__.'/../../tests/');
     }
