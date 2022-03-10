@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-09 10:19:35
+ * @Last Modified time: 2022-03-10 17:12:45
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -35,47 +35,59 @@ class Base
 
 	public function __construct($params = [])
 	{
-        if(!empty($params) && !is_array($params)){
-            $params = [$params];
-        }
-		if (isset($params) && isset($params[0])) {
-			$params[0] = str_replace(['\\','/'], "/", $params[0]);
-			
-            if (strripos($params[0],"/")!==false) {
+        $params = is_array($params)?$params:[$params];
+		$pathFileName = $params[0]??'';
+        $pathFileName = str_replace(['\\','/'], "/", $pathFileName);
 
-                $this->pathname = substr($params[0], 0,strripos($params[0],"/"));
-
-                $this->filename = substr($params[0], strripos($params[0],"/")+1);
-
-            }else{
-                $this->filename = $params[0];
-            }
-
-
-			if (strripos($this->filename,".")!==false) {
-
-				$this->type = $this->type = strtolower(strrev(explode(".", strrev($this->filename))[0]));
-
-				if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
-
-					throw new PosterException('The file naming format is incorrect');
-				}
-			}else{
-				$this->filename = $this->filename;
-			}
-
-			
-
-        }else{
-        	if (empty($this->filename)) {
-	        	$this->filename = time();
-	        }
+        $fileName = $pathFileName?:time();
+            
+        if (strripos($pathFileName,"/")!==false) {
+            $this->setPathName($pathFileName);
+            $fileName = substr($pathFileName, strripos($pathFileName,"/")+1);
         }
 
-		$this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
-        $this->path = $this->path?$this->path.'/':__DIR__.'/../../tests/';
-
+        $this->setFileName($fileName);
+        $this->setPath($pathFileName);
 	}
+
+    /**
+     * setFileName 设置文件名
+     * @Author lang
+     * @Date   2022-03-10T15:42:06+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setFileName($fileName){
+        $this->filename = $fileName;
+        if (strripos($this->filename,".")!==false) {
+            $this->type = substr($this->filename, strripos($this->filename,".")+1);
+            if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
+                throw new PosterException('The file naming format is incorrect');
+            }
+        }
+    }
+
+    /**
+     * setPathName 设置目录名
+     * @Author lang
+     * @Date   2022-03-10T15:42:19+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setPathName($pathFileName){
+         $this->pathname = substr($pathFileName, 0,strripos($pathFileName,"/"));
+    }
+
+    /**
+     * setPath 设置文件位置
+     * @Author lang
+     * @Date   2022-03-10T15:42:38+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setPath($pathFileName){
+        // 绝对路径 or 相对路径
+        $absolute = stripos($pathFileName,"/")===0?:false;
+        $this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
+        $this->path = $absolute?'':($this->path?$this->path.'/':__DIR__.'/../../tests/');
+    }
 
 	/**
 	 * @Author lang
