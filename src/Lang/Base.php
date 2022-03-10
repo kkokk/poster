@@ -6,7 +6,7 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2022-03-10 17:40:49
+ * @Last Modified time: 2022-03-10 17:47:19
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
@@ -86,7 +86,7 @@ class Base
         // 绝对路径 or 相对路径
         // 区分WIN系统绝对路径
         if(stripos(PHP_OS,"WIN")!==false){
-            $absolute = $pathFileName[1]===':'?:false;
+            $absolute = substr($pathFileName,0,1)===':'?:false;
         }else{
             $absolute = stripos($pathFileName,'/')===0?:false;
         }
