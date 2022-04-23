@@ -16,6 +16,8 @@ PHP海报生成插件，极速生成方便快捷。
 
 3.新增字体间隔参数
 
+4.保存路径支持绝对路径和相对路径（相对路径默认项目根目录，当不存在时，默认保存到tests/poster）
+
 #### authors
 lang
 732853989@qq.com
@@ -47,7 +49,7 @@ lang
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
 
-$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径和文件名
+$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径（项目根目录的相对路径）和文件名
 ```
 
 ##### **创建画布** 

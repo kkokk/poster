@@ -6,15 +6,15 @@ require_once(__DIR__."/../PHPQrcode/phpqrcode.php");
  * @Email:  732853989@qq.com
  * @Date:   2020-08-14 11:21:08
  * @Last Modified by:   lang
- * @Last Modified time: 2021-09-09 10:19:35
+ * @Last Modified time: 2022-03-10 17:58:52
  */
 use Kkokk\Poster\Exception\PosterException;
 /**
- *
+ * 
  */
 class Base
 {
-
+    
     protected $im;
     protected $im_w;
     protected $im_h;
@@ -35,46 +35,63 @@ class Base
 
     public function __construct($params = [])
     {
-        if(!empty($params) && !is_array($params)){
-            $params = [$params];
+        $params = is_array($params)?$params:[$params];
+        $pathFileName = $params[0]??'';
+        $pathFileName = str_replace(['\\','/'], "/", $pathFileName);
+
+        $fileName = $pathFileName?:time();
+            
+        if (strripos($pathFileName,"/")!==false) {
+            $this->setPathName($pathFileName);
+            $fileName = substr($pathFileName, strripos($pathFileName,"/")+1);
         }
-        if (isset($params) && isset($params[0])) {
-            $params[0] = str_replace(['\\','/'], "/", $params[0]);
 
-            if (strripos($params[0],"/")!==false) {
+        $this->setFileName($fileName);
+        $this->setPath($pathFileName);
+    }
 
-                $this->pathname = substr($params[0], 0,strripos($params[0],"/"));
-
-                $this->filename = substr($params[0], strripos($params[0],"/")+1);
-
-            }else{
-                $this->filename = $params[0];
+    /**
+     * setFileName 设置文件名
+     * @Author lang
+     * @Date   2022-03-10T15:42:06+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setFileName($fileName){
+        $this->filename = $fileName;
+        if (strripos($this->filename,".")!==false) {
+            $this->type = substr($this->filename, strripos($this->filename,".")+1);
+            if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
+                throw new PosterException('The file naming format is incorrect');
             }
+        }
+    }
 
+    /**
+     * setPathName 设置目录名
+     * @Author lang
+     * @Date   2022-03-10T15:42:19+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setPathName($pathFileName){
+         $this->pathname = substr($pathFileName, 0,strripos($pathFileName,"/"));
+    }
 
-            if (strripos($this->filename,".")!==false) {
-
-                $this->type = strtolower(strrev(explode(".", strrev($this->filename))[0]));
-
-                if (!in_array($this->type, ['jpeg','jpg','png','gif','wbmp'])) {
-
-                    throw new PosterException('The file naming format is incorrect');
-                }
-            }else{
-                $this->filename = $this->filename;
-            }
-
-
-
+    /**
+     * setPath 设置文件位置
+     * @Author lang
+     * @Date   2022-03-10T15:42:38+0800
+     * @param  [type]                   $fileName [description]
+     */
+    private function setPath($pathFileName){
+        // 绝对路径 or 相对路径
+        // 区分WIN系统绝对路径
+        if(stripos(PHP_OS,"WIN")!==false){
+            $$absolute = substr($pathFileName,1,1)===':'?:false;
         }else{
-            if (empty($this->filename)) {
-                $this->filename = time();
-            }
+            $absolute = stripos($pathFileName,'/')===0?:false;
         }
-
         $this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
-        $this->path = $this->path?$this->path.'/':__DIR__.'/../../tests/';
-
+        $this->path = $absolute?'':($this->path?$this->path.'/':__DIR__.'/../../tests/');
     }
 
     /**
@@ -83,7 +100,7 @@ class Base
      * @return [type]
      */
     protected function getData()
-    {
+    {   
         if (empty($this->type)) $this->type='png';
         return $this->returnImage($this->type);
     }
@@ -105,7 +122,7 @@ class Base
      * @DateTime 2020-08-16T12:34:34+0800
      */
     protected function setData()
-    {
+    {   
 
         return $this->setImage($this->type);
     }
@@ -130,7 +147,7 @@ class Base
         }
         header('Content-Type:Image/'.$this->type);
         $this->poster_type[$type]($this->im);
-
+        
     }
 
     /**
@@ -177,7 +194,7 @@ class Base
     protected function ImDst($source,$w,$h){
 
 
-//		if (!is_file($source)) {
+//      if (!is_file($source)) {
 //            throw new PosterException('水印图像不存在');
 //        }
         $this->source = $source;
@@ -193,7 +210,7 @@ class Base
         //创建水印图像资源
         $fun   = 'imagecreatefrom' . image_type_to_extension($bgType, false);
         $cut   = $fun($source);
-
+        
         //设定水印图像的混色模式
         imagealphablending($cut, true);
 
@@ -209,7 +226,7 @@ class Base
             $this->im_h = $bgHight;
         }
 
-
+        
         $this->im   = $cut;
     }
 
@@ -288,7 +305,7 @@ class Base
             $fun = "imagecreatefrom".$bgType;
             $pic = @$fun($path.$src);
         }
-
+        
         $bgWidth = !empty($src_w)?$src_w:$Width;
         $bgHight = !empty($src_h)?$src_h:$Hight;
 
@@ -307,18 +324,18 @@ class Base
                     imagecopyresized($circle_new, $pic,0, 0,0, 0,$w_circle_new, $h_circle_new, $Width, $Hight);
                     $pic = $circle_new;
                 }
-
+                
                 break;
             case 'circle':
 
                 $circle        = $this->createIm($bgWidth, $bgHight,[255, 255, 255, 127],$alpha=true);
                 $circle_new    = $this->createIm($bgWidth, $bgHight,[255, 255, 255, 127],$alpha=true);
-
+                
                 $w_circle = $bgWidth;
                 $h_circle = $bgHight;
                 # 按比例缩放
                 imagecopyresized($circle_new, $pic,0, 0,0, 0,$w_circle, $h_circle, $Width, $Hight);
-
+               
                 $r   = ($w_circle / 2 ); //圆半径
                 for ($x = 0; $x < $w_circle; $x++) {
                     for ($y = 0; $y < $h_circle; $y++) {
@@ -356,7 +373,7 @@ class Base
                 $dst_x = ceil($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100);
 
             }
-
+            
 
         }
 
@@ -370,7 +387,7 @@ class Base
             $dst_y = ceil($this->im_h+$dst_y);
 
         }elseif (strpos($dst_y, "%")!==false) {
-
+            
             if (substr($dst_y, 0,strpos($dst_y, "%"))<0) {
 
                 $dst_y = ceil($this->im_h+(($this->im_h * substr($dst_y, 0,strpos($dst_y, "%")))/100));
@@ -378,14 +395,14 @@ class Base
             }else{
                 $dst_y = ceil($this->im_h * substr($dst_y, 0,strpos($dst_y, "%"))/100);
             }
-
+            
         }
 
         //整合海报
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
 
-        if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);
-        if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new);
+        if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);       
+        if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new);       
     }
 
 
@@ -395,7 +412,7 @@ class Base
         }else{
             $path = "";
         }
-
+        
 
         list($Width, $Hight, $bgType) = @getimagesize($path.$src);
         $bgType = image_type_to_extension($bgType, false);
@@ -407,7 +424,7 @@ class Base
             $fun = "imagecreatefrom".$bgType;
             $pic = @$fun($path.$src);
         }
-
+        
 
         $bgWidth = !empty($src_w)?$src_w:$Width;
         $bgHight = !empty($src_h)?$src_h:$Hight;
@@ -429,18 +446,18 @@ class Base
                     imagecopyresized($circle_new, $pic,0, 0,0, 0,$w_circle_new, $h_circle_new, $Width, $Hight);
                     $pic = $circle_new;
                 }
-
+                
                 break;
             case 'circle':
 
                 $circle        = $this->createIm($bgWidth, $bgHight,[255, 255, 255, 127],$alpha=true);
                 $circle_new    = $this->createIm($bgWidth, $bgHight,[255, 255, 255, 127],$alpha=true);
-
+                
                 $w_circle = $bgWidth;
                 $h_circle = $bgHight;
                 # 按比例缩放
                 imagecopyresized($circle_new, $pic,0, 0,0, 0,$w_circle, $h_circle, $Width, $Hight);
-
+               
                 $r   = ($w_circle / 2 ); //圆半径
                 for ($x = 0; $x < $w_circle; $x++) {
                     for ($y = 0; $y < $h_circle; $y++) {
@@ -461,8 +478,8 @@ class Base
         //整合水印
         imagecopymerge($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight,100);
 
-        if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);
-        if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new);
+        if (isset($circle)&&is_resource($circle)) $this->destroyImage($circle);       
+        if (isset($circle_new)&&is_resource($circle_new)) $this->destroyImage($circle_new); 
     }
 
     protected function CopyText($content,$dst_x,$dst_y,$font,$rgba,$max_w=0,$font_family='',$weight=1,$space=0){
@@ -494,7 +511,7 @@ class Base
             if (isset($max_w)&&!empty($max_w)) {
                 $max_ws = $max_w;
             }
-
+        
             if (($fontBox[2] > $max_ws) && ($contents !== "")) {
                 $contents .= "\n";
             }
@@ -515,14 +532,14 @@ class Base
         if($space>0){
 
             $dst_x_old = $dst_x;
-            for ($j=0; $j < mb_strlen($contents); $j++) {
-
+            for ($j=0; $j < mb_strlen($contents); $j++) { 
+                
                 if(mb_substr($contents, $j, 1)=="\n"){
                     $dst_x = $dst_x_old;
                     $dst_y += 2 * $font;
                     continue;
                 }
-                for ($i=0; $i < $weight; $i++) {
+                for ($i=0; $i < $weight; $i++) { 
                     imagettftext ($this->im, $font, 0, $dst_x+($i*0.25), $dst_y+$font+($i*0.25), $color, $font_family, mb_substr($contents, $j, 1));
                 }
                 $dst_x += $space;
@@ -530,12 +547,12 @@ class Base
 
 
         }else{
-            for ($i=0; $i < $weight; $i++) {
+            for ($i=0; $i < $weight; $i++) { 
                 imagettftext ($this->im, $font, 0, $dst_x+($i*0.25), $dst_y+$font+($i*0.25), $color, $font_family, $contents);
             }
         }
 
-
+        
     }
 
     /**
@@ -571,8 +588,8 @@ class Base
             $bgHight = imagesy($result);
 
         }
-
-
+        
+        
         # 处理目标 x 轴
         if ($dst_x === 'center') {
 
@@ -593,7 +610,7 @@ class Base
                 $dst_x = ceil($this->im_w * substr($dst_x, 0,strpos($dst_x, "%"))/100);
 
             }
-
+            
 
         }
 
@@ -606,7 +623,7 @@ class Base
             $dst_y = ceil($this->im_h+$dst_y);
 
         }elseif (strpos($dst_y, "%")!==false) {
-
+            
             if (substr($dst_y, 0,strpos($dst_y, "%"))<0) {
 
                 $dst_y = ceil($this->im_h+(($this->im_h * substr($dst_y, 0,strpos($dst_y, "%")))/100));
@@ -614,7 +631,7 @@ class Base
             }else{
                 $dst_y = ceil($this->im_h * substr($dst_y, 0,strpos($dst_y, "%"))/100);
             }
-
+            
         }
 
         # 自定义宽高的时候
@@ -631,7 +648,7 @@ class Base
         }
 
 
-        //整合海报
+         //整合海报
         imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
     }
 
@@ -651,6 +668,7 @@ class Base
      */
     protected function creatQr($text,$outfile,$level,$size,$margin,$saveandprint){
         if ($outfile) {
+            $this->setPath($outfile);
             $outfile = $this->path.$outfile;
         }
         return \QRcode::png($text,$outfile,$level,$size,$margin,$saveandprint);
