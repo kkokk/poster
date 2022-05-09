@@ -151,18 +151,18 @@ try {
 		]
 	];
 
-	$result = PosterManager::Poster('poster/poster_user')
-	->buildIm(638,826,[255,255,255,127],false)
-	->buildImageMany($buildImageManyArr)
-	->buildTextMany($buildTextManyArr)
-	->buildQrMany($buildQrManyArr)
-	->getPoster();
+	// $result = PosterManager::Poster('poster/poster_user')
+	// ->buildIm(638,826,[255,255,255,127],false)
+	// ->buildImageMany($buildImageManyArr)
+	// ->buildTextMany($buildTextManyArr)
+	// ->buildQrMany($buildQrManyArr)
+	// ->getPoster();
 
 
 	//给图片添加水印
 	// $result = PosterManager::poster()
-	// ->buildImDst(__DIR__.'/test.jpeg')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','-20%','-20%',0,0,0,0,false)
+	// ->buildImDst(__DIR__.'/poster/1652108837.png')
+	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
 	// ->setPoster();
 
 	# 实例化调用 
@@ -203,7 +203,7 @@ try {
      * @return [type]                                 [description]
 	 */
 	# 静态调用
-	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
+	$result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
 	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');

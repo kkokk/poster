@@ -16,37 +16,36 @@ use Kkokk\Poster\Lang\PosterAbstract;//
 
 class PosterManager 
 {
-    public $Poster;
-    public static $options = "";
-    /** @var Connector */
-    protected static $connector;
+
+    protected static $options;   // 参数
+    protected static $connector; // 实例化类
+    protected static $className; // 实现调用类名
 
 	public function __construct($options=[])
 	{
         if (!empty($options)) {
             self::$options = $options;
         }
-        // $this->Poster = new Poster;
 	}
 
-	/**
+    public function __call($method, $params)
+    {
+        $lang = new self();
+        self::$className = __NAMESPACE__ . '\\Lang\\AbstractTest'; // 使用抽象类实现
+        return $lang->create($method, $params);
+    }
+
+    /**
      * @param $method
      * @param $params
      * @return mixed
      * @throws InvalidManagerException
      */
     public static function __callStatic($method, $params)
-    {   
-
-        $lang = new self();
-        return $lang->create($method, $params);
-    }
-
-    public function __call($method, $params)
-    {   
-
-        $lang = new self();
-        return $lang->create_($method, $params);
+    {
+        self::$options = $params;
+        self::$className = __NAMESPACE__ . '\\Lang\\'.$method; // 使用接口类实现 只是测试不同方式实现
+        return self::buildConnector();
     }
 
     /**
@@ -57,58 +56,19 @@ class PosterManager
      */
     private function create(string $method, array $params)
     {
-        $className = __NAMESPACE__ . '\\Lang\\' . $method;
-        if (!class_exists($className)) {
-            throw new SystemException("the method name does not exist . method : {$method}");
-        }
-        return $this->make($className, $params);
-    }
-
-    /**
-     * @param string $className
-     * @param array $params
-     * @return mixed
-     * @throws InvalidManagerException
-     */
-    private function make(string $className, array $params)
-    {
-        $lang = new $className($params);
-
-
-        if ($lang instanceof MyPoster) {
-            return $lang;
-        }
-        throw new SystemException("this method does not integrate MyPoster . namespace : {$className}");
+        return call_user_func_array([self::buildConnector(),$method], $params);
     }
 
     private static function buildConnector()
     {
-        $options = [];
-        $type    = !empty($options['connector']) ? $options['connector'] : 'AbstractTest';
-
-
         if (!isset(self::$connector)) {
 
-            $className = false !== strpos($type, '\\') ? $type :  __NAMESPACE__.'\\Lang\\' .$type;
-
-            if (!class_exists($className)) {
-                throw new SystemException("the class name does not exist . class : {$type}");
+            if (!class_exists(self::$className)) {
+                throw new SystemException("the class name does not exist . class : " . self::$className);
             }
 
-            self::$connector = new $className(self::$options);
+            self::$connector = new self::$className(self::$options);
         }
         return self::$connector;
-    }
-
-    /**
-     * @param string $method
-     * @param array $params
-     * @return mixed
-     * @throws LangException
-     */
-    private function create_(string $method, array $params)
-    {   
-
-        return call_user_func_array([self::buildConnector(),$method], $params);
     }
 }
