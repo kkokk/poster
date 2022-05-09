@@ -1,2 +1,3 @@
+tests/poster/
 vendor/
 composer.lock
