@@ -10,6 +10,12 @@ PHP海报生成插件，极速生成方便快捷。
 
 提示：
 
+如果无法更新版本，composer 切换回原镜像
+
+全局设置
+
+composer config -g repo.packagist composer https://repo.packagist.org
+
 1.新增批量处理方法
 
 2.新增字体加粗参数
