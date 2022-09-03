@@ -173,7 +173,6 @@ class Base
 	protected function dirExists($pathname){
 
 		if (!file_exists($this->path.$pathname)) {
-
 	        return mkdir($this->path.$pathname,0777,true);
 	    }
 
@@ -207,9 +206,11 @@ class Base
         }
 
         $this->type = image_type_to_extension($bgType, false);
+        if($this->type) throw new PosterException('image resources cannot be empty (' . $source . ')');
+
         //创建水印图像资源
-        $fun   = 'imagecreatefrom' . image_type_to_extension($bgType, false);
-        $cut   = $fun($source);
+        $fun   = 'imagecreatefrom' . $this->type;
+        $cut   = @$fun($source);
         
         //设定水印图像的混色模式
         imagealphablending($cut, true);
@@ -296,7 +297,10 @@ class Base
         }
 
         list($Width, $Hight, $bgType) = @getimagesize($path.$src);
+
         $bgType = image_type_to_extension($bgType, false);
+
+        if(empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
 
         if ($bgType=='gif') {
         	$pic = imagecreatefromstring(file_get_contents($path.$src));
@@ -382,7 +386,6 @@ class Base
 
             $dst_y = ceil(($this->im_h - $bgHight) / 2);
         }elseif (is_numeric($dst_y)&&$dst_y<0) {
-            t;
 
         	$dst_y = ceil($this->im_h+$dst_y);
 
@@ -412,10 +415,11 @@ class Base
         }else{
             $path = "";
         }
-		
 
         list($Width, $Hight, $bgType) = @getimagesize($path.$src);
         $bgType = image_type_to_extension($bgType, false);
+
+        if(empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
 
         if ($bgType=='gif') {
         	$pic = imagecreatefromstring(file_get_contents($path.$src));
@@ -424,7 +428,6 @@ class Base
         	$fun = "imagecreatefrom".$bgType;
         	$pic = @$fun($path.$src);
         }
-        
 
         $bgWidth = !empty($src_w)?$src_w:$Width;
         $bgHight = !empty($src_h)?$src_h:$Hight;
@@ -669,6 +672,8 @@ class Base
     protected function creatQr($text,$outfile,$level,$size,$margin,$saveandprint){
         if ($outfile) {
             $this->setPath($outfile);
+            $this->setPathName($outfile);
+            $this->dirExists($this->pathname);
             $outfile = $this->path.$outfile;
         }
         return \QRcode::png($text,$outfile,$level,$size,$margin,$saveandprint);

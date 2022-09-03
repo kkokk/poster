@@ -107,7 +107,7 @@ try {
 		   'src' => 'https://test.acyapi.51acy.com/wechat/poster/half_circle.png','dst_x' => 254,'dst_y' => 321
 		],
 		[
-		   'src' => 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg','dst_x' => 253,'dst_y' => 326,'src_x' => 0,'src_y' => 0,'src_w' => 131,'src_h' => 131,'alpha' => false,'type'  => 'circle'
+		   'src' => 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png','dst_x' => 253,'dst_y' => 326,'src_x' => 0,'src_y' => 0,'src_w' => 131,'src_h' => 131,'alpha' => false,'type'  => 'circle'
 		],
 		[
 		   'src'   => 'https://test.acyapi.51acy.com/wechat/poster/fengexian.png','dst_x' => 0,'dst_y' => 655
@@ -160,10 +160,10 @@ try {
 
 
 	//给图片添加水印
-	// $result = PosterManager::poster()
-	// ->buildImDst(__DIR__.'/poster/1652108837.png')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
-	// ->setPoster();
+	$result = PosterManager::poster()
+	->buildImDst(__DIR__.'/poster/poster_user.png')
+	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
+	->setPoster();
 
 	# 实例化调用 
 	// 合成图片
@@ -203,7 +203,7 @@ try {
      * @return [type]                                 [description]
 	 */
 	# 静态调用
-	$result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
+	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
 	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
