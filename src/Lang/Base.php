@@ -206,7 +206,7 @@ class Base
         }
 
         $this->type = image_type_to_extension($bgType, false);
-        if($this->type) throw new PosterException('image resources cannot be empty (' . $source . ')');
+        if(empty($this->type)) throw new PosterException('image resources cannot be empty (' . $source . ')');
 
         //创建水印图像资源
         $fun   = 'imagecreatefrom' . $this->type;
