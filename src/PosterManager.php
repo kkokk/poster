@@ -10,23 +10,20 @@ namespace Kkokk\Poster;
  * @Last Modified time: 2021-09-08 10:23:08
  */
 use Kkokk\Poster\Exception\SystemException;
-use Kkokk\Poster\Interfaces\MyPoster;
-use Kkokk\Poster\Lang\Poster;//
-use Kkokk\Poster\Lang\PosterAbstract;//
 
-class PosterManager
+class PosterManager 
 {
 
     protected static $options;   // 参数
     protected static $connector; // 实例化类
     protected static $className; // 实现调用类名
 
-    public function __construct($options=[])
-    {
+	public function __construct($options=[])
+	{
         if (!empty($options)) {
             self::$options = $options;
         }
-    }
+	}
 
     public function __call($method, $params)
     {
@@ -39,7 +36,7 @@ class PosterManager
      * @param $method
      * @param $params
      * @return mixed
-     * @throws InvalidManagerException
+     * @throws SystemException
      */
     public static function __callStatic($method, $params)
     {
@@ -52,7 +49,7 @@ class PosterManager
      * @param string $method
      * @param array $params
      * @return mixed
-     * @throws LangException
+     * @throws SystemException
      */
     private function create(string $method, array $params)
     {
