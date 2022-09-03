@@ -151,19 +151,19 @@ try {
 		]
 	];
 
-	// $result = PosterManager::Poster('poster/poster_user')
-	// ->buildIm(638,826,[255,255,255,127],false)
-	// ->buildImageMany($buildImageManyArr)
-	// ->buildTextMany($buildTextManyArr)
-	// ->buildQrMany($buildQrManyArr)
-	// ->getPoster();
+	$result = PosterManager::Poster('poster/poster_user')
+	->buildIm(638,826,[255,255,255,127],false)
+	->buildImageMany($buildImageManyArr)
+	->buildTextMany($buildTextManyArr)
+	->buildQrMany($buildQrManyArr)
+	->getPoster();
 
 
 	//给图片添加水印
-	$result = PosterManager::poster()
-	->buildImDst(__DIR__.'/poster/poster_user.png')
-	->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
-	->setPoster();
+	// $result = PosterManager::poster()
+	// ->buildImDst(__DIR__.'/poster/poster_user.png')
+	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
+	// ->setPoster();
 
 	# 实例化调用 
 	// 合成图片
