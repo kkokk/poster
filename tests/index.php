@@ -151,12 +151,22 @@ try {
 		]
 	];
 
-	$result = PosterManager::Poster('poster/poster_user')
-	->buildIm(638,826,[255,255,255,127],false)
-	->buildImageMany($buildImageManyArr)
-	->buildTextMany($buildTextManyArr)
-	->buildQrMany($buildQrManyArr)
-	->getPoster();
+    $list = [
+        '1'=>'2',
+        '2'=>'2',
+    ];
+
+    foreach ($list as $key => $value) {
+
+        $result = PosterManager::Poster()
+            ->setPath('poster/' . $key)
+            ->buildIm(638,826,[255,255,255,127],false)
+            ->buildImageMany($buildImageManyArr)
+            ->buildTextMany($buildTextManyArr)
+            ->buildQrMany($buildQrManyArr)
+            ->getPoster();
+
+    }
 
 
 	//给图片添加水印
