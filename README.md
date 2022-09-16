@@ -215,7 +215,7 @@ $poster->buildQrMany($texts); # 批量合成文字
 ##### 设置路径
 
 ```php
-$poster->setPath($path); # 设置路径
+$poster->path($path); # 设置路径
 ```
 
 参数说明

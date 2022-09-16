@@ -240,12 +240,12 @@ class AbstractTest extends PosterAbstract
     }
 
     /**
-     * [setPath description] 设置路径
+     * [path description] 设置路径
      * @Author   lang
      * @DateTime 2022-09-16T15:45:57+0800
      * @return   [type]   [description]
      */
-    public function setPath($path){
+    public function path($path){
 
         $this->setFilePath($path);
         return $this;
