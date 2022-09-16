@@ -59,6 +59,23 @@ class Base
         $this->setPath($pathFileName);
     }
 
+    public function setFilePath($path){
+
+        $path = is_array($path)?$path:[$path];
+        $pathFileName = $path[0]??'';
+        $pathFileName = str_replace(['\\','/'], "/", $pathFileName);
+
+        $fileName = $pathFileName?:time();
+
+        if (strripos($pathFileName,"/")!==false) {
+            $this->setPathName($pathFileName);
+            $fileName = substr($pathFileName, strripos($pathFileName,"/")+1);
+        }
+
+        $this->setFileName($fileName);
+        $this->setPath($pathFileName);
+    }
+
     /**
      * setFileName 设置文件名
      * @Author lang
