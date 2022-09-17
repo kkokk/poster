@@ -185,9 +185,9 @@ $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weigh
 | dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5] |
 | dst_y       | number                | 否   | 画布位置y，默认0                                             |
 | font        | number                | 否   | 字体大小，默认16                                             |
-| rgba        | number                | 否   | 颜色rbga，[255,255,255,1]                                    |
+| rgba        | array                 | 否   | 颜色rbga，[255,255,255,1]                                    |
 | max_w       | number                | 否   | 最大换行宽度，默认0不换行。达到换行宽度自动换行              |
-| font_family | number                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
+| font_family | string                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
 | weight      | integer               | 否   | 字体粗细 默认字体大小                                        |
 | space       | integer               | 否   | 字体间距 默认无                                              |
 
