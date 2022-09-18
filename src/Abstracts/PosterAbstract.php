@@ -19,6 +19,7 @@ abstract class PosterAbstract extends Base
 
 	abstract public function buildIm($w,$h,$rgba=[],$alpha=false);
 	abstract public function buildImDst($src,$w=0,$h=0);
+	abstract public function buildBg($w,$h,$rgba=[],$alpha=false);
     abstract public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal');
 	abstract public function buildImageMany($arr = []);
     abstract public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1,$space=0);
@@ -26,6 +27,7 @@ abstract class PosterAbstract extends Base
     abstract public function buildQr($text,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$size=4,$margin=1);
     abstract public function buildQrMany($arr = []);
     abstract public function Qr($text,$outfile=false,$level='L',$size=4,$margin=1,$saveandprint=0);
+    abstract public function path($path);
 	abstract public function getPoster();
 	abstract public function setPoster();
 	abstract public function stream();

@@ -83,6 +83,21 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 | rgba  | array   | 否   | 颜色rbga，[255,255,255,1] |
 | alpha | boolean | 否   | 是否透明，默认false       |
 
+##### **创建背景、遮罩** 
+
+```php
+$poster->buildBg($w,$h,$rgba,$alpha); # 创建画布
+```
+
+参数说明
+
+| 变量  | 类型    | 必填 | 注释                     |
+| ----- | ------- | ---- | ------------------------ |
+| w     | number  | 是   | 画布宽                   |
+| h     | number  | 是   | 画布高                   |
+| rgba  | array   | 否   | 颜色rbga,[0-255,0-255,0-255,1-127] |
+| alpha | boolean | 否   | 是否透明，是：true       |
+
 ##### **合成图片**
 
 ```php
