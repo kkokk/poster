@@ -19,6 +19,7 @@ abstract class PosterAbstract extends Base
 
 	abstract public function buildIm($w,$h,$rgba=[],$alpha=false);
 	abstract public function buildImDst($src,$w=0,$h=0);
+	abstract public function buildBg($w,$h,$rgba=[],$alpha=false);
     abstract public function buildImage($src,$dst_x=0,$dst_y=0,$src_x=0,$src_y=0,$src_w=0,$src_h=0,$alpha=false,$type='normal');
 	abstract public function buildImageMany($arr = []);
     abstract public function buildText($content,$dst_x=0,$dst_y=0,$font=16,$rgba=[],$max_w=0,$font_family='',$weight=1,$space=0);

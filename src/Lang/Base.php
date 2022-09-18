@@ -113,14 +113,29 @@ class Base
     private function setPath($pathFileName)
     {
         // 绝对路径 or 相对路径
-        // 区分WIN系统绝对路径
-        if (stripos(PHP_OS, "WIN") !== false) {
-            $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
-        } else {
-            $absolute = stripos($pathFileName, '/') === 0 ?: false;
-        }
+        $absolute = $this->isAbsolute($pathFileName);
         $this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
         $this->path = $absolute ? '' : ($this->path ? $this->path . '/' : __DIR__ . '/../../tests/');
+    }
+
+    private function isAbsolute($pathFileName){
+
+        // 区分WIN系统绝对路径、暂时只区分linux win mac
+        switch (PHP_OS) {
+            case 'Darwin':
+                $absolute = stripos($pathFileName, '/') === 0 ?: false;
+                break;
+            case 'linux':
+            default:
+            if (stripos(PHP_OS, "WIN") !== false ) {
+                $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
+            } else {
+                $absolute = stripos($pathFileName, '/') === 0 ?: false;
+            }
+            break;
+        }
+
+        return $absolute;
     }
 
     /**
@@ -267,6 +282,21 @@ class Base
         $this->im = $cut;
     }
 
+    protected function Bg($w, $h, $rgba, $alpha)
+    {
+
+        $pic = $this->createIm($w, $h, $rgba, $alpha);
+
+        $temp_dir = sys_get_temp_dir().'/lang.png';
+
+        $this->poster_type['png']($pic, $temp_dir);
+
+        //整合海报
+        $this->CopyImage($temp_dir,  0, 0, 0, 0, $w, $h);
+
+        unlink($temp_dir);
+    }
+
     /**
      * 创建画布
      */
@@ -329,11 +359,12 @@ class Base
      */
     protected function CopyImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
     {
-
+        $path = "";
         if (strpos($src, "http") === false) {
-            $path = $this->path;
-        } else {
-            $path = "";
+            $absolute = $this->isAbsolute($src);
+            if(!$absolute) {
+                $path = $this->path;
+            }
         }
 
         list($Width, $Hight, $bgType) = @getimagesize($path . $src);
@@ -463,10 +494,12 @@ class Base
 
     protected function CopyMergeImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
     {
+        $path = "";
         if (strpos($src, "http") === false) {
-            $path = $this->path;
-        } else {
-            $path = "";
+            $absolute = $this->isAbsolute($src);
+            if(!$absolute) {
+                $path = $this->path;
+            }
         }
 
         list($Width, $Hight, $bgType) = @getimagesize($path . $src);

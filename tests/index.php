@@ -154,8 +154,10 @@ try {
 	$result = PosterManager::Poster('poster/poster_user')
 	->buildIm(638,826,[255,255,255,127],false)
 	->buildImageMany($buildImageManyArr)
-	->buildTextMany($buildTextManyArr)
-	->buildQrMany($buildQrManyArr)
+	// ->buildTextMany($buildTextManyArr)
+	// ->buildQrMany($buildQrManyArr)
+    ->buildBg(638,826,[0,0,0,50],true)
+    ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
 	->getPoster();
 
 

@@ -51,6 +51,25 @@ class Poster extends Base implements MyPoster
     }
 
     /**
+     * 添加背景
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2022/9/17
+     * Time: 下午11:00
+     * @param $w
+     * @param $h
+     * @param array $rgba
+     * @param false $alpha
+     * @return $this
+     */
+    public function buildBg($w, $h, $rgba = [], $alpha = false)
+    {
+
+        $this->Bg($w, $h, $rgba, $alpha);
+        return $this;
+    }
+
+    /**
      * [buildImage description] 合成图片
      * @Author   lang
      * @DateTime 2020-08-14T20:56:54+0800
