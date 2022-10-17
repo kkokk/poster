@@ -308,6 +308,28 @@ class Base
 
         unlink($temp_dir);
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
+
+
+        // 渐变处理
+        // $color1 = [60, 120, 216];
+        // $color2 = [255, 0, 255];
+
+        // $width = 100;
+        // $height = 400;
+
+        // $im = imagecreatetruecolor($width, $height);
+        // for ($i = $height; $i >= 0; $i--) {
+            
+        //     $colorRgb = calcColor($height, $i, $color1, $color2);
+        //     $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], 60);
+        //     // imagefilledrectangle($im, 0, $i, $width, 0, $color);
+        //     // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];
+        //     for ($j=0; $j < $width; $j++) { 
+        //         imagesetpixel($im, $j, $i, $color);
+        //     }
+
+        // }
+
     }
 
     /**
@@ -365,6 +387,40 @@ class Base
         }
 
         return imagecolorallocate($cut, $rgba[0], $rgba[1], $rgba[2]);
+    }
+
+    // 计算渐变颜色值
+    protected function calcColor($h, $i, $c1, $c2) {
+
+        $res = [];
+
+        $r = abs($c2[0] - $c1[0]);
+        // print_r(floor($r/$h * $i));exit;
+        $rr = $c2[0] - $c1[0];
+        $b = abs($c2[1] - $c1[1]);
+        $bb = $c2[1] - $c1[1];
+        $g = abs($c2[2] - $c1[2]);
+        $gg = $c2[2] - $c1[2];
+
+        if($r==0){
+            $res[] = $c2[0];
+        }else{
+            $res[] = $rr > 0 ? ( $c1[0] + $r/$h * $i) : ($c1[0] - $r/$h * $i);
+        }
+
+        if($b==0){
+            $res[] = $c2[1];
+        }else{
+            $res[] = $bb > 0 ? ( $c1[1] + $b/$h * $i) : ($c1[1] - $b/$h * $i);
+        }
+
+        if($g==0){
+            $res[] = $c2[2];
+        }else{
+            $res[] = $gg > 0 ? ( $c1[2] + $g/$h * $i) : ($c1[2] - $g/$h * $i);
+        }
+
+        return $res;
     }
 
     /**
