@@ -282,19 +282,32 @@ class Base
         $this->im = $cut;
     }
 
-    protected function Bg($w, $h, $rgba, $alpha)
+    /**
+     * 创建背景
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/17
+     * Time: 11:03
+     * @param $w
+     * @param $h
+     * @param $rgba
+     * @param $alpha
+     * @throws PosterException
+     */
+    protected function Bg($w, $h, $rgba, $alpha = false, $shape="", $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
     {
 
         $pic = $this->createIm($w, $h, $rgba, $alpha);
 
-        $temp_dir = sys_get_temp_dir().'/lang.png';
+        $temp_dir = sys_get_temp_dir().'/'.uniqid().'.png';
 
         $this->poster_type['png']($pic, $temp_dir);
 
         //整合海报
-        $this->CopyImage($temp_dir,  0, 0, 0, 0, $w, $h);
+        $this->CopyImage($temp_dir,  $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         unlink($temp_dir);
+        if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
     }
 
     /**
@@ -304,7 +317,7 @@ class Base
     {
         $cut = imagecreatetruecolor($w, $h);
 
-        $white = $alpha ? $this->createColor($cut, $rgba) : $this->createColorText($cut, $rgba);
+        $white = $alpha ? $this->createColorAlpha($cut, $rgba) : $this->createColor($cut, $rgba);
         if ($alpha) {
             imagecolortransparent($cut, $white);
             imagesavealpha($cut, true);
@@ -315,9 +328,9 @@ class Base
     }
 
     /**
-     * 创建画布颜色
+     * 获取颜色值，可设置透明度
      */
-    protected function createColor($cut, $rgba = [255, 255, 255, 127])
+    protected function createColorAlpha($cut, $rgba = [255, 255, 255, 127])
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 127];
@@ -336,9 +349,9 @@ class Base
     }
 
     /**
-     * 创建文字颜色
+     * 获取颜色值，没有透明度
      */
-    protected function createColorText($cut, $rgba = [255, 255, 255, 1])
+    protected function createColor($cut, $rgba = [255, 255, 255, 1])
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 1];
@@ -384,61 +397,66 @@ class Base
         $bgWidth = !empty($src_w) ? $src_w : $Width;
         $bgHight = !empty($src_h) ? $src_h : $Hight;
 
-        switch ($type) {
-            case 'normal':
+        if($type  instanceof Closure) {
 
-                # 自定义宽高的时候
-                if (!empty($src_w) && !empty($src_h)) {
-                    $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-                    // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
-                    // imagecolortransparent($circle_new,$circle_new_white);
-                    // imagefill($circle_new, 0, 0, $circle_new_white);
-                    $w_circle_new = $bgWidth;
-                    $h_circle_new = $bgHight;
-                    # 按比例缩放
-                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
-                    $pic = $circle_new;
-                }
+        } else {
+            switch ($type) {
+                case 'normal':
 
-                break;
-            case 'circle':
-
-                $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-                $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-
-                $w_circle = $bgWidth;
-                $h_circle = $bgHight;
-                # 按比例缩放
-                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
-
-                $r = ($w_circle / 2); //圆半径
-                for ($x = 0; $x < $w_circle; $x++) {
-                    for ($y = 0; $y < $h_circle; $y++) {
-                        $rgbColor = imagecolorat($circle_new, $x, $y);
-                        // $thisColor = imagecolorsforindex($circle_new, $rgbColor); // imagecolorallocatealpha
-
-                        if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
-
-                            imagesetpixel($circle, $x, $y, $rgbColor);
-
-                        }
-
-                        // $newR = $r - 0.5;
-                        // if (((($x - $newR) * ($x - $newR) + ($y - $newR) * ($y - $newR)) == ($newR * $newR))) {
-                        //     imagesetpixel($circle, $x + 1, $y, $rgbColor);
-                        //     imagesetpixel($circle, $x, $y + 1, $rgbColor);
-                        //     imagesetpixel($circle, $x + 1, $y + 1, $rgbColor);
-                        // }
+                    # 自定义宽高的时候
+                    if (!empty($src_w) && !empty($src_h)) {
+                        $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                        // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
+                        // imagecolortransparent($circle_new,$circle_new_white);
+                        // imagefill($circle_new, 0, 0, $circle_new_white);
+                        $w_circle_new = $bgWidth;
+                        $h_circle_new = $bgHight;
+                        # 按比例缩放
+                        imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
+                        $pic = $circle_new;
                     }
-                }
 
+                    break;
+                case 'circle':
 
-                $pic = $circle;
-                break;
-            default:
-                # code...
-                break;
+                    $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                    $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+
+                    $w_circle = $bgWidth;
+                    $h_circle = $bgHight;
+                    # 按比例缩放
+                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
+
+                    $r = ($w_circle / 2); //圆半径
+                    for ($x = 0; $x < $w_circle; $x++) {
+                        for ($y = 0; $y < $h_circle; $y++) {
+                            $rgbColor = imagecolorat($circle_new, $x, $y);
+                            // $thisColor = imagecolorsforindex($circle_new, $rgbColor); // imagecolorallocatealpha
+
+                            if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
+
+                                imagesetpixel($circle, $x, $y, $rgbColor);
+
+                            }
+
+                            // $newR = $r - 0.5;
+                            // if (((($x - $newR) * ($x - $newR) + ($y - $newR) * ($y - $newR)) == ($newR * $newR))) {
+                            //     imagesetpixel($circle, $x + 1, $y, $rgbColor);
+                            //     imagesetpixel($circle, $x, $y + 1, $rgbColor);
+                            //     imagesetpixel($circle, $x + 1, $y + 1, $rgbColor);
+                            // }
+                        }
+                    }
+
+                    $pic = $circle;
+                    break;
+                default:
+                    # code...
+                    break;
+            }
         }
+
+
 
         # 处理目标 x 轴
         if ($dst_x === 'center') {
@@ -580,7 +598,8 @@ class Base
 
         $font_family = !empty($font_family) ? $this->path . $font_family : $this->font_family;
 
-        $color = $this->createColorText($this->im, $rgba);
+        $color = $this->createColorAlpha($this->im, $rgba);
+
         mb_internal_encoding("UTF-8"); // 设置编码
 
         // 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度

@@ -130,7 +130,7 @@ try {
            'content'=> '不应有恨，何事长向别时圆？','dst_x' => 'center','dst_y' => 575,'font' => 16,'rgba' => [51, 51, 51, 1]
        ],
        [
-           'content'=> '人有悲欢离合，月有阴晴圆缺，此事古难全。','dst_x' => 'center','dst_y' => 595,'font' => 16,'rgba' => [51, 51, 51, 1]
+           'content'=> '人有悲欢离合，月有阴晴圆缺，此事古难全。','dst_x' => 'center','dst_y' => 595,'font' => 16,'rgba' => [51, 51, 51, 120]
        ],
        [
            'content'=> '但愿人长久，千里共婵娟。','dst_x' => 'center','dst_y' => 615,'font' => 16,'rgba' => [51, 51, 51, 1]
@@ -152,10 +152,10 @@ try {
 	];
 
 	$result = PosterManager::Poster('poster/poster_user')
-	->buildIm(638,826,[255,255,255,127],false)
+	->buildIm(638,826,[255,255,255,1],true)
 	->buildImageMany($buildImageManyArr)
-	// ->buildTextMany($buildTextManyArr)
-	// ->buildQrMany($buildQrManyArr)
+	->buildTextMany($buildTextManyArr)
+	->buildQrMany($buildQrManyArr)
     ->buildBg(638,826,[0,0,0,50],true)
     ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
 	->getPoster();

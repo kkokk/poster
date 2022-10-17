@@ -63,10 +63,10 @@ class AbstractTest extends PosterAbstract
      * @param false $alpha
      * @return $this
      */
-    public function buildBg($w, $h, $rgba = [], $alpha = false)
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $shape="", $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
     {
 
-        $this->Bg($w, $h, $rgba, $alpha);
+        $this->Bg($w, $h, $rgba, $alpha, $shape, $dst_x, $dst_y, $src_x, $src_y);
         return $this;
     }
 
