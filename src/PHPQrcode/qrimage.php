@@ -27,7 +27,7 @@
     class QRimage {
     
         //----------------------------------------------------------------------
-        public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE) 
+        public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveAndPrint=FALSE) 
         {
             $image = self::image($frame, $pixelPerPoint, $outerFrame);
             
@@ -35,7 +35,7 @@
                 Header("Content-type: image/png");
                 ImagePng($image);
             } else {
-                if($saveandprint===TRUE){
+                if($saveAndPrint===TRUE){
                     ImagePng($image, $filename);
                     header("Content-type: image/png");
                     ImagePng($image);

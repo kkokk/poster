@@ -10,6 +10,12 @@ PHP海报生成插件，极速生成方便快捷。
 
 提示：
 
+如果无法更新版本，composer 切换回原镜像
+
+全局设置
+
+composer config -g repo.packagist composer https://repo.packagist.org
+
 1.新增批量处理方法
 
 2.新增字体加粗参数
@@ -95,8 +101,13 @@ $poster->buildBg($w,$h,$rgba,$alpha); # 创建画布
 | ----- | ------- | ---- | ------------------------ |
 | w     | number  | 是   | 画布宽                   |
 | h     | number  | 是   | 画布高                   |
-| rgba  | array   | 否   | 颜色rbga,[0-255,0-255,0-255,1-127] |
+| rgba  | array   | 否   | color颜色数组取值范围0-255、alpha透明度范围1-127、to颜色渐变方向取值范围bottom、top、left、right默认bottom<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
 | alpha | boolean | 否   | 是否透明，是：true       |
+| dst_x | number\|string\|array | 否 | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y | number\|string\|array | 否 | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| src_x | number | 否 | 图片x轴，默认0 |
+| src_y | number | 否 | 图片y轴，默认0 |
+| func | closure | 否 | 匿名函数（闭包），可以已当前背景为基础合成相应的内容<br />示例：`->buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 ,     I'm function($im){         $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);     })` |
 
 ##### **合成图片**
 
@@ -109,8 +120,8 @@ $poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type)
 | 变量  | 类型           | 必填 | 注释                                                         |
 | ----- | -------------- | ---- | ------------------------------------------------------------ |
 | src   | string         | 是   | 路径，支持网络图片（带http或https）                          |
-| dst_x | number\|string | 否   | 目标x轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| dst_y | number\|string | 否   | 目标y轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| dst_x | number\|string | 否   | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x | number         | 否   | 图片x轴，默认0                                               |
 | src_y | number         | 否   | 图片y轴，默认0                                               |
 | src_w | number         | 否   | 图片自定义宽，默认原宽                                       |
@@ -150,8 +161,8 @@ $poster->buildQr($text,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$size,$margin);
 | 变量   | 类型           | 必填 | 注释                                                         |
 | ------ | -------------- | ---- | ------------------------------------------------------------ |
 | text   | string         | 是   | 内容，例如：http://www.520yummy.com                          |
-| dst_x  | number\|string | 否   | 画布位置x 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
-| dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中 支持百分比20% 支持自定义  支持正负 |
+| dst_x  | number\|string | 否   | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x  | number         | 否   | 图片x轴，默认0                                               |
 | src_y  | number         | 否   | 图片y轴，默认0                                               |
 | src_w  | number         | 否   | 图片自定义宽，默认原宽                                       |
@@ -194,9 +205,9 @@ $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weigh
 | dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5] |
 | dst_y       | number                | 否   | 画布位置y，默认0                                             |
 | font        | number                | 否   | 字体大小，默认16                                             |
-| rgba        | number                | 否   | 颜色rbga，[255,255,255,1]                                    |
+| rgba        | array                 | 否   | 颜色rbga，[255,255,255,1]                                    |
 | max_w       | number                | 否   | 最大换行宽度，默认0不换行。达到换行宽度自动换行              |
-| font_family | number                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
+| font_family | string                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
 | weight      | integer               | 否   | 字体粗细 默认字体大小                                        |
 | space       | integer               | 否   | 字体间距 默认无                                              |
 
@@ -220,6 +231,18 @@ $poster->buildQrMany($texts); # 批量合成文字
 ```
 
 参数说明：与**合成文字**参数一致。
+
+##### 设置路径
+
+```php
+$poster->path($path); # 设置路径
+```
+
+参数说明
+
+| 变量        | 类型                  | 必填 | 注释                                                         |
+| ----------- | --------------------- | ---- | ------------------------------------------------------------ |
+| path        | string\|array         | 是   | 地址，例如：poster/poster_user                               |
 
 ##### 获取海报
 
@@ -455,7 +478,21 @@ try {
 	->buildImageMany($buildImageManyArr)
 	->buildTextMany($buildImageManyArr)
 	->buildQrMany($buildQrManyArr)
-	->getPoster();
+  ->buildBg(
+    400,
+    526,
+    ['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 
+     'alpha'=>50, 
+     'to'=>'bottom'
+    ],
+    true, 
+    ['center', -10], 
+    ['center', 10], 
+    0, 
+    0 ,
+    function($im){
+      im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
+  })->getPoster();
     
     # 给图片添加水印
     $setImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
