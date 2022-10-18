@@ -1,7 +1,7 @@
 <?php
 
 namespace Kkokk\Poster\Lang;
-require_once(__DIR__ . "/../PHPQrcode/phpqrcode.php");
+require_once(__DIR__ . '/../PHPQrcode/phpqrcode.php');
 
 /**
  * @Author: lang
@@ -46,34 +46,35 @@ class Base
         } else {
             $pathFileName = $params[0] ?? '';
         }
-        $pathFileName = str_replace(['\\', '/'], "/", $pathFileName);
+        $pathFileName = str_replace(['\\', '/'], '/', $pathFileName);
 
         $fileName = $pathFileName ?: time();
 
-        if (strripos($pathFileName, "/") !== false) {
+        if (strripos($pathFileName, '/') !== false) {
             $this->setPathName($pathFileName);
-            $fileName = substr($pathFileName, strripos($pathFileName, "/") + 1);
+            $fileName = substr($pathFileName, strripos($pathFileName, '/') + 1);
         }
 
         $this->setFileName($fileName);
         $this->setPath($pathFileName);
     }
 
-    public function setFilePath($path){
+    public function setFilePath($path)
+    {
 
-        $path = is_array($path)?$path:[$path];
+        $path = is_array($path) ? $path : [$path];
         if (PHP_VERSION <= 7) {
             $pathFileName = isset($path[0]) ? $path[0] : '';
         } else {
             $pathFileName = $path[0] ?? '';
         }
-        $pathFileName = str_replace(['\\','/'], "/", $pathFileName);
+        $pathFileName = str_replace(['\\', '/'], '/', $pathFileName);
 
-        $fileName = $pathFileName?:time();
+        $fileName = $pathFileName ?: time();
 
-        if (strripos($pathFileName,"/")!==false) {
+        if (strripos($pathFileName, '/') !== false) {
             $this->setPathName($pathFileName);
-            $fileName = substr($pathFileName, strripos($pathFileName,"/")+1);
+            $fileName = substr($pathFileName, strripos($pathFileName, '/') + 1);
         }
 
         $this->setFileName($fileName);
@@ -89,8 +90,8 @@ class Base
     private function setFileName($fileName)
     {
         $this->filename = $fileName;
-        if (strripos($this->filename, ".") !== false) {
-            $this->type = substr($this->filename, strripos($this->filename, ".") + 1);
+        if (strripos($this->filename, '.') !== false) {
+            $this->type = substr($this->filename, strripos($this->filename, '.') + 1);
             if (!in_array($this->type, ['jpeg', 'jpg', 'png', 'gif', 'wbmp'])) {
                 throw new PosterException('The file naming format is incorrect');
             }
@@ -105,7 +106,7 @@ class Base
      */
     private function setPathName($pathFileName)
     {
-        $this->pathname = substr($pathFileName, 0, strripos($pathFileName, "/"));
+        $this->pathname = substr($pathFileName, 0, strripos($pathFileName, '/'));
     }
 
     /**
@@ -118,11 +119,12 @@ class Base
     {
         // 绝对路径 or 相对路径
         $absolute = $this->isAbsolute($pathFileName);
-        $this->path = iconv("UTF-8", "GBK", $_SERVER['DOCUMENT_ROOT']);
+        $this->path = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
         $this->path = $absolute ? '' : ($this->path ? $this->path . '/' : __DIR__ . '/../../tests/');
     }
 
-    private function isAbsolute($pathFileName){
+    private function isAbsolute($pathFileName)
+    {
 
         // 区分WIN系统绝对路径、暂时只区分linux win mac
         switch (PHP_OS) {
@@ -131,12 +133,12 @@ class Base
                 break;
             case 'linux':
             default:
-            if (stripos(PHP_OS, "WIN") !== false ) {
-                $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
-            } else {
-                $absolute = stripos($pathFileName, '/') === 0 ?: false;
-            }
-            break;
+                if (stripos(PHP_OS, 'WIN') !== false) {
+                    $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
+                } else {
+                    $absolute = stripos($pathFileName, '/') === 0 ?: false;
+                }
+                break;
         }
 
         return $absolute;
@@ -188,7 +190,7 @@ class Base
 
         if ($outfile) {
             $this->dirExists($this->pathname);
-            if (strripos($this->filename, ".") === false) {
+            if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $this->type;
             }
             $this->poster_type[$type]($this->im, $this->path . $this->pathname . '/' . $this->filename);
@@ -248,13 +250,13 @@ class Base
     {
 
 
-//		if (!is_file($source)) {
-//            throw new PosterException('水印图像不存在');
-//        }
+        // if (!is_file($source)) {
+        //     throw new PosterException('水印图像不存在');
+        // }
         $this->source = $source;
         //获取水印图像信息
         $info = @getimagesize($source);
-        list($bgWidth, $bgHight, $bgType) = @getimagesize($source);
+        list($bgWidth, $bgHeight, $bgType) = @getimagesize($source);
 
         if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
             throw new PosterException('非法水印文件');
@@ -274,50 +276,251 @@ class Base
             $this->im_w = $w;
             $this->im_h = $h;
             $circle_new = $this->createIm($w, $h, [255, 255, 255, 127], $alpha = true);
-            imagecopyresized($circle_new, $cut, 0, 0, 0, 0, $w, $h, $bgWidth, $bgHight);
+            imagecopyresized($circle_new, $cut, 0, 0, 0, 0, $w, $h, $bgWidth, $bgHeight);
             $cut = $circle_new;
             // $this->destroyImage($circle_new);
         } else {
             $this->im_w = $bgWidth;
-            $this->im_h = $bgHight;
+            $this->im_h = $bgHeight;
         }
 
 
         $this->im = $cut;
     }
 
-    // 计算渐变颜色值
-    protected function calcColor($h, $i, $c1, $c2) {
-
+    /**
+     * 计算渐变颜色值
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 16:08
+     * @param $h
+     * @param $i
+     * @param $c1
+     * @param $c2
+     * @return array
+     */
+    protected function calcColor($h, $i, $c1, $c2)
+    {
         $res = [];
-
         $r = abs($c2[0] - $c1[0]);
-        // print_r(floor($r/$h * $i));exit;
         $rr = $c2[0] - $c1[0];
         $b = abs($c2[1] - $c1[1]);
         $bb = $c2[1] - $c1[1];
         $g = abs($c2[2] - $c1[2]);
         $gg = $c2[2] - $c1[2];
 
-        if($r==0){
+        if ($r == 0) {
             $res[] = $c2[0];
-        }else{
-            $res[] = $rr > 0 ? ( $c1[0] + $r/$h * $i) : ($c1[0] - $r/$h * $i);
+        } else {
+            $res[] = $rr > 0 ? ($c1[0] + $r / $h * $i) : ($c1[0] - $r / $h * $i);
         }
 
-        if($b==0){
+        if ($b == 0) {
             $res[] = $c2[1];
-        }else{
-            $res[] = $bb > 0 ? ( $c1[1] + $b/$h * $i) : ($c1[1] - $b/$h * $i);
+        } else {
+            $res[] = $bb > 0 ? ($c1[1] + $b / $h * $i) : ($c1[1] - $b / $h * $i);
         }
 
-        if($g==0){
+        if ($g == 0) {
             $res[] = $c2[2];
-        }else{
-            $res[] = $gg > 0 ? ( $c1[2] + $g/$h * $i) : ($c1[2] - $g/$h * $i);
+        } else {
+            $res[] = $gg > 0 ? ($c1[2] + $g / $h * $i) : ($c1[2] - $g / $h * $i);
         }
 
         return $res;
+    }
+
+    /**
+     * 计算颜色渐变区块->等比分配
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 10:56
+     * @param $rgba
+     * @param $h
+     * @param $i
+     * @return array
+     */
+    protected function calcColorArea($rgbaColor, $rgbaCount, $h, $i)
+    {
+        // 单色
+        if ($rgbaCount == 1) {
+            $colorRgb = $this->calcColor($h, $i, $rgbaColor[0], $rgbaColor[0]);
+        } elseif ($rgbaCount == 2) {
+            // 两种颜色
+            $colorRgb = $this->calcColor($h, $i, $rgbaColor[0], $rgbaColor[1]);
+        } else {
+            // 多种颜色 计算距离并分配颜色
+            $rgbaCount = $rgbaCount - 1;
+            $d = ceil($h / $rgbaCount);
+            $index1 = 0;
+            $index2 = 1;
+            $di = 0;
+            for ($j = $rgbaCount + 1; $j > 0; $j--) {
+
+                if ($i >= ceil((($j - 1) * $d)) && $i <= ceil($j * $d)) {
+                    $index1 = $j - 1;
+                    $index2 = $j;
+                    $di = $i - (($j - 1) * $d);
+                    break;
+                }
+            }
+
+            $colorRgb = $this->calcColor($d, $di, $rgbaColor[$index1], $rgbaColor[$index2]);
+        }
+
+        return $colorRgb;
+    }
+
+    /**
+     * 计算颜色渐变方向
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 16:19
+     * @param $im
+     * @param $rgbaColor
+     * @param $rgbaCount
+     * @param $alphas
+     * @param $to
+     * @param $w
+     * @param $h
+     */
+    protected function calcColorDirection($im, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h)
+    {
+
+        if ($to == 'top') {
+            $toi = $h;
+            $toj = $w;
+            $rgbaColor = array_reverse($rgbaColor);
+            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+        } elseif ($to == 'left') {
+            $toi = $w;
+            $toj = $h;
+            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+        } elseif ($to == 'right') {
+            $toi = $w;
+            $toj = $h;
+            $rgbaColor = array_reverse($rgbaColor);
+            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+        } else {
+            $toi = $h;
+            $toj = $w;
+            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+        }
+    }
+
+    /**
+     * 渐变处理方法
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 15:41
+     */
+    protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $ii = 'i', $jj = 'j')
+    {
+        for ($i = $toi; $i >= 0; $i--) {
+            // $colorRgb = $this->calcColor($h, $i, $color1, $color2);
+            $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $toi, $i);
+            $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+            // imagefilledrectangle($this->im, 0, $i, $w, 0, $color); // 填充颜色
+            // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
+            for ($j = 0; $j < $toj; $j++) {
+                imagesetpixel($im, $$jj, $$ii, $color);
+            }
+
+        }
+
+        return $im;
+    }
+
+    /**
+     * 计算画布X轴位置
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 16:10
+     * @return int
+     */
+    protected function calcDstX($dst_x, $imWidth, $bgWidth)
+    {
+
+
+        if ($dst_x == '0') {
+
+        } elseif ($dst_x == 'center') {
+
+            $dst_x = ceil(($imWidth - $bgWidth) / 2);
+
+        } elseif (is_numeric($dst_x) && $dst_x < 0) {
+
+            $dst_x = ceil($imWidth + $dst_x);
+
+        } elseif (is_array($dst_x)) {
+            if ($dst_x[0] == 'center') {
+                $dst_x = ceil(($imWidth - $bgWidth) / 2) + $dst_x[1];
+            }
+        } elseif (strpos($dst_x, '%') !== false) {
+
+            if (substr($dst_x, 0, strpos($dst_x, '%')) < 0) {
+
+                $dst_x = ceil($imWidth + ($imWidth * substr($dst_x, 0, strpos($dst_x, '%')) / 100));
+
+            } else {
+
+                $dst_x = ceil($imWidth * substr($dst_x, 0, strpos($dst_x, '%')) / 100);
+
+            }
+
+        }
+
+        return $dst_x;
+    }
+
+    /**
+     * 计算画布Y轴位置
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 16:10
+     * @return int
+     */
+    protected function calcDstY($dst_y, $imHeight, $bgHeight)
+    {
+        if ($dst_y == '0') {
+
+        } elseif ($dst_y == 'center') {
+
+            $dst_y = ceil(($imHeight - $bgHeight) / 2);
+
+        } elseif (is_numeric($dst_y) && $dst_y < 0) {
+
+            $dst_y = ceil($imHeight + $dst_y);
+
+        } elseif (is_array($dst_y)) {
+
+            if ($dst_y[0] == 'center') {
+
+                $dst_y = ceil(($imHeight - $bgHeight) / 2) + $dst_y[1];
+
+            }
+
+        } elseif (strpos($dst_y, '%') !== false) {
+
+            if (substr($dst_y, 0, strpos($dst_y, '%')) < 0) {
+
+                $dst_y = ceil($imHeight + (($imHeight * substr($dst_y, 0, strpos($dst_y, '%'))) / 100));
+
+            } else {
+
+                $dst_y = ceil($imHeight * substr($dst_y, 0, strpos($dst_y, '%')) / 100);
+
+            }
+
+        }
+
+        return $dst_y;
     }
 
     /**
@@ -332,44 +535,58 @@ class Base
      * @param $alpha
      * @throws PosterException
      */
-    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
+    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '')
     {
         // 判断颜色是否渐变
-        if(is_array($rgba[0])) {
-            // 渐变处理
-            $color1 = $rgba[0];
-            $color2 = $rgba[1];
-            if (PHP_VERSION <= 7) {
-                $alphas = isset($rgba[3]) ? $rgba[3] : 1;
-            } else {
-                $alphas = $rgba[3] ?? 1;
-            }
-
-            $pic = imagecreatetruecolor($w, $h);
-            for ($i = $h; $i >= 0; $i--) {
-
-                $colorRgb = $this->calcColor($h, $i, $color1, $color2);
-                $color = imagecolorallocatealpha($pic, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
-                // imagefilledrectangle($im, 0, $i, $width, 0, $color); // 填充颜色
-                // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
-                for ($j=0; $j < $w; $j++) {
-                    imagesetpixel($pic, $j, $i, $color);
-                }
-
-            }
+        if (PHP_VERSION <= 7) {
+            $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
+            $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
+            $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
         } else {
-            $pic = $this->createIm($w, $h, $rgba, $alpha);
+            $rgbaColor = $rgba['color'] ?? [[0, 0, 0]];
+            $alphas = $rgba['alpha'] ?? 1;
+            $to = $rgba['to'] ?? 'bottom';
+        }
+        $rgbaCount = count($rgbaColor);
+
+        // im不存在则创建
+        if (empty($this->im)) {
+            $this->Im($w, $h, [], $alpha);
+        }
+        // 渐变处理->直接处理im
+        // 计算颜色方向
+        $pic = $this->createIm($w, $h, [], $alpha);
+        $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
+
+        $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
+        $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
+
+        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        if($func instanceof \Closure) {
+            // 闭包处理 由于设计原因。。。先克隆处理一下
+            $that = clone $this;
+            $that->im = $pic;
+            $that->im_w = $w;
+            $that->im_h = $h;
+            $func($that);
+            imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+            unset($that);
         }
 
-        $temp_dir = sys_get_temp_dir().'/'.uniqid().'.png';
-
-        $this->poster_type['png']($pic, $temp_dir);
-
-        //整合海报
-        $this->CopyImage($temp_dir,  $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-
-        unlink($temp_dir);
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
+        unset($rgbaCount);
+        unset($rgbaColor);
+        unset($alphas);
+        unset($to);
+        unset($w);
+        unset($h);
+        unset($rgba);
+        unset($alpha);
+        unset($dst_x);
+        unset($dst_y);
+        unset($src_x);
+        unset($src_y);
     }
 
     /**
@@ -429,16 +646,17 @@ class Base
         return imagecolorallocate($cut, $rgba[0], $rgba[1], $rgba[2]);
     }
 
-
     /**
      * 创建图片，合并到画布，释放内存
      */
     protected function CopyImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
     {
-        $path = "";
-        if (strpos($src, "http") === false) {
+        if (empty($this->im)) throw new PosterException('im resources not be found');
+
+        $path = '';
+        if (strpos($src, 'http') === false) {
             $absolute = $this->isAbsolute($src);
-            if(!$absolute) {
+            if (!$absolute) {
                 $path = $this->path;
             }
         }
@@ -453,24 +671,24 @@ class Base
             $pic = imagecreatefromstring(file_get_contents($path . $src));
         } else {
 
-            $fun = "imagecreatefrom" . $bgType;
+            $fun = 'imagecreatefrom' . $bgType;
             $pic = @$fun($path . $src);
         }
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
-        $bgHight = !empty($src_h) ? $src_h : $Hight;
+        $bgHeight = !empty($src_h) ? $src_h : $Hight;
 
         switch ($type) {
             case 'normal':
 
                 # 自定义宽高的时候
                 if (!empty($src_w) && !empty($src_h)) {
-                    $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                    $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
                     // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
                     // imagecolortransparent($circle_new,$circle_new_white);
                     // imagefill($circle_new, 0, 0, $circle_new_white);
                     $w_circle_new = $bgWidth;
-                    $h_circle_new = $bgHight;
+                    $h_circle_new = $bgHeight;
                     # 按比例缩放
                     imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
                     $pic = $circle_new;
@@ -479,11 +697,11 @@ class Base
                 break;
             case 'circle':
 
-                $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-                $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                $circle = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
+                $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
 
                 $w_circle = $bgWidth;
-                $h_circle = $bgHight;
+                $h_circle = $bgHeight;
                 # 按比例缩放
                 imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
 
@@ -516,63 +734,31 @@ class Base
         }
 
         # 处理目标 x 轴
-        if ($dst_x === 'center') {
-
-            $dst_x = ceil(($this->im_w - $bgWidth) / 2);
-
-        } elseif (is_numeric($dst_x) && $dst_x < 0) {
-
-            $dst_x = ceil($this->im_w + $dst_x);
-
-        } elseif (strpos($dst_x, "%") !== false) {
-
-            if (substr($dst_x, 0, strpos($dst_x, "%")) < 0) {
-
-                $dst_x = ceil($this->im_w + ($this->im_w * substr($dst_x, 0, strpos($dst_x, "%")) / 100));
-
-            } else {
-
-                $dst_x = ceil($this->im_w * substr($dst_x, 0, strpos($dst_x, "%")) / 100);
-
-            }
-
-
-        }
+        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
-        if ($dst_y === 'center') {
-
-            $dst_y = ceil(($this->im_h - $bgHight) / 2);
-        } elseif (is_numeric($dst_y) && $dst_y < 0) {
-
-            $dst_y = ceil($this->im_h + $dst_y);
-
-        } elseif (strpos($dst_y, "%") !== false) {
-
-            if (substr($dst_y, 0, strpos($dst_y, "%")) < 0) {
-
-                $dst_y = ceil($this->im_h + (($this->im_h * substr($dst_y, 0, strpos($dst_y, "%"))) / 100));
-
-            } else {
-                $dst_y = ceil($this->im_h * substr($dst_y, 0, strpos($dst_y, "%")) / 100);
-            }
-
-        }
+        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
 
         //整合海报
-        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
+        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
 
+        if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
         if (isset($circle) && is_resource($circle)) $this->destroyImage($circle);
         if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
+        unset($path);
+        unset($bgWidth);
+        unset($bgHeight);
+        unset($bgType);
     }
-
 
     protected function CopyMergeImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
     {
-        $path = "";
-        if (strpos($src, "http") === false) {
+        if (empty($this->im)) throw new PosterException('im resources not be found');
+
+        $path = '';
+        if (strpos($src, 'http') === false) {
             $absolute = $this->isAbsolute($src);
-            if(!$absolute) {
+            if (!$absolute) {
                 $path = $this->path;
             }
         }
@@ -586,17 +772,17 @@ class Base
             $pic = imagecreatefromstring(file_get_contents($path . $src));
         } else {
 
-            $fun = "imagecreatefrom" . $bgType;
+            $fun = 'imagecreatefrom' . $bgType;
             $pic = @$fun($path . $src);
         }
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
-        $bgHight = !empty($src_h) ? $src_h : $Hight;
+        $bgHeight = !empty($src_h) ? $src_h : $Hight;
 
         switch ($type) {
             case 'normal':
 
-                $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
                 //整合水印
                 imagecopy($circle_new, $pic, 0, 0, 0, 0, $bgWidth, $bgWidth);
                 # 自定义宽高的时候
@@ -605,7 +791,7 @@ class Base
                     // imagecolortransparent($circle_new,$circle_new_white);
                     // imagefill($circle_new, 0, 0, $circle_new_white);
                     $w_circle_new = $bgWidth;
-                    $h_circle_new = $bgHight;
+                    $h_circle_new = $bgHeight;
                     # 按比例缩放
                     imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
                     $pic = $circle_new;
@@ -614,11 +800,11 @@ class Base
                 break;
             case 'circle':
 
-                $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-                $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                $circle = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
+                $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
 
                 $w_circle = $bgWidth;
-                $h_circle = $bgHight;
+                $h_circle = $bgHeight;
                 # 按比例缩放
                 imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
 
@@ -640,14 +826,33 @@ class Base
         }
 
         //整合水印
-        imagecopymerge($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight, 100);
+        imagecopymerge($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight, 100);
 
         if (isset($circle) && is_resource($circle)) $this->destroyImage($circle);
         if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
     }
 
+    /**
+     * 合并文字
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/18
+     * Time: 16:20
+     * @param $content
+     * @param $dst_x
+     * @param $dst_y
+     * @param $font
+     * @param $rgba
+     * @param int $max_w
+     * @param string $font_family
+     * @param int $weight
+     * @param int $space
+     * @return bool
+     * @throws PosterException
+     */
     protected function CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w = 0, $font_family = '', $weight = 1, $space = 0)
     {
+        if (empty($this->im)) throw new PosterException('im resources not be found');
 
         $font = ($font * 3) / 4; // px 转化为 pt
 
@@ -657,10 +862,10 @@ class Base
 
         $color = $this->createColorAlpha($this->im, $rgba);
 
-        mb_internal_encoding("UTF-8"); // 设置编码
+        mb_internal_encoding('UTF-8'); // 设置编码
 
         // 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度
-        $contents = "";
+        $contents = '';
         $letter = [];
 
         // 将字符串拆分成一个个单字 保存到数组 letter 中
@@ -669,7 +874,7 @@ class Base
         }
 
         foreach ($letter as $l) {
-            $teststr = $contents . " " . $l;
+            $teststr = $contents . ' ' . $l;
             $fontBox = imagettfbbox($font, 0, $font_family, $teststr);
             // $testbox = imagettfbbox($fontsize, $angle, $fontface, $teststr);
             // 判断拼接后的字符串是否超过预设的宽度
@@ -678,7 +883,7 @@ class Base
                 $max_ws = $max_w;
             }
 
-            if (($fontBox[2] > $max_ws) && ($contents !== "")) {
+            if (($fontBox[2] > $max_ws) && ($contents !== '')) {
                 $contents .= "\n";
             }
             $contents .= $l;
@@ -718,7 +923,6 @@ class Base
             }
         }
 
-
     }
 
     /**
@@ -735,6 +939,8 @@ class Base
      */
     protected function CopyQr($text, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
     {
+        if (empty($this->im)) throw new PosterException('im resources not be found');
+
         $result = \QRcode::re_png($text, $size, $margin);
         if ($src_w > 0) {
 
@@ -748,11 +954,11 @@ class Base
 
         if ($src_h > 0) {
 
-            $bgHight = $src_h;
+            $bgHeight = $src_h;
             $Hight = imagesy($result);
         } else {
 
-            $bgHight = imagesy($result);
+            $bgHeight = imagesy($result);
 
         }
 
@@ -766,15 +972,15 @@ class Base
 
             $dst_x = ceil($this->im_w + $dst_x);
 
-        } elseif (strpos($dst_x, "%") !== false) {
+        } elseif (strpos($dst_x, '%') !== false) {
 
-            if (substr($dst_x, 0, strpos($dst_x, "%")) < 0) {
+            if (substr($dst_x, 0, strpos($dst_x, '%')) < 0) {
 
-                $dst_x = ceil($this->im_w + ($this->im_w * substr($dst_x, 0, strpos($dst_x, "%")) / 100));
+                $dst_x = ceil($this->im_w + ($this->im_w * substr($dst_x, 0, strpos($dst_x, '%')) / 100));
 
             } else {
 
-                $dst_x = ceil($this->im_w * substr($dst_x, 0, strpos($dst_x, "%")) / 100);
+                $dst_x = ceil($this->im_w * substr($dst_x, 0, strpos($dst_x, '%')) / 100);
 
             }
 
@@ -784,31 +990,31 @@ class Base
         # 处理目标 y 轴
         if ($dst_y === 'center') {
 
-            $dst_y = ceil(($this->im_h - $bgHight) / 2);
+            $dst_y = ceil(($this->im_h - $bgHeight) / 2);
         } elseif (is_numeric($dst_y) && $dst_y < 0) {
 
             $dst_y = ceil($this->im_h + $dst_y);
 
-        } elseif (strpos($dst_y, "%") !== false) {
+        } elseif (strpos($dst_y, '%') !== false) {
 
-            if (substr($dst_y, 0, strpos($dst_y, "%")) < 0) {
+            if (substr($dst_y, 0, strpos($dst_y, '%')) < 0) {
 
-                $dst_y = ceil($this->im_h + (($this->im_h * substr($dst_y, 0, strpos($dst_y, "%"))) / 100));
+                $dst_y = ceil($this->im_h + (($this->im_h * substr($dst_y, 0, strpos($dst_y, '%'))) / 100));
 
             } else {
-                $dst_y = ceil($this->im_h * substr($dst_y, 0, strpos($dst_y, "%")) / 100);
+                $dst_y = ceil($this->im_h * substr($dst_y, 0, strpos($dst_y, '%')) / 100);
             }
 
         }
 
         # 自定义宽高的时候
         if (!empty($src_w) && !empty($src_h)) {
-            $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+            $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true);
             // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
             // imagecolortransparent($circle_new,$circle_new_white);
             // imagefill($circle_new, 0, 0, $circle_new_white);
             $w_circle_new = $bgWidth;
-            $h_circle_new = $bgHight;
+            $h_circle_new = $bgHeight;
             # 按比例缩放
             imagecopyresized($circle_new, $result, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
             $result = $circle_new;
@@ -816,7 +1022,7 @@ class Base
 
 
         //整合海报
-        imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHight);
+        imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
     }
 
     /**
@@ -830,18 +1036,18 @@ class Base
      *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
      * @param  [type]                   $size         [控制生成图片的大小，默认为4]
      * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
-     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @param  [type]                   $saveAndPrint [保存二维码图片并显示出来，$outfile必须传递图片路径]
      * @return []                                     [description]
      */
-    protected function creatQr($text, $outfile, $level, $size, $margin, $saveandprint)
+    protected function creatQr($text, $outfile, $level, $size, $margin, $saveAndPrint)
     {
         if ($outfile) {
             $this->setPath($outfile);
             $this->setPathName($outfile);
             $this->dirExists($this->pathname);
-            $outfile = $this->path . $outfile;
         }
-        return \QRcode::png($text, $outfile, $level, $size, $margin, $saveandprint);
+        \QRcode::png($text, $this->path . $outfile, $level, $size, $margin, $saveAndPrint);
+        return ['url' => $outfile];
     }
 
     /**

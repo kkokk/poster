@@ -63,10 +63,10 @@ class AbstractTest extends PosterAbstract
      * @param false $alpha
      * @return $this
      */
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '')
     {
 
-        $this->Bg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y);
+        $this->Bg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func);
         return $this;
     }
 
@@ -166,14 +166,14 @@ class AbstractTest extends PosterAbstract
             foreach ($arr as $value) {
                 $value['dst_x'] = isset($value['dst_x']) ? $value['dst_x'] : 0;
                 $value['dst_y'] = isset($value['dst_y']) ? $value['dst_y'] : 0;
-                $value['font']  = isset($value['font']) ? $value['font'] : 0;
-                $value['rgba']  = isset($value['rgba']) ? $value['rgba'] : [];
+                $value['font'] = isset($value['font']) ? $value['font'] : 0;
+                $value['rgba'] = isset($value['rgba']) ? $value['rgba'] : [];
                 $value['max_w'] = isset($value['max_w']) ? $value['max_w'] : 0;
                 $value['font_family'] = isset($value['font_family']) ? $value['font_family'] : '';
                 $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
                 $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight']);
             }
-        }else{
+        } else {
             foreach ($arr as $value) {
                 $value['dst_x'] = $value['dst_x'] ?? 0;
                 $value['dst_y'] = $value['dst_y'] ?? 0;
@@ -250,12 +250,12 @@ class AbstractTest extends PosterAbstract
      *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
      * @param  [type]                   $size         [控制生成图片的大小，默认为4]
      * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
-     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @param  [type]                   $saveAndPrint [保存二维码图片并显示出来，$outfile必须传递图片路径]
      * @return []                                     [description]
      */
-    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveandprint = 0)
+    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0)
     {
-        return $this->creatQr($text, $outfile, $level, $size, $margin, $saveandprint);
+        return $this->creatQr($text, $outfile, $level, $size, $margin, $saveAndPrint);
     }
 
     /**
@@ -264,7 +264,8 @@ class AbstractTest extends PosterAbstract
      * @DateTime 2022-09-16T15:45:57+0800
      * @return   [type]   [description]
      */
-    public function path($path){
+    public function path($path)
+    {
 
         $this->setFilePath($path);
         return $this;

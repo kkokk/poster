@@ -15,7 +15,7 @@ require '../vendor/autoload.php';
  */
 
 try {
-		
+
 	/**
 	 * [buildIm description] 创建画布
 	 * @Author   lang
@@ -25,7 +25,7 @@ try {
 	 * @param    array                   $rgba [description] 颜色rbga
 	 * @param    boolean                 $alpha [description] 是否透明
 	 */
-	
+
 	/**
 	 * [buildImDst description] 创建指定图片为画布
 	 * @Author   lang
@@ -52,7 +52,7 @@ try {
 	 * @param    boolean                  $alpha [description] 是否透明 是 true
 	 * @return   array                           [description] 返回相对路径,数组
 	 */
-	
+
 	/**
 	 * [buildQr description] 合成二维码
 	 * @Author lang
@@ -66,21 +66,21 @@ try {
 	 * @param  integer                  $margin [百变大小]
 	 * @return [type]                           [description]
 	 */
-	
+
 	/**
 	 * [buildText description] 合成文字
 	 * @Author   lang
 	 * @DateTime 2020-08-14T22:09:20+0800
 	 * @param    [type]                   $content     [description]
-	 * @param    integer                  $dst_x       [description] 
+	 * @param    integer                  $dst_x       [description]
 	 * @param    integer                  $dst_y       [description]
 	 * @param    integer                  $font        [description] 字体大小
-	 * @param    array                    $rgba        [description] 
+	 * @param    array                    $rgba        [description]
 	 * @param    integer                  $max_w       [description] 最大换行高度
 	 * @param    string                   $font_family [description] 字体，可不填，有默认 (相对路径为项目根目录)
 	 * @return   [type]                                [description]
 	 */
-	
+
 	# 静态调用
 	// 合成图片
 	// $result = PosterManager::Poster('poster/poster_user')
@@ -96,7 +96,7 @@ try {
 	// ->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
 	// ->buildQr('http://www.baidu.com','20%','20%',0,0,8,2)
 	// ->getPoster();
-	
+
 
 	# 批量合成
 	$buildImageManyArr = [
@@ -159,15 +159,15 @@ try {
     // ->buildBg(638,826,[0,0,0,50],true)
     // ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
 	// ->getPoster();
-
-    $result = PosterManager::Poster('poster/poster_user')
-        ->buildIm(638,826,[255,255,255,1],true)
-        ->buildImageMany($buildImageManyArr)
-        ->buildTextMany($buildTextManyArr)
-        ->buildQrMany($buildQrManyArr)
-        ->buildBg(638,826,[[0,0,0,50], [0,255,162], 110],true)
-        ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
-        ->getPoster();
+    echo microtime().PHP_EOL;
+    // $result = PosterManager::Poster('poster/poster_user')
+    //     ->buildIm(638,826,[255,255,255,1],true)
+    //     ->buildImageMany($buildImageManyArr)
+    //     ->buildTextMany($buildTextManyArr)
+    //     ->buildQrMany($buildQrManyArr)
+    //     ->buildBg(638,826,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true)
+    //     ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
+    //     ->getPoster();
 
 
 	//给图片添加水印
@@ -176,28 +176,31 @@ try {
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','25%','65%',0,0,0,0,false)
 	// ->setPoster();
 
-	# 实例化调用 
+	# 实例化调用
 	// 合成图片
-	// $PosterManager = new PosterManager();
-	// $result = $PosterManager->buildIm(638,826,[255,255,255,127],false)
-	// ->buildIm(638,826,[255,255,255,127],false)
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-	// ->buildImage('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',253,326,0,0,131,131,false,'circle')
-	// ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-	// ->buildText('苏轼','center',477,16,[51, 51, 51, 1])
-	// ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[153, 153, 153, 1])
-	// ->buildText('长按识别',497,720,15,[153, 153, 153, 1])
-	// ->buildText('查看TA的更多作品',413,757,15,[153, 153, 153, 1])
-	// ->buildQr('http://www.baidu.com',37,692,0,0,4,1)
-	// ->getPoster();
+	$PosterManager = new PosterManager('poster/poster_user1');
+	$result = $PosterManager
+	->buildIm(638,826,[255,255,255,127],false)
+    ->buildImageMany($buildImageManyArr)
+    ->buildTextMany($buildTextManyArr)
+    ->buildQrMany($buildQrManyArr)
+    ->buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 ,
+        function($im){
+            $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
+        })
+    ->getPoster();
+
+    echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
+    echo microtime().PHP_EOL;
+    echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
+    print_r(getrusage()).PHP_EOL;
 
 	//给图片添加水印
 	// $PosterManager = new PosterManager();
 	// $result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
 	// ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg','center','-20%',0,0,0,0,true)
 	// ->setPoster();
-	 
+
 	//生成二维码
 	/**
 	 * [Qr description]
@@ -210,14 +213,14 @@ try {
      *      这个参数控制二维码容错率，不同的参数表示二维码可被覆盖的区域百分比，也就是被覆盖的区域还能识别
      * @param  [type]                   $size         [控制生成图片的大小，默认为4]
      * @param  [type]                   $margin       [控制生成二维码的空白区域大小]
-     * @param  [type]                   $saveandprint [保存二维码图片并显示出来，$outfile必须传递图片路径]
+     * @param  [type]                   $saveAndPrint [保存二维码图片并显示出来，$outfile必须传递图片路径]
      * @return [type]                                 [description]
 	 */
 	# 静态调用
 	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
-	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
+	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

@@ -280,10 +280,10 @@
         }
         
         //----------------------------------------------------------------------
-        public static function png($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveandprint=false) 
+        public static function png($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveAndPrint=false) 
         {
             $enc = QRencode::factory($level, $size, $margin);
-            return $enc->encodePNG($text, $outfile, $saveandprint=false);
+            return $enc->encodePNG($text, $outfile, $saveAndPrint=false);
         }
 
         //----------------------------------------------------------------------
@@ -477,7 +477,7 @@
         }
         
         //----------------------------------------------------------------------
-        public function encodePNG($intext, $outfile = false,$saveandprint=false) 
+        public function encodePNG($intext, $outfile = false,$saveAndPrint=false) 
         {
             try {
             
@@ -491,7 +491,7 @@
                 
                 $maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab)+2*$this->margin));
                 
-                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
+                QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveAndPrint);
             
             } catch (Exception $e) {
             

@@ -32,7 +32,7 @@ interface MyPoster
 
     public function buildImDst($src, $w = 0, $h = 0);
 
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0);
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func='');
 
     public function buildImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal');
 
@@ -46,7 +46,7 @@ interface MyPoster
 
     public function buildQrMany($arr = []);
 
-    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveandprint = 0);
+    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
 
     public function path($path);
 
