@@ -220,7 +220,7 @@ try {
 	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
-	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
+	$result = $PosterManager->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

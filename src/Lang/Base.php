@@ -413,10 +413,19 @@ class Base
 
     /**
      * 渐变处理方法
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2022/10/18
-     * Time: 15:41
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2022/10/19
+     * Time: 上午12:13
+     * @param $im
+     * @param $toi
+     * @param $toj
+     * @param $rgbaColor
+     * @param $rgbaCount
+     * @param $alphas
+     * @param string $ii
+     * @param string $jj
+     * @return mixed
      */
     protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $ii = 'i', $jj = 'j')
     {
@@ -448,7 +457,7 @@ class Base
 
 
         if ($dst_x == '0') {
-
+            return $dst_x;
         } elseif ($dst_x == 'center') {
 
             $dst_x = ceil(($imWidth - $bgWidth) / 2);
@@ -489,7 +498,7 @@ class Base
     protected function calcDstY($dst_y, $imHeight, $bgHeight)
     {
         if ($dst_y == '0') {
-
+            return $dst_y;
         } elseif ($dst_y == 'center') {
 
             $dst_y = ceil(($imHeight - $bgHeight) / 2);
@@ -964,48 +973,11 @@ class Base
 
 
         # 处理目标 x 轴
-        if ($dst_x === 'center') {
+        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
 
-            $dst_x = ceil(($this->im_w - $bgWidth) / 2);
-
-        } elseif (is_numeric($dst_x) && $dst_x < 0) {
-
-            $dst_x = ceil($this->im_w + $dst_x);
-
-        } elseif (strpos($dst_x, '%') !== false) {
-
-            if (substr($dst_x, 0, strpos($dst_x, '%')) < 0) {
-
-                $dst_x = ceil($this->im_w + ($this->im_w * substr($dst_x, 0, strpos($dst_x, '%')) / 100));
-
-            } else {
-
-                $dst_x = ceil($this->im_w * substr($dst_x, 0, strpos($dst_x, '%')) / 100);
-
-            }
-
-
-        }
 
         # 处理目标 y 轴
-        if ($dst_y === 'center') {
-
-            $dst_y = ceil(($this->im_h - $bgHeight) / 2);
-        } elseif (is_numeric($dst_y) && $dst_y < 0) {
-
-            $dst_y = ceil($this->im_h + $dst_y);
-
-        } elseif (strpos($dst_y, '%') !== false) {
-
-            if (substr($dst_y, 0, strpos($dst_y, '%')) < 0) {
-
-                $dst_y = ceil($this->im_h + (($this->im_h * substr($dst_y, 0, strpos($dst_y, '%'))) / 100));
-
-            } else {
-                $dst_y = ceil($this->im_h * substr($dst_y, 0, strpos($dst_y, '%')) / 100);
-            }
-
-        }
+        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
 
         # 自定义宽高的时候
         if (!empty($src_w) && !empty($src_h)) {
@@ -1023,6 +995,8 @@ class Base
 
         //整合海报
         imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
+        if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
+        if (isset($result) && is_resource($result)) $this->destroyImage($result);
     }
 
     /**
