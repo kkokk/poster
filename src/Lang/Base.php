@@ -62,7 +62,11 @@ class Base
     public function setFilePath($path){
 
         $path = is_array($path)?$path:[$path];
-        $pathFileName = $path[0]??'';
+        if (PHP_VERSION <= 7) {
+            $pathFileName = isset($path[0]) ? $path[0] : '';
+        } else {
+            $pathFileName = $path[0] ?? '';
+        }
         $pathFileName = str_replace(['\\','/'], "/", $pathFileName);
 
         $fileName = $pathFileName?:time();
@@ -282,6 +286,40 @@ class Base
         $this->im = $cut;
     }
 
+    // 计算渐变颜色值
+    protected function calcColor($h, $i, $c1, $c2) {
+
+        $res = [];
+
+        $r = abs($c2[0] - $c1[0]);
+        // print_r(floor($r/$h * $i));exit;
+        $rr = $c2[0] - $c1[0];
+        $b = abs($c2[1] - $c1[1]);
+        $bb = $c2[1] - $c1[1];
+        $g = abs($c2[2] - $c1[2]);
+        $gg = $c2[2] - $c1[2];
+
+        if($r==0){
+            $res[] = $c2[0];
+        }else{
+            $res[] = $rr > 0 ? ( $c1[0] + $r/$h * $i) : ($c1[0] - $r/$h * $i);
+        }
+
+        if($b==0){
+            $res[] = $c2[1];
+        }else{
+            $res[] = $bb > 0 ? ( $c1[1] + $b/$h * $i) : ($c1[1] - $b/$h * $i);
+        }
+
+        if($g==0){
+            $res[] = $c2[2];
+        }else{
+            $res[] = $gg > 0 ? ( $c1[2] + $g/$h * $i) : ($c1[2] - $g/$h * $i);
+        }
+
+        return $res;
+    }
+
     /**
      * 创建背景
      * Author: lang
@@ -294,10 +332,34 @@ class Base
      * @param $alpha
      * @throws PosterException
      */
-    protected function Bg($w, $h, $rgba, $alpha = false, $shape="", $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
+    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
     {
+        // 判断颜色是否渐变
+        if(is_array($rgba[0])) {
+            // 渐变处理
+            $color1 = $rgba[0];
+            $color2 = $rgba[1];
+            if (PHP_VERSION <= 7) {
+                $alphas = isset($rgba[3]) ? $rgba[3] : 1;
+            } else {
+                $alphas = $rgba[3] ?? 1;
+            }
 
-        $pic = $this->createIm($w, $h, $rgba, $alpha);
+            $pic = imagecreatetruecolor($w, $h);
+            for ($i = $h; $i >= 0; $i--) {
+
+                $colorRgb = $this->calcColor($h, $i, $color1, $color2);
+                $color = imagecolorallocatealpha($pic, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+                // imagefilledrectangle($im, 0, $i, $width, 0, $color); // 填充颜色
+                // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
+                for ($j=0; $j < $w; $j++) {
+                    imagesetpixel($pic, $j, $i, $color);
+                }
+
+            }
+        } else {
+            $pic = $this->createIm($w, $h, $rgba, $alpha);
+        }
 
         $temp_dir = sys_get_temp_dir().'/'.uniqid().'.png';
 
@@ -308,28 +370,6 @@ class Base
 
         unlink($temp_dir);
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
-
-
-        // 渐变处理
-        // $color1 = [60, 120, 216];
-        // $color2 = [255, 0, 255];
-
-        // $width = 100;
-        // $height = 400;
-
-        // $im = imagecreatetruecolor($width, $height);
-        // for ($i = $height; $i >= 0; $i--) {
-            
-        //     $colorRgb = calcColor($height, $i, $color1, $color2);
-        //     $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], 60);
-        //     // imagefilledrectangle($im, 0, $i, $width, 0, $color);
-        //     // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];
-        //     for ($j=0; $j < $width; $j++) { 
-        //         imagesetpixel($im, $j, $i, $color);
-        //     }
-
-        // }
-
     }
 
     /**
@@ -389,39 +429,6 @@ class Base
         return imagecolorallocate($cut, $rgba[0], $rgba[1], $rgba[2]);
     }
 
-    // 计算渐变颜色值
-    protected function calcColor($h, $i, $c1, $c2) {
-
-        $res = [];
-
-        $r = abs($c2[0] - $c1[0]);
-        // print_r(floor($r/$h * $i));exit;
-        $rr = $c2[0] - $c1[0];
-        $b = abs($c2[1] - $c1[1]);
-        $bb = $c2[1] - $c1[1];
-        $g = abs($c2[2] - $c1[2]);
-        $gg = $c2[2] - $c1[2];
-
-        if($r==0){
-            $res[] = $c2[0];
-        }else{
-            $res[] = $rr > 0 ? ( $c1[0] + $r/$h * $i) : ($c1[0] - $r/$h * $i);
-        }
-
-        if($b==0){
-            $res[] = $c2[1];
-        }else{
-            $res[] = $bb > 0 ? ( $c1[1] + $b/$h * $i) : ($c1[1] - $b/$h * $i);
-        }
-
-        if($g==0){
-            $res[] = $c2[2];
-        }else{
-            $res[] = $gg > 0 ? ( $c1[2] + $g/$h * $i) : ($c1[2] - $g/$h * $i);
-        }
-
-        return $res;
-    }
 
     /**
      * 创建图片，合并到画布，释放内存
@@ -453,66 +460,60 @@ class Base
         $bgWidth = !empty($src_w) ? $src_w : $Width;
         $bgHight = !empty($src_h) ? $src_h : $Hight;
 
-        if($type  instanceof Closure) {
+        switch ($type) {
+            case 'normal':
 
-        } else {
-            switch ($type) {
-                case 'normal':
-
-                    # 自定义宽高的时候
-                    if (!empty($src_w) && !empty($src_h)) {
-                        $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-                        // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
-                        // imagecolortransparent($circle_new,$circle_new_white);
-                        // imagefill($circle_new, 0, 0, $circle_new_white);
-                        $w_circle_new = $bgWidth;
-                        $h_circle_new = $bgHight;
-                        # 按比例缩放
-                        imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
-                        $pic = $circle_new;
-                    }
-
-                    break;
-                case 'circle':
-
-                    $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                # 自定义宽高的时候
+                if (!empty($src_w) && !empty($src_h)) {
                     $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
-
-                    $w_circle = $bgWidth;
-                    $h_circle = $bgHight;
+                    // $circle_new_white = imagecolorallocatealpha($circle_new, 255, 255, 255, 127);
+                    // imagecolortransparent($circle_new,$circle_new_white);
+                    // imagefill($circle_new, 0, 0, $circle_new_white);
+                    $w_circle_new = $bgWidth;
+                    $h_circle_new = $bgHight;
                     # 按比例缩放
-                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
+                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
+                    $pic = $circle_new;
+                }
 
-                    $r = ($w_circle / 2); //圆半径
-                    for ($x = 0; $x < $w_circle; $x++) {
-                        for ($y = 0; $y < $h_circle; $y++) {
-                            $rgbColor = imagecolorat($circle_new, $x, $y);
-                            // $thisColor = imagecolorsforindex($circle_new, $rgbColor); // imagecolorallocatealpha
+                break;
+            case 'circle':
 
-                            if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
+                $circle = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
+                $circle_new = $this->createIm($bgWidth, $bgHight, [255, 255, 255, 127], $alpha = true);
 
-                                imagesetpixel($circle, $x, $y, $rgbColor);
+                $w_circle = $bgWidth;
+                $h_circle = $bgHight;
+                # 按比例缩放
+                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
 
-                            }
+                $r = ($w_circle / 2); //圆半径
+                for ($x = 0; $x < $w_circle; $x++) {
+                    for ($y = 0; $y < $h_circle; $y++) {
+                        $rgbColor = imagecolorat($circle_new, $x, $y);
+                        // $thisColor = imagecolorsforindex($circle_new, $rgbColor); // imagecolorallocatealpha
 
-                            // $newR = $r - 0.5;
-                            // if (((($x - $newR) * ($x - $newR) + ($y - $newR) * ($y - $newR)) == ($newR * $newR))) {
-                            //     imagesetpixel($circle, $x + 1, $y, $rgbColor);
-                            //     imagesetpixel($circle, $x, $y + 1, $rgbColor);
-                            //     imagesetpixel($circle, $x + 1, $y + 1, $rgbColor);
-                            // }
+                        if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
+
+                            imagesetpixel($circle, $x, $y, $rgbColor);
+
                         }
+
+                        // $newR = $r - 0.5;
+                        // if (((($x - $newR) * ($x - $newR) + ($y - $newR) * ($y - $newR)) == ($newR * $newR))) {
+                        //     imagesetpixel($circle, $x + 1, $y, $rgbColor);
+                        //     imagesetpixel($circle, $x, $y + 1, $rgbColor);
+                        //     imagesetpixel($circle, $x + 1, $y + 1, $rgbColor);
+                        // }
                     }
+                }
 
-                    $pic = $circle;
-                    break;
-                default:
-                    # code...
-                    break;
-            }
+                $pic = $circle;
+                break;
+            default:
+                # code...
+                break;
         }
-
-
 
         # 处理目标 x 轴
         if ($dst_x === 'center') {
