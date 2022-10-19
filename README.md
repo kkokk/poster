@@ -24,6 +24,10 @@ composer config -g repo.packagist composer https://repo.packagist.org
 
 4.保存路径支持绝对路径和相对路径（相对路径默认项目根目录，当不存在时，默认保存到tests/poster）
 
+5.新增设置路径
+
+6.新增添加背景（透明、渐变、位置、大小）
+
 #### authors
 lang
 732853989@qq.com
@@ -44,6 +48,8 @@ lang
 ![输入图片说明](https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large "在这里输入图片标题")
 
 ![输入图片说明](http://img.520yummy.com/images/2/2022/04/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg "在这里输入图片标题")
+
+![输入图片说明](https://cdn.learnku.com/uploads/images/202210/19/54036/JoJhekR1um.png!large "在这里输入图片标题")
 
 演示地址：暂无
 
