@@ -181,10 +181,16 @@ try {
 	$PosterManager = new PosterManager('poster/poster_user1');
 	$result = $PosterManager
 	->buildIm(638,826,[255,255,255,127],false)
-    ->buildImageMany($buildImageManyArr)
-    ->buildTextMany($buildTextManyArr)
-    ->buildQrMany($buildQrManyArr)
-    ->buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 ,
+    // ->buildImageMany($buildImageManyArr)
+    // ->buildTextMany($buildTextManyArr)
+    // ->buildQrMany($buildQrManyArr)
+    ->buildBg(400,400,['color'=>[[255, 0, 0],
+        [255, 125, 0],
+        [255, 255, 0],
+        [0, 255, 0],
+        [0, 255, 255],
+        [0, 0, 255],
+        [255, 0, 255]], 'alpha'=>1, 'to'=>'top'],true, 'center', 'center', 0, 0 ,
         function($im){
             $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
         })
@@ -220,7 +226,7 @@ try {
 	// $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
 	# 实例化调用
 	// $PosterManager = new PosterManager();
-	$result = $PosterManager->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
+	// $result = $PosterManager->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
 	print_r($result);exit;
 } catch (Exception $e) {
 	echo $e->getMessage();

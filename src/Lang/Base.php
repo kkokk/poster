@@ -375,10 +375,10 @@ class Base
 
     /**
      * 计算颜色渐变方向
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2022/10/18
-     * Time: 16:19
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 上午12:17
      * @param $im
      * @param $rgbaColor
      * @param $rgbaCount
@@ -386,29 +386,94 @@ class Base
      * @param $to
      * @param $w
      * @param $h
+     * @return mixed
      */
-    protected function calcColorDirection($im, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h)
+    public function calcColorDirection($im, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h)
     {
 
-        if ($to == 'top') {
-            $toi = $h;
-            $toj = $w;
-            $rgbaColor = array_reverse($rgbaColor);
-            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
-        } elseif ($to == 'left') {
-            $toi = $w;
-            $toj = $h;
-            $rgbaColor = array_reverse($rgbaColor);
-            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
-        } elseif ($to == 'right') {
-            $toi = $w;
-            $toj = $h;
-            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
-        } else {
-            $toi = $h;
-            $toj = $w;
-            $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+        $to = preg_replace('~\s+~', ' ', trim($to,' '));
+
+        switch ($to) {
+            case '':
+            case 'bottom':
+                $toi = $h;
+                $toj = $w;
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                break;
+            case 'top':
+                $toi = $h;
+                $toj = $w;
+                $rgbaColor = array_reverse($rgbaColor);
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                break;
+            case 'left':
+                $toi = $w;
+                $toj = $h;
+                $rgbaColor = array_reverse($rgbaColor);
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+                break;
+            case 'right':
+                $toi = $w;
+                $toj = $h;
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+                break;
+            case 'right bottom':
+            case 'bottom right':
+                $toi = $w;
+                $toj = $h;
+                $rgbaColor = array_reverse($rgbaColor);
+                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                break;
+            case 'right top':
+            case 'top right':
+                $toi = $w;
+                $toj = $h;
+                $rgbaColor = array_reverse($rgbaColor);
+                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                break;
+            case 'left bottom':
+            case 'bottom left':
+                $toi = $w;
+                $toj = $h;
+                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                break;
+            case 'left top':
+            case 'top left':
+                $toi = $w;
+                $toj = $h;
+                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                break;
+            default:
+                // code...
+                break;
         }
+
+        return $im;
+    }
+
+    /**
+     * 获取颜色
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 上午12:15
+     * @param $im
+     * @param $alphas
+     * @param $rgbaColor
+     * @param $rgbaCount
+     * @param $length
+     * @param $i
+     * @return false|int
+     */
+    public function getColor($im, $alphas, $rgbaColor, $rgbaCount, $length, $i){
+        $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
+        $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+        return $color;
+    }
+
+    public function getAlphasColor($im, $colorRgb, $alphas){
+        $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+        return $color;
     }
 
     /**
@@ -429,16 +494,130 @@ class Base
      */
     protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $ii = 'i', $jj = 'j')
     {
+        $radius = 200;
+        $r = $radius;
         for ($i = $toi; $i >= 0; $i--) {
-            // $colorRgb = $this->calcColor($h, $i, $color1, $color2);
-            $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $toi, $i);
-            $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+            // 获取颜色
+            $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $toi, $i);
             // imagefilledrectangle($this->im, 0, $i, $w, 0, $color); // 填充颜色
             // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
-                imagesetpixel($im, $$jj, $$ii, $color);
+                $rj = $$jj;
+                $ri = $$ii;
+                if (($j >= $radius && $j <= ($toj - $radius)) || ($i >= $radius && $i <= ($toi - $radius))) {
+                    //不在四角的范围内,直接画
+                    imagesetpixel($im, $rj, $ri, $color);
+                } else {
+                    // 上左
+                    $r_x  = $r;
+                    $r_y  = $r;
+                    if( ((($j - $r_x) * ($j - $r_x) + ($i - $r_y) * ($i - $r_y)) <= ($r * $r))) {
+                        imagesetpixel($im, $rj, $ri, $color);
+                    }
+                    //上右
+                    $y_x = $toj - $r; //圆心X坐标
+                    $y_y = $r; //圆心Y坐标
+                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($im, $rj, $ri, $color);
+                    }
+                    //下左
+                    $y_x = $r; //圆心X坐标
+                    $y_y = $toi - $r; //圆心Y坐标
+                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($im, $rj, $ri, $color);
+                    }
+                    //下右
+                    $y_x = $toj - $r; //圆心X坐标
+                    $y_y = $toi - $r; //圆心Y坐标
+                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($im, $rj, $ri, $color);
+                    }
+                }
             }
 
+        }
+
+        return $im;
+    }
+
+    /**
+     * 渐变处理方法 对角
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 上午12:13
+     * @param $im
+     * @param $toi
+     * @param $toj
+     * @param $rgbaColor
+     * @param $rgbaCount
+     * @param $alphas
+     * @param int $x
+     * @param int $y
+     * @return mixed
+     */
+    protected function linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0)
+    {
+
+        $toLen = $toi >= $toj ? $toi : $toj;
+
+        $len = $toi+$toj;
+
+        $ii = $len-1;
+
+        if( $x == 0 && $y == 0) {
+            // 从 0,0 开始
+            for ($i = 0; $i < $toLen + 1; $i++) {
+                //设$i为y轴坐标
+                $f = 0;
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                for ($j = 0; $j <= $i; $j++) {
+                    if ($j <= $toi && ($i - $j) <= $toj) {
+                        if (!$f) {
+                            $x = $j;
+                            $y = $i - $j;
+                            $f = 1;
+                        }
+                        imagesetpixel($im, $j, $i - $j, $color);
+                    }
+                }
+            }
+            //加入右半段
+            for ($i = $x + 1; $i <= $toi; $i++) {
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                for ($j = 0; $j <= $y; $j++) {
+                    if (($i + $j) <= $toi && ($y - $j) <= $toj) {
+                        imagesetpixel($im, $i + $j, $y - $j, $color);
+                    }
+                }
+            }
+        } else {
+            // 从 0,y 开始
+            for ($i = 0; $i < $toLen + 1; $i++) {
+                //设$i为y轴坐标
+                $f = false;
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                for ($j = 0; $j <= $i; $j++) {
+                    if ($j <= $toi && ($i - $j) <= $toj) {
+                        if (!$f) {
+                            $x = $j;
+                            $y = $i - $j;
+                            $f = true;
+                        }
+                        imagesetpixel($im, $j, $toj - ($i - $j), $color);
+                    }
+                }
+            }
+
+            //加入后半段
+            for ($i = $x + 1; $i <= $toi; $i++) {
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                for ($j = 0; $j <= $y; $j++) {
+                    if (($i + $j) <= $toi && ($y - $j) <= $toj) {
+                        imagesetpixel($im, $i + $j, $j, $color);
+                    }
+                }
+            }
         }
 
         return $im;
