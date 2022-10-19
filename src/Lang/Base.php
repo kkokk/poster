@@ -398,11 +398,11 @@ class Base
         } elseif ($to == 'left') {
             $toi = $w;
             $toj = $h;
+            $rgbaColor = array_reverse($rgbaColor);
             $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
         } elseif ($to == 'right') {
             $toi = $w;
             $toj = $h;
-            $rgbaColor = array_reverse($rgbaColor);
             $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
         } else {
             $toi = $h;
