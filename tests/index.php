@@ -184,13 +184,13 @@ try {
     // ->buildImageMany($buildImageManyArr)
     // ->buildTextMany($buildTextManyArr)
     // ->buildQrMany($buildQrManyArr)
-    ->buildBg(400,400,['color'=>[[255, 0, 0],
+    ->buildBg(400,526,['color'=>[[255, 0, 0],
         [255, 125, 0],
         [255, 255, 0],
         [0, 255, 0],
         [0, 255, 255],
         [0, 0, 255],
-        [255, 0, 255]], 'alpha'=>1, 'to'=>'top'],true, 'center', 'center', 0, 0 ,
+        [255, 0, 255]], 'alpha'=>1, 'to'=>'right bottom', 'radius'=>400],true, 'center', 'center', 0, 0 ,
         function($im){
             $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
         })

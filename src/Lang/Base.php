@@ -391,7 +391,7 @@ class Base
     public function calcColorDirection($im, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h)
     {
 
-        $to = preg_replace('~\s+~', ' ', trim($to,' '));
+        $to = preg_replace('~\s+~', ' ', trim($to, ' '));
 
         switch ($to) {
             case '':
@@ -452,7 +452,7 @@ class Base
     }
 
     /**
-     * 获取颜色
+     * 获取渐变颜色值
      * @Author lang
      * @Email: 732853989@qq.com
      * Date: 2022/10/20
@@ -465,79 +465,119 @@ class Base
      * @param $i
      * @return false|int
      */
-    public function getColor($im, $alphas, $rgbaColor, $rgbaCount, $length, $i){
+    public function getColor($im, $alphas, $rgbaColor, $rgbaCount, $length, $i)
+    {
         $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
         $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
         return $color;
     }
 
-    public function getAlphasColor($im, $colorRgb, $alphas){
+    /**
+     * 获取透明颜色值
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 9:37
+     * @param $im
+     * @param $colorRgb
+     * @param $alphas
+     * @return false|int
+     */
+    public function getAlphasColor($im, $colorRgb, $alphas)
+    {
         $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
         return $color;
     }
 
     /**
      * 渐变处理方法
-     * @Author lang
-     * @Email: 732853989@qq.com
-     * Date: 2022/10/19
-     * Time: 上午12:13
-     * @param $im
-     * @param $toi
-     * @param $toj
-     * @param $rgbaColor
-     * @param $rgbaCount
-     * @param $alphas
-     * @param string $ii
-     * @param string $jj
-     * @return mixed
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 10:04
+     * @param $im resource 画布资源
+     * @param $toi double 宽或高
+     * @param $toj double 高或宽
+     * @param $rgbaColor array 渐变色值
+     * @param $rgbaCount int 渐变色数量
+     * @param $alphas int 透明度 1 - 127
+     * @param int $radius int 圆角
+     * @param string $ii string x,y 变量取值替换
+     * @param string $jj string x,y 变量取值替换
+     * @return mixed|resource
      */
     protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $ii = 'i', $jj = 'j')
     {
-        $radius = 200;
-        $r = $radius;
+
         for ($i = $toi; $i >= 0; $i--) {
             // 获取颜色
             $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $toi, $i);
             // imagefilledrectangle($this->im, 0, $i, $w, 0, $color); // 填充颜色
             // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
-                $rj = $$jj;
-                $ri = $$ii;
-                if (($j >= $radius && $j <= ($toj - $radius)) || ($i >= $radius && $i <= ($toi - $radius))) {
-                    //不在四角的范围内,直接画
-                    imagesetpixel($im, $rj, $ri, $color);
-                } else {
-                    // 上左
-                    $r_x  = $r;
-                    $r_y  = $r;
-                    if( ((($j - $r_x) * ($j - $r_x) + ($i - $r_y) * ($i - $r_y)) <= ($r * $r))) {
-                        imagesetpixel($im, $rj, $ri, $color);
-                    }
-                    //上右
-                    $y_x = $toj - $r; //圆心X坐标
-                    $y_y = $r; //圆心Y坐标
-                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
-                        imagesetpixel($im, $rj, $ri, $color);
-                    }
-                    //下左
-                    $y_x = $r; //圆心X坐标
-                    $y_y = $toi - $r; //圆心Y坐标
-                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
-                        imagesetpixel($im, $rj, $ri, $color);
-                    }
-                    //下右
-                    $y_x = $toj - $r; //圆心X坐标
-                    $y_y = $toi - $r; //圆心Y坐标
-                    if (((($j - $y_x) * ($j - $y_x) + ($i - $y_y) * ($i - $y_y)) <= ($r * $r))) {
-                        imagesetpixel($im, $rj, $ri, $color);
-                    }
-                }
+                imagesetpixel($im, $$jj, $$ii, $color);
             }
 
         }
 
         return $im;
+    }
+
+    /**
+     * 画圆角
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/10/20
+     * Time: 9:55
+     * @param $im resource 画布资源
+     * @param $w double 宽
+     * @param $h double 高
+     * @param $radius int 圆角
+     * @return mixed|resource
+     */
+    protected function setPixelRadius($im, $w, $h, $radius)
+    {
+        $newIm = $this->createIm($w, $h, [], true);;
+
+        $len = $w > $h ? $h / 2 : $w / 2;
+        $radius = $radius < $len ? floor($radius) : floor($len);
+        $r = $radius;
+        for ($x = 0; $x <= $w; $x++) {
+            for ($y = 0; $y <= $h; $y++) {
+                $color = imagecolorat($im, $x, $y);
+                if (($x >= $radius && $x <= ($w - $radius)) || ($y >= $radius && $y <= ($h - $radius))) {
+                    //不在四角的范围内,直接画
+                    imagesetpixel($newIm, $x, $y, $color);
+                } else {
+                    // 上左
+                    $y_x = $r;
+                    $y_y = $r;
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($newIm, $x, $y, $color);
+                    }
+                    //上右
+                    $y_x = $w - $r; //圆心X坐标
+                    $y_y = $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($newIm, $x, $y, $color);
+                    }
+                    //下左
+                    $y_x = $r; //圆心X坐标
+                    $y_y = $h - $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($newIm, $x, $y, $color);
+                    }
+                    //下右
+                    $y_x = $w - $r; //圆心X坐标
+                    $y_y = $h - $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($newIm, $x, $y, $color);
+                    }
+                }
+            }
+        }
+
+        return $newIm;
     }
 
     /**
@@ -561,11 +601,11 @@ class Base
 
         $toLen = $toi >= $toj ? $toi : $toj;
 
-        $len = $toi+$toj;
+        $len = $toi + $toj;
 
-        $ii = $len-1;
+        $ii = $len - 1;
 
-        if( $x == 0 && $y == 0) {
+        if ($x == 0 && $y == 0) {
             // 从 0,0 开始
             for ($i = 0; $i < $toLen + 1; $i++) {
                 //设$i为y轴坐标
@@ -730,10 +770,12 @@ class Base
             $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
             $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
             $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
+            $radius = isset($rgba['radius']) ? $rgba['radius'] : 0;
         } else {
             $rgbaColor = $rgba['color'] ?? [[0, 0, 0]];
             $alphas = $rgba['alpha'] ?? 1;
             $to = $rgba['to'] ?? 'bottom';
+            $radius = $rgba['radius'] ?? 0;
         }
         $rgbaCount = count($rgbaColor);
 
@@ -746,12 +788,17 @@ class Base
         $pic = $this->createIm($w, $h, [], $alpha);
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
 
+        // 如果设置了圆角则画圆角
+        if($radius > 0) {
+            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
+        }
+
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
 
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
-        if($func instanceof \Closure) {
+        if ($func instanceof \Closure) {
             // 闭包处理 由于设计原因。。。先克隆处理一下
             $that = clone $this;
             $that->im = $pic;
