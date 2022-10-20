@@ -107,13 +107,13 @@ $poster->buildBg($w,$h,$rgba,$alpha); # 创建画布
 | ----- | ------- | ---- | ------------------------ |
 | w     | number  | 是   | 画布宽                   |
 | h     | number  | 是   | 画布高                   |
-| rgba  | array   | 否   | color颜色数组取值范围0-255、alpha透明度范围1-127、to颜色渐变方向取值范围bottom、top、left、right默认bottom<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
+| rgba  | array   | 否   | color 颜色数组取值范围0-255<br />alpha 透明度范围1-127<br />to 颜色渐变方向取值范围bottom、top、left、right默认bottom<br />radius 圆角 默认0<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
 | alpha | boolean | 否   | 是否透明，是：true       |
 | dst_x | number\|string\|array | 否 | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
-| dst_y | number\|string\|array | 否 | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y | number\|string\|array | 否 | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x | number | 否 | 图片x轴，默认0 |
 | src_y | number | 否 | 图片y轴，默认0 |
-| func | closure | 否 | 匿名函数（闭包），可以已当前背景为基础合成相应的内容<br />示例：`->buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 ,     I'm function($im){         $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);     })` |
+| func | closure | 否 | 匿名函数（闭包），可以已当前背景为基础合成相应的内容<br />示例：`buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 , function($im){         $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);     })` |
 
 ##### **合成图片**
 
@@ -127,7 +127,7 @@ $poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type)
 | ----- | -------------- | ---- | ------------------------------------------------------------ |
 | src   | string         | 是   | 路径，支持网络图片（带http或https）                          |
 | dst_x | number\|string | 否   | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
-| dst_y | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x | number         | 否   | 图片x轴，默认0                                               |
 | src_y | number         | 否   | 图片y轴，默认0                                               |
 | src_w | number         | 否   | 图片自定义宽，默认原宽                                       |
@@ -168,7 +168,7 @@ $poster->buildQr($text,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$size,$margin);
 | ------ | -------------- | ---- | ------------------------------------------------------------ |
 | text   | string         | 是   | 内容，例如：http://www.520yummy.com                          |
 | dst_x  | number\|string | 否   | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
-| dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
+| dst_y  | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x  | number         | 否   | 图片x轴，默认0                                               |
 | src_y  | number         | 否   | 图片y轴，默认0                                               |
 | src_w  | number         | 否   | 图片自定义宽，默认原宽                                       |
