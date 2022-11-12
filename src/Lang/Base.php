@@ -540,37 +540,44 @@ class Base
         $newIm = $this->createIm($w, $h, [], true);;
 
         $len = $w > $h ? $h / 2 : $w / 2;
-        $radius = $radius < $len ? floor($radius) : floor($len);
-        $r = $radius;
-        for ($x = 0; $x <= $w; $x++) {
-            for ($y = 0; $y <= $h; $y++) {
+
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius, $len);
+
+        for ($x = 0; $x < $w; $x++) {
+            for ($y = 0; $y < $h; $y++) {
                 $color = imagecolorat($im, $x, $y);
-                if (($x >= $radius && $x <= ($w - $radius)) || ($y >= $radius && $y <= ($h - $radius))) {
+                if (($x >= $leftTopRadius || $y >= $leftTopRadius)
+                && (($x <= ($w - $rightTopRadius) || $y >= $rightTopRadius))
+                && (($x >= $leftBottomRadius || $y <= ($h - $leftBottomRadius)))
+                && (($x <= ($w - $rightBottomRadius)) || $y <= ($h - $rightBottomRadius))) {
                     //不在四角的范围内,直接画
                     imagesetpixel($newIm, $x, $y, $color);
-                } else {
+                }else{
                     // 上左
-                    $y_x = $r;
-                    $y_y = $r;
-                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                    $y_x = $leftTopRadius;
+                    $y_y = $leftTopRadius;
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($leftTopRadius * $leftTopRadius))) {
                         imagesetpixel($newIm, $x, $y, $color);
                     }
-                    //上右
-                    $y_x = $w - $r; //圆心X坐标
-                    $y_y = $r; //圆心Y坐标
-                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+
+                    // 上右
+                    $y_x = $w - $rightTopRadius;
+                    $y_y = $rightTopRadius;
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($rightTopRadius * $rightTopRadius))) {
                         imagesetpixel($newIm, $x, $y, $color);
                     }
+
                     //下左
-                    $y_x = $r; //圆心X坐标
-                    $y_y = $h - $r; //圆心Y坐标
-                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                    $y_x = $rightTopRadius;
+                    $y_y = $h - $rightTopRadius;
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($leftBottomRadius * $leftBottomRadius))) {
                         imagesetpixel($newIm, $x, $y, $color);
                     }
+
                     //下右
-                    $y_x = $w - $r; //圆心X坐标
-                    $y_y = $h - $r; //圆心Y坐标
-                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                    $y_x = $w - $rightBottomRadius;
+                    $y_y = $h - $rightBottomRadius;
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($rightBottomRadius * $rightBottomRadius))) {
                         imagesetpixel($newIm, $x, $y, $color);
                     }
                 }
@@ -578,6 +585,71 @@ class Base
         }
 
         return $newIm;
+    }
+
+    /**
+     * 根据传值类型获取四个角的半径
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/11/12
+     * Time: 15:39
+     * @param $radius string|array|integer '20 10' [20, 10] 10
+     * @param $len
+     * @return false[]|float[]
+     */
+    protected function getRadiusType($radius, $len){
+        if(is_string($radius)){
+            // 把字符串格式转数组
+            $radius = preg_replace('~\s+~', ' ', trim($radius, ' '));
+            $radius = explode(' ', $radius);
+        } elseif (is_numeric($radius)) {
+            // 整形转数组
+            $radius = [$radius, $radius, $radius, $radius];
+        }else{
+            if(!is_array($radius)) throw new PosterException('圆角参数类型错误');
+        }
+        // [20] 四个角
+        // [20,30] 第一个值 左上 右下 第二个值 右上 左下
+        // [20,30,20] 第一个值 左上 第二个值 右上 左下 第三个值 右下
+        // [20,30,20,10]  左上 右上 右下  左下
+        $radiusCount = count($radius);
+        if($radiusCount==1){
+            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightTopRadius = $this->getMaxRadius($len, $radius[0]);
+            $leftBottomRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
+        }elseif($radiusCount==2){
+            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
+            $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
+        }elseif($radiusCount==3){
+            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
+            $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
+            $rightBottomRadius = $this->getMaxRadius($len, $radius[2]);
+        }else{
+            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
+            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
+            $leftBottomRadius = $this->getMaxRadius($len, $radius[2]);
+            $rightBottomRadius = $this->getMaxRadius($len, $radius[3]);
+        }
+
+        return [$leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius];
+    }
+
+    /**
+     * 获取最大圆角半径
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/11/12
+     * Time: 15:14
+     * @param $len
+     * @param $radius
+     * @return false|float
+     */
+    protected function getMaxRadius($len, $radius){
+        return $radius < $len ? floor($radius) : floor($len);
     }
 
     /**
@@ -789,7 +861,7 @@ class Base
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
 
         // 如果设置了圆角则画圆角
-        if($radius > 0) {
+        if($radius) {
             $pic = $this->setPixelRadius($pic, $w, $h, $radius);
         }
 
