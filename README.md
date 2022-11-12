@@ -28,6 +28,8 @@ composer config -g repo.packagist composer https://repo.packagist.org
 
 6.新增添加背景（透明、渐变、位置、大小）
 
+7.新增添加背景（圆角）
+
 #### authors
 lang
 732853989@qq.com
@@ -98,7 +100,18 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 ##### **创建背景、遮罩** 
 
 ```php
-$poster->buildBg($w,$h,$rgba,$alpha); # 创建画布
+// 背景rgba 参数解释
+// color 颜色数组取值范围0-255
+// alpha 透明度范围1-127
+// to 颜色渐变方向取值范围bottom、top、left、right默认bottom
+// 单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]
+// 多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left']
+// radius string|array|integer 圆角 默认0 ( '10 20', [10, 20, 30], 10)
+// [20] 四个角
+// [20,30] 第一个值 左上 右下 第二个值 右上 左下
+// [20,30,20] 第一个值 左上 第二个值 右上 左下 第三个值 右下
+// [20,30,20,10]  左上 右上 右下  左下
+$poster->buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom', 'radius'=>'10'],true, ['center', -10], ['center', 10], 0, 0 , function($im){         $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);     }); # 创建画布
 ```
 
 参数说明
@@ -107,13 +120,13 @@ $poster->buildBg($w,$h,$rgba,$alpha); # 创建画布
 | ----- | ------- | ---- | ------------------------ |
 | w     | number  | 是   | 画布宽                   |
 | h     | number  | 是   | 画布高                   |
-| rgba  | array   | 否   | color 颜色数组取值范围0-255<br />alpha 透明度范围1-127<br />to 颜色渐变方向取值范围bottom、top、left、right默认bottom<br />radius 圆角 默认0<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
+| rgba  | array   | 否   | color 颜色数组取值范围0-255<br />alpha 透明度范围1-127<br />to 颜色渐变方向取值范围bottom、top、left、right默认bottom<br />radius string\|array\|integer 圆角 默认0<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
 | alpha | boolean | 否   | 是否透明，是：true       |
 | dst_x | number\|string\|array | 否 | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | dst_y | number\|string\|array | 否 | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | src_x | number | 否 | 图片x轴，默认0 |
 | src_y | number | 否 | 图片y轴，默认0 |
-| func | closure | 否 | 匿名函数（闭包），可以已当前背景为基础合成相应的内容<br />示例：`buildBg(400,526,['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 'alpha'=>50, 'to'=>'bottom'],true, ['center', -10], ['center', 10], 0, 0 , function($im){         $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);     })` |
+| func | closure | 否 | 匿名函数（闭包），可以已当前背景为基础合成相应的内容 |
 
 ##### **合成图片**
 
