@@ -119,8 +119,17 @@ class Base
     {
         // 绝对路径 or 相对路径
         $absolute = $this->isAbsolute($pathFileName);
-        $this->path = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
+        $this->path = $this->getDocumentRoot();
         $this->path = $absolute ? '' : ($this->path ? $this->path . '/' : __DIR__ . '/../../tests/');
+    }
+
+    /**
+     * 获取项目根目录
+     * @Author lang
+     * @Date   2022-03-10T15:42:38+0800
+     */
+    private function getDocumentRoot(){
+        return iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
     }
 
     private function isAbsolute($pathFileName)
@@ -1165,7 +1174,12 @@ class Base
 
         if ($content == '') return true;
 
-        $font_family = !empty($font_family) ? $this->path . $font_family : $this->font_family;
+        if(!empty($font_family)) {
+            $isAbsolute = $this->isAbsolute($font_family);
+            $font_family = !$isAbsolute ? $this->getDocumentRoot() . $font_family : realpath($font_family);
+        } else {
+            $font_family = $this->font_family;
+        }
 
         $color = $this->createColorAlpha($this->im, $rgba);
 
