@@ -577,8 +577,8 @@ class Base
                     }
 
                     //下左
-                    $y_x = $rightTopRadius;
-                    $y_y = $h - $rightTopRadius;
+                    $y_x = $leftBottomRadius;
+                    $y_y = $h - $leftBottomRadius;
                     if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($leftBottomRadius * $leftBottomRadius))) {
                         imagesetpixel($newIm, $x, $y, $color);
                     }
