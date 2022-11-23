@@ -180,17 +180,17 @@ try {
 	// 合成图片
 	$PosterManager = new PosterManager('poster/poster_user1');
 	$result = $PosterManager
-	->buildIm(638,826,[255,255,255,127],false)
+	// ->buildIm(638,826,[255,255,255,127],false)
     // ->buildImageMany($buildImageManyArr)
     // ->buildTextMany($buildTextManyArr)
     // ->buildQrMany($buildQrManyArr)
-    ->buildBg(400,526,['color'=>[[255, 0, 0],
+    ->buildBg(400,500,['color'=>[[255, 0, 0],
         [255, 125, 0],
         [255, 255, 0],
         [0, 255, 0],
         [0, 255, 255],
         [0, 0, 255],
-        [255, 0, 255]], 'alpha'=>1, 'to'=>'right bottom', 'radius'=>'100 200 50'],true, 'center', 'center', 0, 0 ,
+        [255, 0, 255]], 'alpha'=>1, 'to'=>'left top', 'radius'=>'0'],true, 'center', 'center', 0, 0 ,
         function($im){
             $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
         })

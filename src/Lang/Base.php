@@ -431,26 +431,26 @@ class Base
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
                 break;
             case 'right top':
             case 'top right':
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
                 break;
             case 'left bottom':
             case 'bottom left':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
                 break;
             case 'left top':
             case 'top left':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
                 break;
             default:
                 // code...
@@ -662,7 +662,7 @@ class Base
     }
 
     /**
-     * 渐变处理方法 对角
+     * 渐变处理方法 对角 分两段循环
      * @Author lang
      * @Email: 732853989@qq.com
      * Date: 2022/10/20
@@ -744,6 +744,134 @@ class Base
         return $im;
     }
 
+    /**
+     * 根据对角线长度循环
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/11/23
+     * Time: 11:35
+     * @param $im
+     * @param $toi
+     * @param $toj
+     * @param $rgbaColor
+     * @param $rgbaCount
+     * @param $alphas
+     * @param int $x
+     * @param int $y
+     * @return mixed
+     */
+    protected function linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0){
+        $total = $toi + $toj + 1; // 对角线最大循环次数
+        $isRectangle = $toi != $toj; // 判断是否是长方形
+        // 获取中间位置数值
+        $centerNum = !$isRectangle ? $this->centerNumSquare($total) : $this->centerNumRectangle($toi, $toj);
+
+        $ii = $total; // 颜色计算递减数值
+
+        $toiTag = 'ii'; // 默认宽大于长
+        $tojTag = 'jj'; // 默认宽大于长
+        if($toj > $toi){  // 长大于宽
+            $toiTag = 'jj';
+            $tojTag = 'ii';
+        }
+
+        if($isRectangle){ // 长方形
+            for ($i=0; $i < $total; $i++) {
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
+                $im = $this->getPointRectangle($im, $i, $centerNum, $total, $color, $toiTag, $tojTag, $x, $y);
+            }
+        } else {
+            // 正方形
+            for ($i=0; $i < $total; $i++) {
+                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
+                $im = $this->getPointSquare($im, $i, $centerNum, $color, $x, $y);
+            }
+        }
+
+        return $im;
+    }
+
+    /**
+     * 正方形获取中间位置数值
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/11/23
+     * Time: 10:38
+     * @param $num
+     * @return float|int
+     */
+    protected function centerNumSquare($num){
+        return $num / 2 ;
+    }
+
+    /**
+     * 长方形获取中间位置数值
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/11/23
+     * Time: 10:39
+     * @param $x
+     * @param $y
+     * @return int
+     */
+    protected function centerNumRectangle($x, $y){
+        return $x > $y ? $y + 1 : $x + 1;
+    }
+
+    protected function getPointRectangle($im, $num, $centerNum, $total, $color, $toiTag, $tojTag, $x=0, $y=0){
+
+        $len = $total - $centerNum * 2; // 求取对角线上相交线坐标到边的最大宽度数量
+
+        $min = $centerNum; // 从第几次循环开始保持最大宽度
+        $max = $min + $len; // 到第几结束
+
+        if($num >= $min && $num <= $max){
+            $ii = $num - $centerNum + 1;
+            for ($jj=$centerNum - 1; $jj >= 0; $jj--) {
+                imagesetpixel($im, ceil($$toiTag), abs($y - floor($$tojTag)), $color);
+                $ii++;
+            }
+
+        } elseif ($num > $max){
+
+            $num = $num - $centerNum;
+            $ii = $num+1;
+            $jj = $max - $len - 1;
+            for ($i=$max; $i > $num; $i--) {
+                imagesetpixel($im, ceil($$toiTag), abs($y - floor($$tojTag)), $color);
+                $ii++;
+                $jj--;
+            }
+
+        } else {
+
+            for ($i=0; $i <= $num; $i++) {
+                imagesetpixel($im, $i,  abs($y - ($num-$i)), $color);
+            }
+
+        }
+
+        return $im;
+    }
+
+    protected function getPointSquare($im, $num, $centerNum, $color, $x=0, $y=0){
+        if($num > $centerNum){
+            $num = $num - $centerNum;
+            $ii = $num;
+            for ($i=$centerNum; $i >= $num; $i--) {
+                // $arr[] = [ceil($ii) , floor($i)];
+                imagesetpixel($im, ceil($ii), abs($y - floor($i)), $color);
+                $ii++;
+            }
+        } else {
+
+            for ($i=0; $i <= $num; $i++) {
+                // $arr[] = [$i , $num-$i];
+                imagesetpixel($im, $i, abs($y - ($num-$i)), $color);
+            }
+        }
+        return $im;
+    }
     /**
      * 计算画布X轴位置
      * Author: lang
