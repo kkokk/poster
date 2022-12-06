@@ -16,6 +16,13 @@ require '../vendor/autoload.php';
 
 try {
 
+
+
+    $data = PosterManager::Captcha('slider')->config()->get();
+
+    print_r($data);
+    exit;
+
 	/**
 	 * [buildIm description] 创建画布
 	 * @Author   lang
