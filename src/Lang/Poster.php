@@ -10,12 +10,13 @@ namespace Kkokk\Poster\Lang;
  * 接口模式
  */
 
+use Kkokk\Poster\Base\PosterBase;
 use Kkokk\Poster\Interfaces\MyPoster;
 
 /**
  * 执行
  */
-class Poster extends Base implements MyPoster
+class Poster extends PosterBase implements MyPoster
 {
     /**
      * [buildIm description] 创建画布
