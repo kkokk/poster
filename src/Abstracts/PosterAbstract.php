@@ -3,7 +3,7 @@
 namespace Kkokk\Poster\Abstracts;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Lang\Base;
+use Kkokk\Poster\Base\PosterBase;
 
 /**
  * @Author: lang
@@ -17,7 +17,7 @@ use Kkokk\Poster\Lang\Base;
 /**
  * 执行
  */
-abstract class PosterAbstract extends Base
+abstract class PosterAbstract extends PosterBase
 {
     /**
      * buildIm 创建画布

@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "php": ">=5.6.0",
-        "ext-gd": "*"
+        "ext-gd": "*",
+      "ext-iconv": "*"
     },
     "license": "MIT",
     "authors": [

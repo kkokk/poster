@@ -15,6 +15,17 @@ require '../vendor/autoload.php';
  */
 
 try {
+    echo microtime().PHP_EOL;
+
+    $data = PosterManager::Captcha()->get();
+
+    // print_r($data);
+
+    echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
+    echo microtime().PHP_EOL;
+    echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
+    print_r(getrusage()).PHP_EOL;
+    exit;
 
 	/**
 	 * [buildIm description] 创建画布

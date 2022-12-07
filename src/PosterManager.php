@@ -21,7 +21,7 @@ class PosterManager
 	public function __construct($options=[])
 	{
         if (!empty($options)) {
-            self::$options = $options;
+            self::$options = !is_array($options) ? [$options] : $options;
         }
 	}
 
@@ -64,7 +64,7 @@ class PosterManager
                 throw new SystemException("the class name does not exist . class : " . self::$className);
             }
 
-            self::$connector = new self::$className(self::$options);
+            self::$connector = new self::$className(...self::$options);
         }
         return self::$connector;
     }

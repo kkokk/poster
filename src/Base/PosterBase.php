@@ -1,6 +1,6 @@
 <?php
 
-namespace Kkokk\Poster\Lang;
+namespace Kkokk\Poster\Base;
 require_once(__DIR__ . '/../PHPQrcode/phpqrcode.php');
 
 /**
@@ -16,7 +16,7 @@ use Kkokk\Poster\Exception\PosterException;
 /**
  *
  */
-class Base
+class PosterBase
 {
 
     protected $im;
@@ -1036,13 +1036,13 @@ class Base
     /**
      * 创建画布
      */
-    protected function createIm($w, $h, $rgba, $alpha = false)
+    public function createIm($w, $h, $rgba, $alpha = false)
     {
         $cut = imagecreatetruecolor($w, $h);
 
         $white = $alpha ? $this->createColorAlpha($cut, $rgba) : $this->createColor($cut, $rgba);
         if ($alpha) {
-            imagecolortransparent($cut, $white);
+            // imagecolortransparent($cut, $white);
             imagesavealpha($cut, true);
         }
         imagefill($cut, 0, 0, $white);
