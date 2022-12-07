@@ -1036,13 +1036,13 @@ class PosterBase
     /**
      * 创建画布
      */
-    protected function createIm($w, $h, $rgba, $alpha = false)
+    public function createIm($w, $h, $rgba, $alpha = false)
     {
         $cut = imagecreatetruecolor($w, $h);
 
         $white = $alpha ? $this->createColorAlpha($cut, $rgba) : $this->createColor($cut, $rgba);
         if ($alpha) {
-            imagecolortransparent($cut, $white);
+            // imagecolortransparent($cut, $white);
             imagesavealpha($cut, true);
         }
         imagefill($cut, 0, 0, $white);
