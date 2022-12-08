@@ -89,7 +89,12 @@ class Slider extends MyCaptcha
      */
     public function check($key, $value, $leeway = 0)
     {
-        $x = Cache::pull($key);
+        if(class_exists(Cache::class)){
+            $x = Cache::pull($key);
+        } else {
+            return false;
+        }
+
         if(empty($x)) return false;
 
         $leeway = $leeway ?: $this->leeway;
@@ -121,13 +126,13 @@ class Slider extends MyCaptcha
         $bg = $draw->createIm($slider_width, $slider_height, [0, 0, 0, 60], true);
         $ims = $draw->createIm($slider_width, $slider_height, [], false);
 
-        $x1 = mt_rand(0, $bg_width - $w);
+        $x1 = mt_rand(30, $bg_width - $w);
         $x2 = $x1 + $w;
 
         $y1 = mt_rand(0, $bg_height - $h);
         $y2 = $y1 + $h;
 
-        $xx1 = mt_rand(0, $bg_width - $w);
+        $xx1 = mt_rand(30, $bg_width - $w);
         // $xx2 = $xx1 + $slider_width;
 
         $yy1 = mt_rand(0, $bg_height - $h);
