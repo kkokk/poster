@@ -8,6 +8,8 @@ PHP海报生成插件，极速生成方便快捷。
 
 快速生成海报、生成签到日、生成二维码、合成二维码、图片添加水印
 
+增加滑块验证生成
+
 提示：
 
 如果无法更新版本，composer 切换回原镜像
@@ -46,6 +48,30 @@ lang
 文档地址：http://www.520yummy.com/composer/poster/doc.html
 
 演示效果
+2022-12 增加了生成滑块验证图片
+
+![输入图片说明](tests/122301561368230151165-1.gif)
+
+```php
+	use Kkokk\Poster\PosterManager;
+	use Kkokk\Poster\Exception\PosterException;
+	
+	try {
+		# 获取滑块验证参数
+		# 内部使用了 laravel 的 cache 缓存
+		# 返回的是图片的 base64 、 缓存key 、滑块高度
+		$data = PosterManager::Captcha()->get();
+		
+		# 验证滑块
+		# 前端根据相关滑块操作进行处理, 返回x坐标
+		# 传入返回的key， 和前端传回来的x坐标
+		# 返回 true 则验证成功
+		$res = PosterManager::Captcha()->check($key, $value);
+		
+	} catch (PosterException $e) {
+		print_r($e->getMessage())
+	}
+```
 
 ![输入图片说明](https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large "在这里输入图片标题")
 
