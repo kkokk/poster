@@ -55,7 +55,7 @@ lang
 
 ![输入图片说明](https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large "在这里输入图片标题")
 
-![输入图片说明](http://img.520yummy.com/images/2/2022/04/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg "在这里输入图片标题")
+![输入图片说明](tests/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg)
 
 ![输入图片说明](https://cdn.learnku.com/uploads/images/202210/19/54036/JoJhekR1um.png!large "在这里输入图片标题")
 
