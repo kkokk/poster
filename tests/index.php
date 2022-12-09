@@ -206,7 +206,7 @@ try {
         function($im){
             $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
         })
-    ->getPoster();
+    ->baseData();
 
     echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
     echo microtime().PHP_EOL;

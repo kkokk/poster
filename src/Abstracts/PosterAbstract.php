@@ -65,6 +65,8 @@ abstract class PosterAbstract extends PosterBase
 
     abstract public function stream();
 
+    abstract public function baseData();
+
     public function __construct($params = [])
     {
         parent::__construct($params);

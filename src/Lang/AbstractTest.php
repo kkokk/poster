@@ -306,4 +306,8 @@ class AbstractTest extends PosterAbstract
 
         return $this->setData();
     }
+
+    public function baseData(){
+        return $this->getBaseData();
+    }
 }
