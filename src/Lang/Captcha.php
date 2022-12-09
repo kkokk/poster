@@ -18,6 +18,11 @@ class Captcha
         $this->className = ucfirst($type);
     }
 
+    public function type($type = 'slider'){
+        $this->className = ucfirst($type);
+        return $this;
+    }
+
     function __call($method, $arguments)
     {
         $className = '\\Kkokk\\Poster\Captcha\\' . $this->className;

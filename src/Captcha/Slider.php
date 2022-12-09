@@ -58,7 +58,7 @@ class Slider extends MyCaptcha
 
         $data = $this->draw();
 
-        // imagepng($this->im, __DIR__.'/../../tests/poster/im.png');
+        imagepng($this->im, __DIR__.'/../../tests/poster/im.png');
 
         $baseData = $this->baseData($this->im);
 
@@ -162,7 +162,7 @@ class Slider extends MyCaptcha
 
     protected function drawImage($src = ''){
 
-        $src = $src ?: $this->getSliderBg($src);
+        $src = $src ?: $this->getSliderBg();
 
         list($Width, $Hight, $bgType) = @getimagesize($src);
 

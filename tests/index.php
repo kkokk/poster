@@ -18,6 +18,7 @@ try {
     echo microtime().PHP_EOL;
 
     $data = PosterManager::Captcha()->get();
+    $data = PosterManager::Captcha()->type('rotate')->get();
 
     // print_r($data);
 
