@@ -131,16 +131,16 @@ class Rotate extends MyCaptcha
 
         $surplusR = ($Width - $bgWidth)/2;
 
-        $r = ($bgWidth / 2) - 5; //圆半径
+        $r = ($bgWidth / 2) - 2; //圆半径
         for ($x = 0; $x < $bgWidth; $x++) {
             for ($y = 0; $y < $bgHeight; $y++) {
-                $rgbColor = imagecolorat($rotateBg, $x + 5 + $surplusR, $y + 5 + $surplusR);
+                $rgbColor = imagecolorat($rotateBg, $x + 2 + $surplusR, $y + 2 + $surplusR);
                 if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
-                    imagesetpixel($circle, $x + 5, $y + 5, $rgbColor);
+                    imagesetpixel($circle, $x + 2, $y + 2, $rgbColor);
                 }
             }
         }
-        imagecopyresampled($this->im, $circle, 0, 0, 5, 5, $bgWidth, $bgHeight, $bgWidth-10, $bgHeight-10);
+        imagecopyresampled($this->im, $circle, 0, 0, 2, 2, $bgWidth, $bgHeight, $bgWidth-3, $bgHeight-3);
 
         imagedestroy($rotateBg);
         imagedestroy($circle);
