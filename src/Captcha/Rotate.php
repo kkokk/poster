@@ -13,7 +13,7 @@ use Kkokk\Poster\Abstracts\MyCaptcha;
 use Kkokk\Poster\Exception\PosterException;
 use Illuminate\Support\Facades\Cache;
 
-class Rotate extends \Kkokk\Poster\Abstracts\MyCaptcha
+class Rotate extends MyCaptcha
 {
     protected $configs = [
         'src'           => '',
@@ -37,7 +37,7 @@ class Rotate extends \Kkokk\Poster\Abstracts\MyCaptcha
         return $this;
     }
 
-    public function check($key, $value, $leeway = 0)
+    public function check($key, $value, $leeway = 3)
     {
         if(class_exists(Cache::class)){
             $x = Cache::pull($key);
@@ -56,7 +56,7 @@ class Rotate extends \Kkokk\Poster\Abstracts\MyCaptcha
     {
         $data = $this->draw();
 
-        imagejpeg($this->im, __DIR__.'/../../tests/poster/rotate.jpg');
+        // imagejpeg($this->im, __DIR__.'/../../tests/poster/rotate.jpg');
 
         $baseData = $this->baseData($this->im, 'jpg');
 
