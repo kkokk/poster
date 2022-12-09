@@ -12,6 +12,7 @@ require_once(__DIR__ . '/../PHPQrcode/phpqrcode.php');
  */
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Common\Common;
 
 /**
  *
@@ -174,6 +175,13 @@ class PosterBase
         if (empty($this->type)) $this->type = 'png';
         return $this->returnImage($this->type, false);
     }
+
+    protected function getBaseData(){
+        $common = new Common();
+        if (empty($this->type)) $this->type = 'png';
+        return $common->baseData($this->im, $this->type);
+    }
+
 
     /**
      * [setData description]
@@ -1474,7 +1482,7 @@ class PosterBase
     protected function destroyImage($Resource)
     {
 
-        imagedestroy($Resource);
+        !is_resource($this->im) || imagedestroy($Resource);
     }
 
     /**
@@ -1482,6 +1490,6 @@ class PosterBase
      */
     public function __destruct()
     {
-        empty($this->im) || imagedestroy($this->im);
+        empty($this->im) || !is_resource($this->im) || imagedestroy($this->im);
     }
 }

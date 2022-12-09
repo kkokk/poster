@@ -8,6 +8,7 @@
 
 namespace Kkokk\Poster\Abstracts;
 
+use Kkokk\Poster\Common\Common;
 
 abstract class MyCaptcha
 {
@@ -21,13 +22,8 @@ abstract class MyCaptcha
     protected $leeway = 5;   // 误差值
 
     // 转base64
-    protected function baseData($im){
-        ob_start();
-        imagepng($im);
-        $data = ob_get_contents();
-        ob_end_clean();
-        $baseData = "data:image/png;base64,".base64_encode($data);
-        imagedestroy($im);
-        return $baseData;
+    protected function baseData($im, $type='png'){
+        $Common = new Common;
+        return $Common->baseData($im, $type);
     }
 }

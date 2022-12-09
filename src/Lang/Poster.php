@@ -309,4 +309,8 @@ class Poster extends PosterBase implements MyPoster
 
         return $this->setData();
     }
+
+    public function baseData(){
+        return $this->getBaseData();
+    }
 }

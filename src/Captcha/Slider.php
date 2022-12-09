@@ -162,7 +162,7 @@ class Slider extends MyCaptcha
 
     protected function drawImage($src = ''){
 
-        $src = $src ?: $this->getSliderBg($src);
+        $src = $src ?: $this->getSliderBg();
 
         list($Width, $Hight, $bgType) = @getimagesize($src);
 
