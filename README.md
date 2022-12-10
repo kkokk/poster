@@ -41,21 +41,15 @@ lang
 1.  composer require kkokk/poster
 2.  composer update kkokk/poster
 
-#### 使用说明
-
-注意：没有特别说明，统一都是px。
-
-文档地址：http://www.520yummy.com/composer/poster/doc.html
-
-演示效果
+#### 演示效果
 
 2022-12 增加了生成滑块验证图片
 
-![输入图片说明](tests/122301561368230151165-1.gif)
+<img src="tests/122301561368230151165-1.gif" alt="输入图片说明" style="zoom: 33%;" />
 
-![输入图片说明](https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large "在这里输入图片标题")
+<img src="https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large" alt="输入图片说明" title="在这里输入图片标题" style="zoom:50%;" />
 
-![输入图片说明](tests/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg)
+<img src="tests/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg" alt="输入图片说明" style="zoom:50%;" />
 
 ![输入图片说明](https://cdn.learnku.com/uploads/images/202210/19/54036/JoJhekR1um.png!large "在这里输入图片标题")
 
@@ -63,14 +57,34 @@ lang
 
 ​	生成签到日历海报、邀请海报
 
-##### **引用海报类**
+#### **引用海报类**
+
+注意：没有特别说明，统一都是px。
+
+文档地址：http://www.520yummy.com/composer/poster/doc.html
 
 ```php
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
-
-$poster = PosterManager::Poster('poster/poster_user'); # 设置保存路径（项目根目录的相对路径）和文件名
 ```
+
+#### 海报使用说明
+
+```php
+$poster = PosterManager::Poster();
+```
+
+##### 设置路径
+
+```php
+$poster->path($path); # 设置路径
+```
+
+参数说明
+
+| 变量 | 类型          | 必填 | 注释                           |
+| ---- | ------------- | ---- | ------------------------------ |
+| path | string\|array | 是   | 地址，例如：poster/poster_user |
 
 ##### **创建画布** 
 
@@ -106,10 +120,10 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 ##### **创建背景、遮罩** 
 
 ```php
-// 背景rgba 参数解释
-// color 颜色数组取值范围0-255
-// alpha 透明度范围1-127
-// to 颜色渐变方向取值范围bottom、top、left、right默认bottom
+// 背景 rgba 参数解释
+// color 颜色数组取值范围 0-255
+// alpha 透明度范围 1-127
+// to 颜色渐变方向取值范围 bottom、 top、 left、 right、 left top、 right top、 left bottom、 right bottom 默认 bottom
 // 单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]
 // 多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left']
 // radius string|array|integer 圆角 默认0 ( '10 20', [10, 20, 30], 10)
@@ -139,7 +153,7 @@ $poster->buildBg(400,526,[
 | ----- | ------- | ---- | ------------------------ |
 | w     | number  | 是   | 画布宽                   |
 | h     | number  | 是   | 画布高                   |
-| rgba  | array   | 否   | color 颜色数组取值范围0-255<br />alpha 透明度范围1-127<br />to 颜色渐变方向取值范围bottom、top、left、right默认bottom<br />radius string\|array\|integer 圆角 默认0<br />单色：['color'=>[[0-255,0-255,0-255]],'alpha'=>1-127]<br />多色渐变：['color'=>[[0-255,0-255,0-255], [0-255,0-255,0-255]],'alpha'=>1-127, 'to'=>'left'] |
+| rgba  | array   | 否   | 详见上方注释 |
 | alpha | boolean | 否   | 是否透明，是：true       |
 | dst_x | number\|string\|array | 否 | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
 | dst_y | number\|string\|array | 否 | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
@@ -270,18 +284,6 @@ $poster->buildQrMany($texts); # 批量合成文字
 
 参数说明：与**合成文字**参数一致。
 
-##### 设置路径
-
-```php
-$poster->path($path); # 设置路径
-```
-
-参数说明
-
-| 变量        | 类型                  | 必填 | 注释                                                         |
-| ----------- | --------------------- | ---- | ------------------------------------------------------------ |
-| path        | string\|array         | 是   | 地址，例如：poster/poster_user                               |
-
 ##### 获取海报
 
 ```php
@@ -312,6 +314,16 @@ $poster->stream(); # 输出图片流
 
 返回说明：返回文件流，可输出到浏览器或img标签。
 
+##### **输出base64**
+
+```php
+$poster->baseData(); # 返回base64
+```
+
+参数说明：无。
+
+返回说明：返回回base64，不保留在服务器直接使用。
+
 ##### 生成二维码
 
 ```php
@@ -331,6 +343,77 @@ $qr = PosterManager::Poster()->Qr('http://www.520yummy.com','poster/1.png'); # �
 
 返回说明：outfile 为空，输出二维码图片，不生成文件；否则返回图片路径。
 
+#### 验证码使用说明
+
+##### 滑块验证
+
+```php
+# 滑块自定义参数
+$params = [
+    'src'           => '',  // 背景图片，尺寸 340 * 191
+    'im_width'      => 340, // 画布宽度
+    'im_height'     => 251, // 画布高度
+    'bg_width'      => 340, // 背景宽度
+    'bg_height'     => 191, // 背景高度
+    'slider_width'  => 50,  // 滑块宽度
+    'slider_height' => 50,  // 滑块高度
+    'slider_border' => 2,   // 滑块边框
+];
+
+$type = 'slider';
+
+/**
+  * 获取滑块验证参数
+  * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key 、滑块高度
+  * @param string $type   验证码类型
+  * @param array  $params 验证码自定义参数
+  * @return arary
+  */
+$data = PosterManager::Captcha()->type($type)->config($params)->get();
+
+/** 
+  * 验证滑块
+  * 前端根据相关滑块操作进行处理, 返回x坐标，返回 true 则验证成功
+  * @param string     $key     缓存key
+  * @param string|int $value   前端传回来的x坐标
+  * @param int        $leeway  误差值
+  * @return boolean
+  */
+$res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
+```
+
+##### 旋转图片验证
+
+```php
+# 滑块自定义参数
+$params = [
+        'src'           => '',  // 背景图片，尺寸 350 * 350 正方形都可 
+        'im_width'      => 350, // 画布宽度
+        'im_height'     => 350, // 画布高度
+    ];
+
+$type = 'rotate';
+
+/**
+  * 获取滑块验证参数
+  * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key
+  * @param string $type   验证码类型
+  * @param array  $params 验证码自定义参数
+  * @return arary
+  */
+$data = PosterManager::Captcha()->type($type)->config($params)->get();
+
+/** 
+  * 验证滑块
+  * 前端根据相关滑块操作进行处理, 返回x坐标，返回 true 则验证成功
+  * @param string     $key     缓存key
+  * @param string|int $value   前端传回来的旋转角度
+  * @param int        $leeway  误差值
+  * @return boolean
+  */
+$res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
+```
+
 #### 示例
 
 ##### 滑块验证
@@ -340,23 +423,17 @@ $qr = PosterManager::Poster()->Qr('http://www.520yummy.com','poster/1.png'); # �
 	use Kkokk\Poster\Exception\PosterException;
 	
 	try {
-		# 获取滑块验证参数
-		# 内部使用了 laravel 的 cache 缓存
-		# 返回的是图片的 base64 、 缓存key 、滑块高度
-		$data = PosterManager::Captcha()->get();
+
+		$data = PosterManager::Captcha()->type('slider')->get();
 		
-		# 验证滑块
-		# 前端根据相关滑块操作进行处理, 返回x坐标
-		# 传入返回的key， 和前端传回来的x坐标
-		# 返回 true 则验证成功
-		$res = PosterManager::Captcha()->check($key, $value);
+		$res = PosterManager::Captcha()->type('slider')->check($key, $value);
 		
 	} catch (PosterException $e) {
 		print_r($e->getMessage())
 	}
 ```
 
-##### 静态调用
+##### 海报类静态调用
 ```php
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
@@ -386,40 +463,8 @@ try {
 		[
         	'src' => 'https://test.acyapi.51acy.com/wechat/poster/top_bg.png'
         ],
-        [
-            'src' => 'https://test.acyapi.51acy.com/wechat/poster/half_circle.png',
-            'dst_x' => 254,
-            'dst_y' => 321
-        ],
-        [
-            'src' => 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg',
-            'dst_x' => 253,
-            'dst_y' => 326,
-            'src_x' => 0,
-            'src_y' => 0,
-            'src_w' => 131,
-            'src_h' => 131,
-            'alpha' => false,
-            'type'  => 'circle'
-        ],
-        [
-            'src'   => 'https://test.acyapi.51acy.com/wechat/poster/fengexian.png',
-            'dst_x' => 0,
-            'dst_y' => 655
-        ]
 	];
 	$buildTextManyArr  = [
-		[
-            'content'=> '苏轼',
-            'dst_x' => 'center',
-            'dst_y' => 477,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
         [
             'content'=> '明月几时有，把酒问青天。不知天上宫阙，今夕是何年。',
             'dst_x' => 'center',
@@ -431,83 +476,6 @@ try {
             'weight' => 1,
             'space'=>20
         ],
-        [
-            'content'=> '我欲乘风归去，又恐琼楼玉宇，高处不胜寒。',
-            'dst_x' => 'center',
-            'dst_y' => 535,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。',
-            'dst_x' => 'center',
-            'dst_y' => 555,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '不应有恨，何事长向别时圆？',
-            'dst_x' => 'center',
-            'dst_y' => 575,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '人有悲欢离合，月有阴晴圆缺，此事古难全。',
-            'dst_x' => 'center',
-            'dst_y' => 595,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '但愿人长久，千里共婵娟。',
-            'dst_x' => 'center',
-            'dst_y' => 615,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '长按识别',
-            'dst_x' => 'center',
-            'dst_y' => 720,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-        [
-            'content'=> '查看TA的更多作品',
-            'dst_x' => 'center',
-            'dst_y' => 757,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ]
 	];
 	$buildQrManyArr    = [
 		[
@@ -521,17 +489,6 @@ try {
             'size'=>4,
             'margin'=>1
 		],
-		[
-			'text'=>'http://www.520yummy.com',
-            'dst_x'=>74,
-            'dst_y'=>692,
-            'src_x'=>0,
-            'src_y'=>0,
-            'src_w'=>0,
-            'src_h'=>0,
-            'size'=>4,
-            'margin'=>1
-		]
 	];
 
 	$result = PosterManager::Poster('poster/poster_user')
@@ -551,7 +508,8 @@ try {
             0 ,
             function($im){
               $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
-        })->getPoster();
+        	}
+        )->getPoster();
     
     # 给图片添加水印
     $setImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
@@ -567,7 +525,7 @@ try {
 }
 ```
 
-##### 实例化调用
+##### 海报类实例化调用
 ```php
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
