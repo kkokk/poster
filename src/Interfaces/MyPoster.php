@@ -55,4 +55,6 @@ interface MyPoster
     public function setPoster();
 
     public function stream();
+
+    public function baseData();
 }
