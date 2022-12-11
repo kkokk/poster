@@ -1061,7 +1061,7 @@ class PosterBase
     /**
      * 获取颜色值，可设置透明度
      */
-    protected function createColorAlpha($cut, $rgba = [255, 255, 255, 127])
+    public function createColorAlpha($cut, $rgba = [255, 255, 255, 127])
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 127];

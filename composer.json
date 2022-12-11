@@ -5,7 +5,8 @@
     "require": {
         "php": ">=5.6.0",
         "ext-gd": "*",
-      "ext-iconv": "*"
+        "ext-iconv": "*",
+        "ext-mbstring": "*"
     },
     "license": "MIT",
     "authors": [
