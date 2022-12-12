@@ -17,10 +17,11 @@ class Click extends MyCaptcha
         'src'           => '',
         'im_width'      => 256,
         'im_height'     => 256,
+        'type'          => 'text', // text 汉字 number 数字 alpha_num 字母和数字
         'font_family'   => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
         'font_size'     => 32, // 字体大小
         'line_count'    => 0, // 干扰线数量
-        'char_count'    => 0, // 干扰字符数量
+        'char_count'    => 10, // 干扰字符数量
     ];  // 验证码图片配置
 
     public function config($param = [])
@@ -70,6 +71,10 @@ class Click extends MyCaptcha
         if($this->configs['src']) { // 如果指定背景则用背景
             $this->drawImage($this->configs['src'], true);
         }
+
+        $this->drawLine(); // 字
+
+        $this->drawChar(); // 字
 
         $this->drawText(); // 字
     }
