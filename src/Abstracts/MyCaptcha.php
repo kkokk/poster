@@ -100,11 +100,10 @@ abstract class MyCaptcha
 
             for ($i = 0; $i < $charCount; $i++) {
                 $content = mb_substr($contents, mt_rand(0, mb_strlen($contents) - 1), 1);
-                $x = mt_rand(0, $im_width);
-                $y = mt_rand(0, $im_height);
+                $x = mt_rand($font, $im_width - $font);
+                $y = mt_rand($font, $im_height - $font);
                 $angle = mt_rand(0, 45);
                 imagettftext($this->im, $font, $angle, $x, $y, $color, $font_family, $content);
-
             }
         }
     }

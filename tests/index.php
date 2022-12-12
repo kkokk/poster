@@ -17,9 +17,9 @@ require '../vendor/autoload.php';
 try {
     echo microtime().PHP_EOL;
 
-    // $data = PosterManager::Captcha()->get();
+    $data = PosterManager::Captcha()->get();
     // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
-    $data = PosterManager::Captcha()->type('click')->config(['src'=>__DIR__.'/../src/style/rotate_bg/rotate0'.mt_rand(1, 5).'.jpg'])->get();
+    $data = PosterManager::Captcha()->type('click')->config(['font_count'=>2])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();

@@ -6,7 +6,8 @@
         "php": ">=5.6.0",
         "ext-gd": "*",
         "ext-iconv": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-json": "*"
     },
     "license": "MIT",
     "authors": [
