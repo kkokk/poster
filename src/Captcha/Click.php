@@ -68,7 +68,7 @@ class Click extends MyCaptcha
         $this->im = $this->PosterBase->createIm($im_width, $im_height, [mt_rand(125, 255), 255, mt_rand(125, 255), 1], false);
 
         if($this->configs['src']) { // 如果指定背景则用背景
-            $this->drawImage($this->configs['src'], false, 0, 0, 0, 0, $im_width, $im_height);
+            $this->drawImage($this->configs['src'], true);
         }
 
         $this->drawText(); // 字
