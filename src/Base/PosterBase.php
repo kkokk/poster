@@ -37,7 +37,6 @@ class PosterBase
         'wbmp' => 'imagewbmp'
     ];
 
-
     public function __construct($params = [])
     {
         $params = is_array($params) ? $params : [$params];
@@ -60,6 +59,15 @@ class PosterBase
         $this->setPath($pathFileName);
     }
 
+    /**
+     * 设置文件路径
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:55
+     * @param $path
+     * @throws PosterException
+     */
     public function setFilePath($path)
     {
 
@@ -133,6 +141,15 @@ class PosterBase
         return iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
     }
 
+    /**
+     * 判断是否是绝对路径
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:54
+     * @param $pathFileName
+     * @return bool
+     */
     private function isAbsolute($pathFileName)
     {
 
@@ -155,6 +172,7 @@ class PosterBase
     }
 
     /**
+     * 获取文件路径
      * @Author lang
      * @Date   2020-08-14T14:06:27+0800
      * @return [type]
@@ -166,6 +184,7 @@ class PosterBase
     }
 
     /**
+     * 输出流
      * @Author lang
      * @Date   2020-08-14T14:06:27+0800
      * @return [type]
@@ -176,15 +195,22 @@ class PosterBase
         return $this->returnImage($this->type, false);
     }
 
+    /**
+     * 获取base64文件
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:47
+     * @return string
+     */
     protected function getBaseData(){
         $common = new Common();
         if (empty($this->type)) $this->type = 'png';
         return $common->baseData($this->im, $this->type);
     }
 
-
     /**
-     * [setData description]
+     * 设置图片
      * @Author   lang
      * @DateTime 2020-08-16T12:34:34+0800
      */
@@ -220,7 +246,7 @@ class PosterBase
     }
 
     /**
-     * [setImage description]
+     * 输出图片到文件
      * @Author   lang
      * @DateTime 2020-08-16T12:35:17+0800
      * @param    [type]                   $type [description]
@@ -236,6 +262,7 @@ class PosterBase
     }
 
     /**
+     * 检查文件是否存在并创建
      * @Author lang
      * @Date   2020-08-14T15:32:04+0800
      * @param  [type]
@@ -826,6 +853,23 @@ class PosterBase
         return $x > $y ? $y + 1 : $x + 1;
     }
 
+    /**
+     * 长方形通过对角线循环绘画
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:51
+     * @param $im
+     * @param $num
+     * @param $centerNum
+     * @param $total
+     * @param $color
+     * @param $toiTag
+     * @param $tojTag
+     * @param int $x
+     * @param int $y
+     * @return mixed
+     */
     protected function getPointRectangle($im, $num, $centerNum, $total, $color, $toiTag, $tojTag, $x=0, $y=0){
 
         $len = $total - $centerNum * 2; // 求取对角线上相交线坐标到边的最大宽度数量
@@ -862,6 +906,20 @@ class PosterBase
         return $im;
     }
 
+    /**
+     * 正方形通过对角线循环绘画
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:52
+     * @param $im
+     * @param $num
+     * @param $centerNum
+     * @param $color
+     * @param int $x
+     * @param int $y
+     * @return mixed
+     */
     protected function getPointSquare($im, $num, $centerNum, $color, $x=0, $y=0){
         if($num > $centerNum){
             $num = $num - $centerNum;
@@ -880,6 +938,7 @@ class PosterBase
         }
         return $im;
     }
+
     /**
      * 计算画布X轴位置
      * Author: lang
@@ -1082,7 +1141,7 @@ class PosterBase
     /**
      * 获取颜色值，没有透明度
      */
-    protected function createColor($cut, $rgba = [255, 255, 255, 1])
+    public function createColor($cut, $rgba = [255, 255, 255, 1])
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 1];
@@ -1113,22 +1172,22 @@ class PosterBase
             }
         }
 
-        list($Width, $Hight, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($path . $src);
 
         $bgType = image_type_to_extension($bgType, false);
 
         if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
 
-        if ($bgType == 'gif') {
+        $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
+        if($getGdVersion && (float) $matches[1] < 2 && $bgType == 'gif') {
             $pic = imagecreatefromstring(file_get_contents($path . $src));
         } else {
-
             $fun = 'imagecreatefrom' . $bgType;
             $pic = @$fun($path . $src);
         }
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
-        $bgHeight = !empty($src_h) ? $src_h : $Hight;
+        $bgHeight = !empty($src_h) ? $src_h : $Height;
 
         switch ($type) {
             case 'normal':
@@ -1142,7 +1201,7 @@ class PosterBase
                     $w_circle_new = $bgWidth;
                     $h_circle_new = $bgHeight;
                     # 按比例缩放
-                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
+                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Height);
                     $pic = $circle_new;
                 }
 
@@ -1155,7 +1214,7 @@ class PosterBase
                 $w_circle = $bgWidth;
                 $h_circle = $bgHeight;
                 # 按比例缩放
-                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
+                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Height);
 
                 $r = ($w_circle / 2); //圆半径
                 for ($x = 0; $x < $w_circle; $x++) {
@@ -1203,6 +1262,23 @@ class PosterBase
         unset($bgType);
     }
 
+    /**
+     * 合并图片
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:52
+     * @param $src
+     * @param $dst_x
+     * @param $dst_y
+     * @param $src_x
+     * @param $src_y
+     * @param $src_w
+     * @param $src_h
+     * @param false $alpha
+     * @param string $type
+     * @throws PosterException
+     */
     protected function CopyMergeImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
@@ -1215,21 +1291,24 @@ class PosterBase
             }
         }
 
-        list($Width, $Hight, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($path . $src);
         $bgType = image_type_to_extension($bgType, false);
 
         if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
 
-        if ($bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($path . $src));
-        } else {
+        // if ($bgType == 'gif') {
+        //     $pic = imagecreatefromstring(file_get_contents($path . $src));
+        // } else {
+        //
+        //     $fun = 'imagecreatefrom' . $bgType;
+        //     $pic = @$fun($path . $src);
+        // }
 
-            $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($path . $src);
-        }
+        $fun = 'imagecreatefrom' . $bgType;
+        $pic = @$fun($path . $src);
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
-        $bgHeight = !empty($src_h) ? $src_h : $Hight;
+        $bgHeight = !empty($src_h) ? $src_h : $Height;
 
         switch ($type) {
             case 'normal':
@@ -1245,7 +1324,7 @@ class PosterBase
                     $w_circle_new = $bgWidth;
                     $h_circle_new = $bgHeight;
                     # 按比例缩放
-                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
+                    imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Height);
                     $pic = $circle_new;
                 }
 
@@ -1258,7 +1337,7 @@ class PosterBase
                 $w_circle = $bgWidth;
                 $h_circle = $bgHeight;
                 # 按比例缩放
-                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Hight);
+                imagecopyresized($circle_new, $pic, 0, 0, 0, 0, $w_circle, $h_circle, $Width, $Height);
 
                 $r = ($w_circle / 2); //圆半径
                 for ($x = 0; $x < $w_circle; $x++) {
@@ -1383,7 +1462,7 @@ class PosterBase
     }
 
     /**
-     * [CopyQr description]
+     * 合并二维码
      * @Author lang
      * @Date   2020-10-14T14:40:51+0800
      * @param  [type]                   $text   [description]
@@ -1412,7 +1491,7 @@ class PosterBase
         if ($src_h > 0) {
 
             $bgHeight = $src_h;
-            $Hight = imagesy($result);
+            $Height = imagesy($result);
         } else {
 
             $bgHeight = imagesy($result);
@@ -1436,7 +1515,7 @@ class PosterBase
             $w_circle_new = $bgWidth;
             $h_circle_new = $bgHeight;
             # 按比例缩放
-            imagecopyresized($circle_new, $result, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Hight);
+            imagecopyresized($circle_new, $result, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Height);
             $result = $circle_new;
         }
 
@@ -1448,7 +1527,7 @@ class PosterBase
     }
 
     /**
-     * [creatQr description]
+     * 生成二维码
      * @Author lang
      * @Date   2020-10-14T10:59:28+0800
      * @param  [type]                   $text         [二维码包含的内容，可以是链接、文字、json字符串等等]

@@ -8,9 +8,7 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Base\PosterBase;
 use Kkokk\Poster\Abstracts\MyCaptcha;
-use Kkokk\Poster\Exception\PosterException;
 use Illuminate\Support\Facades\Cache;
 
 class Slider extends MyCaptcha
@@ -53,19 +51,19 @@ class Slider extends MyCaptcha
         return $this;
     }
 
-    public function get()
+    public function get($expire = 0)
     {
 
         $data = $this->draw();
 
-        // imagepng($this->im, __DIR__.'/../../tests/poster/im.png');
+        imagepng($this->im, __DIR__.'/../../tests/poster/im.png');
 
         $baseData = $this->baseData($this->im);
 
         $key = uniqid('slider'.mt_rand(0, 9999), true);
 
         if(class_exists(Cache::class)){
-            Cache::put($key , $data['x'], $this->expire);
+            Cache::put($key , $data['x'], $expire ?: $this->expire);
         }
 
         return [
@@ -104,12 +102,11 @@ class Slider extends MyCaptcha
 
     // 实现图片绘制
     public function draw(){
-        $draw = new PosterBase;
-        
+
         $im_width = $this->configs['im_width'];
         $im_height = $this->configs['im_height'];
 
-        $this->im = $draw->createIm($im_width, $im_height, [], true);
+        $this->im = $this->PosterBase->createIm($im_width, $im_height, [], true);
 
         $this->drawImage($this->configs['src']); // 添加bg图片
 
@@ -123,8 +120,8 @@ class Slider extends MyCaptcha
         $w = $slider_width - $border;
         $h = $slider_height - $border;
 
-        $bg = $draw->createIm($slider_width, $slider_height, [0, 0, 0, 60], true);
-        $ims = $draw->createIm($slider_width, $slider_height, [], false);
+        $bg = $this->PosterBase->createIm($slider_width, $slider_height, [0, 0, 0, 60], true);
+        $ims = $this->PosterBase->createIm($slider_width, $slider_height, [], false);
 
         $x1 = mt_rand(30, $bg_width - $w);
         $x2 = $x1 + $w;
@@ -160,28 +157,7 @@ class Slider extends MyCaptcha
         ];
     }
 
-    protected function drawImage($src = ''){
-
-        $src = $src ?: $this->getSliderBg();
-
-        list($Width, $Hight, $bgType) = @getimagesize($src);
-
-        $bgType = image_type_to_extension($bgType, false);
-
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
-
-        if ($bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($src));
-        } else {
-
-            $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($src);
-        }
-
-        imagecopy($this->im, $pic, 0, 0, 0, 0, $Width, $Hight);
-    }
-
-    protected function getSliderBg(){
+    protected function getImBg(){
         return __DIR__.'/../style/slider_bg/layer0'.mt_rand(1,3).'.jpg';
     }
 

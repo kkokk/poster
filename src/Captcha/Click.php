@@ -8,17 +8,19 @@
 
 namespace Kkokk\Poster\Captcha;
 
+use Kkokk\Poster\Abstracts\MyCaptcha;
 
-use Kkokk\Poster\Base\PosterBase;
-
-class Click extends \Kkokk\Poster\Abstracts\MyCaptcha
+class Click extends MyCaptcha
 {
 
     protected $configs = [
         'src'           => '',
         'im_width'      => 256,
         'im_height'     => 256,
-        'font_family'   => __DIR__ . '/../style/simkai.ttf',
+        'font_family'   => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
+        'font_size'     => 32, // 字体大小
+        'line_count'    => 0, // 干扰线数量
+        'char_count'    => 0, // 干扰字符数量
     ];  // 验证码图片配置
 
     public function config($param = [])
@@ -28,10 +30,18 @@ class Click extends \Kkokk\Poster\Abstracts\MyCaptcha
             $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
             $this->configs['im_width'] = isset($param['im_width']) ? $param['im_width'] : $this->configs['im_width'];
             $this->configs['im_height'] = isset($param['im_height']) ? $param['im_height'] : $this->configs['im_height'];
+            $this->configs['font_family'] = isset($param['font_family']) ? $param['font_family'] : $this->configs['font_family'];
+            $this->configs['font_size'] = isset($param['font_size']) ? $param['font_size'] : $this->configs['font_size'];
+            $this->configs['line_count'] = isset($param['line_count']) ? $param['line_count'] : $this->configs['line_count'];
+            $this->configs['char_count'] = isset($param['char_count']) ? $param['line_count'] : $this->configs['char_count'];
         } else {
             $this->configs['src'] = $param['src'] ?? $this->configs['src'];
             $this->configs['im_width'] = $param['im_width'] ?? $this->configs['im_width'];
             $this->configs['im_height'] = $param['im_height'] ?? $this->configs['im_height'];
+            $this->configs['font_family'] = $param['font_family'] ?? $this->configs['font_family'];
+            $this->configs['font_size'] = $param['font_size'] ?? $this->configs['font_size'];
+            $this->configs['line_count'] = $param['line_count'] ?? $this->configs['line_count'];
+            $this->configs['char_count'] = $param['char_count'] ?? $this->configs['char_count'];
         }
 
         return $this;
@@ -42,7 +52,7 @@ class Click extends \Kkokk\Poster\Abstracts\MyCaptcha
         // TODO: Implement check() method.
     }
 
-    public function get()
+    public function get($expire = 0)
     {
         $data = $this->draw();
 
@@ -51,27 +61,35 @@ class Click extends \Kkokk\Poster\Abstracts\MyCaptcha
 
     public function draw()
     {
-        $draw = new PosterBase;
 
         $im_width = $this->configs['im_width'];
         $im_height = $this->configs['im_height'];
 
-        $this->im = $draw->createIm($im_width, $im_height, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1], false);
+        $this->im = $this->PosterBase->createIm($im_width, $im_height, [mt_rand(125, 255), 255, mt_rand(125, 255), 1], false);
 
-        $this->drawText($draw); // 字
+        if($this->configs['src']) { // 如果指定背景则用背景
+            $this->drawImage($this->configs['src'], false, 0, 0, 0, 0, $im_width, $im_height);
+        }
+
+        $this->drawText(); // 字
     }
 
-    public function drawText($draw){
+    public function drawText(){
         $font_family = $this->configs['font_family'];
-        $font = 32;
+        $font = $this->configs['font_size'];
+        $fontSmall = $this->configs['font_size'] - 2;
         $contents = '浪迹天涯';
-        $rgba = [];
-        $color = $draw->createColorAlpha($this->im, [52, 52, 52, 1]);
+
+        $color = $this->PosterBase->createColorAlpha($this->im, [255, 255, 255, 1]);
 
         for ($i=0; $i < mb_strlen($contents); $i++) {
             $content = mb_substr($contents, $i, 1);
-            imagettftext($this->im, $font, mt_rand(0, 180), mt_rand(30, 236), mt_rand(30, 236), $color, $font_family, $content);
+            $x = mt_rand(40, 216);
+            $y = mt_rand(40, 216);
+            $angle = mt_rand(0, 180);
+            imagettftext($this->im, $font, $angle, $x, $y, $color, $font_family, $content);
+            $colorNew = $this->PosterBase->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+            imagettftext($this->im, $fontSmall, $angle, $x + 1, $y - 1, $colorNew, $font_family, $content);
         }
-
     }
 }

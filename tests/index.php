@@ -18,7 +18,13 @@ try {
     echo microtime().PHP_EOL;
 
     // $data = PosterManager::Captcha()->get();
+    // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     $data = PosterManager::Captcha()->type('click')->get();
+    $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
+    $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
+    $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
+    $data = PosterManager::Captcha()->type('input')->config(['type'=>'math'])->get();
+    // $data = PosterManager::Captcha()->type('rotate')->get();
 
     // print_r($data);
 

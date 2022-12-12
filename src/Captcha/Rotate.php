@@ -8,9 +8,7 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Base\PosterBase;
 use Kkokk\Poster\Abstracts\MyCaptcha;
-use Kkokk\Poster\Exception\PosterException;
 use Illuminate\Support\Facades\Cache;
 
 class Rotate extends MyCaptcha
@@ -52,18 +50,18 @@ class Rotate extends MyCaptcha
         return $x >= ($value - $leeway) && $x <= ($value + $leeway);
     }
 
-    public function get()
+    public function get($expire = 0)
     {
         $data = $this->draw();
 
-        // imagejpeg($this->im, __DIR__.'/../../tests/poster/rotate.jpg');
+        imagejpeg($this->im, __DIR__.'/../../tests/poster/rotate.jpg');
 
         $baseData = $this->baseData($this->im, 'jpg');
 
         $key = uniqid('rotate'.mt_rand(0, 9999), true);
 
         if(class_exists(Cache::class)){
-            Cache::put($key , $data['angle'], $this->expire);
+            Cache::put($key , $data['angle'], $expire ?: $this->expire);
         }
 
         return [
@@ -74,50 +72,27 @@ class Rotate extends MyCaptcha
 
     public function draw()
     {
-        $draw = new PosterBase;
 
         $im_width = $this->configs['im_width'];
         $im_height = $this->configs['im_height'];
 
-        $this->im = $draw->createIm($im_width, $im_height, [], true);
+        $this->im = $this->PosterBase->createIm($im_width, $im_height, [], true);
 
-        $this->drawImage(); // 背景图
+        $this->drawImage($this->configs['src']); // 背景图
 
         // 旋转角度
         $angle = mt_rand(45, 315);
 
         $this->im = imagerotate($this->im , $angle, 0);
 
-        $this->drawRotate($draw);
+        $this->drawRotate();
 
         return [
             'angle' => $angle
         ];
     }
 
-    protected function drawImage($src = ''){
-
-        $src = $src ?: $this->getSliderBg();
-
-        list($Width, $Hight, $bgType) = @getimagesize($src);
-
-        $bgType = image_type_to_extension($bgType, false);
-
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
-
-        if ($bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($src));
-        } else {
-
-            $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($src);
-        }
-
-        imagecopyresized($this->im, $pic, 0, 0, 0, 0, $this->configs['im_width'], $this->configs['im_height'], $Width, $Hight);
-        imagedestroy($pic);
-    }
-
-    protected function drawRotate($draw){
+    protected function drawRotate(){
         $Width = imagesx($this->im);
 
         $rotateBg = $this->im; // 旋转后的背景
@@ -125,9 +100,9 @@ class Rotate extends MyCaptcha
         $bgWidth = $this->configs['im_width'];
         $bgHeight = $this->configs['im_height'];
 
-        $circle = $draw->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = false);
+        $circle = $this->PosterBase->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = false);
 
-        $this->im = $draw->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true); // 最后输出的jpg
+        $this->im = $this->PosterBase->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], $alpha = true); // 最后输出的jpg
 
         $surplusR = ($Width - $bgWidth)/2;
 
@@ -146,7 +121,7 @@ class Rotate extends MyCaptcha
         imagedestroy($circle);
     }
 
-    protected function getSliderBg(){
+    protected function getImBg(){
         return __DIR__.'/../style/rotate_bg/rotate0'.mt_rand(1,5).'.jpg';
     }
 }
