@@ -19,7 +19,7 @@ try {
 
     $data = PosterManager::Captcha()->get();
     // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
-    $data = PosterManager::Captcha()->type('click')->config(['font_count'=>2])->get();
+    $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
     $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
@@ -212,7 +212,7 @@ try {
         function($im){
             $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
         })
-    ->baseData();
+    ->getPoster();
 
     echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
     echo microtime().PHP_EOL;

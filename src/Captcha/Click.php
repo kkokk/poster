@@ -16,11 +16,12 @@ class Click extends MyCaptcha
     protected $configs = [
         'src'           => '',
         'im_width'      => 256,
-        'im_height'     => 316,
+        'im_height'     => 306,
         'bg_width'      => 256,
         'bg_height'     => 256,
         'type'          => 'text', // text 汉字 number 数字 alpha_num 字母和数字
         'font_family'   => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
+        'contents'      => '', // 自定义文字
         'font_size'     => 42, // 字体大小
         'font_count'    => 0, // 字体大小
         'line_count'    => 0, // 干扰线数量
@@ -32,10 +33,7 @@ class Click extends MyCaptcha
         if(empty($param)) return $this;
         if(PHP_VERSION < 7) {
             $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
-            $this->configs['im_width'] = isset($param['im_width']) ? $param['im_width'] : $this->configs['im_width'];
-            $this->configs['im_height'] = isset($param['im_height']) ? $param['im_height'] : $this->configs['im_height'];
-            $this->configs['bg_width'] = isset($param['bg_width']) ? $param['bg_width'] : $this->configs['bg_width'];
-            $this->configs['bg_height'] = isset($param['bg_height']) ? $param['bg_height'] : $this->configs['bg_height'];
+            $this->configs['contents'] = isset($param['contents']) ? $param['contents'] : $this->configs['contents'];
             $this->configs['font_family'] = isset($param['font_family']) ? $param['font_family'] : $this->configs['font_family'];
             $this->configs['font_size'] = isset($param['font_size']) ? $param['font_size'] : $this->configs['font_size'];
             $this->configs['font_count'] = isset($param['font_count']) ? $param['font_count'] : $this->configs['font_count'];
@@ -43,16 +41,15 @@ class Click extends MyCaptcha
             $this->configs['char_count'] = isset($param['char_count']) ? $param['line_count'] : $this->configs['char_count'];
         } else {
             $this->configs['src'] = $param['src'] ?? $this->configs['src'];
-            $this->configs['im_width'] = $param['im_width'] ?? $this->configs['im_width'];
-            $this->configs['im_height'] = $param['im_height'] ?? $this->configs['im_height'];
-            $this->configs['bg_width'] = $param['bg_width'] ?? $this->configs['bg_width'];
-            $this->configs['bg_height'] = $param['bg_height'] ?? $this->configs['bg_height'];
+            $this->configs['contents'] = $param['contents'] ?? $this->configs['contents'];
             $this->configs['font_family'] = $param['font_family'] ?? $this->configs['font_family'];
             $this->configs['font_size'] = $param['font_size'] ?? $this->configs['font_size'];
             $this->configs['font_count'] = $param['font_count'] ?? $this->configs['font_count'];
             $this->configs['line_count'] = $param['line_count'] ?? $this->configs['line_count'];
             $this->configs['char_count'] = $param['char_count'] ?? $this->configs['char_count'];
         }
+
+        if($this->configs['contents']) $this->configs['font_count'] = mb_strlen($this->configs['contents']);
 
         return $this;
     }
@@ -77,10 +74,9 @@ class Click extends MyCaptcha
             Cache::put($key , json_encode($data['contents']), $expire ?: $this->expire);
         }
 
-        // print_r($data);
-
         return [
             'img' => $baseData,
+            'y'   => 296
         ];
     }
 
@@ -113,12 +109,22 @@ class Click extends MyCaptcha
 
     public function getContents($contentsLen){
 
-        $str = $this->getChar('text');
-
         $contents = [];
 
-        for ($i=0; $i < $contentsLen; $i++) {
-            $contents[$i]['contents'] = mb_substr($str, mt_rand(0, 299), 1);
+        if($this->configs['contents']) {
+
+            for ($i=0; $i < $contentsLen; $i++) {
+                $contents[$i]['contents'] = mb_substr($this->configs['contents'], $i, 1);
+            }
+
+        } else {
+
+            $str = $this->getChar('text');
+
+            for ($i=0; $i < $contentsLen; $i++) {
+                $contents[$i]['contents'] = mb_substr($str, mt_rand(0, 299), 1);
+            }
+
         }
 
         return $contents;
@@ -181,7 +187,6 @@ class Click extends MyCaptcha
     public function drawText(){
         $font_family = $this->configs['font_family'];
         $font = $this->configs['font_size'];
-        $fontSmall = $this->configs['font_size'] - 2;
 
         $contentsLen = $this->configs['font_count'] ?: mt_rand(2, 4);
         $contentsLen = $contentsLen < 2 ? 2 : ($contentsLen > 4 ? 4 : $contentsLen);
@@ -207,13 +212,17 @@ class Click extends MyCaptcha
                 $angle
             ];
             imagettftext($this->im, $font, $angle, $x, $y, $color, $font_family, $v['contents']);
-            $colorNew = $this->PosterBase->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
-            imagettftext($this->im, $fontSmall, $angle, $x + 1, $y - 1, $colorNew, $font_family, $v['contents']);
+            // 加粗字体
+            $ttfCount = 6;
+            for ($j=1; $j <= $ttfCount; $j ++) {
+                $ttfColor = $this->PosterBase->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+                imagettftext($this->im, $font - ($j * 2), $angle, $x + $j, $y - $j, $ttfColor, $font_family, $v['contents']);
+            }
         }
 
         $color = $this->PosterBase->createColorAlpha($this->im, [0, 0, 0, 1]);
 
-        imagettftext($this->im, 28, 0, 10, 296, $color, $font_family, $content);
+        imagettftext($this->im, 32, 0, 10, 296, $color, $font_family, $content);
 
         return [
             'content' => $content,

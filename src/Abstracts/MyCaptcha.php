@@ -116,6 +116,7 @@ abstract class MyCaptcha
             case 'alpha_num':
                 $str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
                 break;
+            case 'math':
             case 'number':
                 $str = '1234567890';
                 break;
