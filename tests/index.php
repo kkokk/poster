@@ -16,7 +16,7 @@ require '../vendor/autoload.php';
 
 try {
     echo microtime().PHP_EOL;
-    $json = '[{"x":142,"y":33},{"x":178,"y":198},{"x":67,"y":81},{"x":78,"y":203}]';
+    $json = '[{"x":93,"y":77},{"x":105,"y":189},{"x":200,"y":103},{"x":156,"y":196}]';
     $data = PosterManager::Captcha()->type('click')->check(0, $json);
     var_dump($data);
     exit;
