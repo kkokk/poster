@@ -14,24 +14,24 @@ class Click extends MyCaptcha
 {
 
     protected $configs = [
-        'src'           => '',
-        'im_width'      => 256,
-        'im_height'     => 306,
-        'bg_width'      => 256,
-        'bg_height'     => 256,
-        'type'          => 'text', // text 汉字 number 数字 alpha_num 字母和数字
-        'font_family'   => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
-        'contents'      => '', // 自定义文字
-        'font_size'     => 42, // 字体大小
-        'font_count'    => 0, // 字体大小
-        'line_count'    => 0, // 干扰线数量
-        'char_count'    => 0, // 干扰字符数量
+        'src' => '',
+        'im_width' => 256,
+        'im_height' => 306,
+        'bg_width' => 256,
+        'bg_height' => 256,
+        'type' => 'text', // text 汉字 number 数字 alpha_num 字母和数字
+        'font_family' => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
+        'contents' => '', // 自定义文字
+        'font_size' => 42, // 字体大小
+        'font_count' => 0, // 字体大小
+        'line_count' => 0, // 干扰线数量
+        'char_count' => 0, // 干扰字符数量
     ];  // 验证码图片配置
 
     public function config($param = [])
     {
-        if(empty($param)) return $this;
-        if(PHP_VERSION < 7) {
+        if (empty($param)) return $this;
+        if (PHP_VERSION < 7) {
             $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
             $this->configs['contents'] = isset($param['contents']) ? $param['contents'] : $this->configs['contents'];
             $this->configs['font_family'] = isset($param['font_family']) ? $param['font_family'] : $this->configs['font_family'];
@@ -49,34 +49,81 @@ class Click extends MyCaptcha
             $this->configs['char_count'] = $param['char_count'] ?? $this->configs['char_count'];
         }
 
-        if($this->configs['contents']) $this->configs['font_count'] = mb_strlen($this->configs['contents']);
+        if ($this->configs['contents']) $this->configs['font_count'] = mb_strlen($this->configs['contents']);
 
         return $this;
     }
 
     public function check($key, $value, $leeway = 0)
     {
-        // TODO: Implement check() method.
+        if (class_exists(Cache::class)) {
+            $contents = Cache::pull($key);
+        } else {
+            return false;
+        }
+
+        if (empty($contents)) return false;
+
+        $points = json_decode($contents, true);
+
+        // 第四象限
+        foreach ($points['contents'] as $k => $v) {
+            $point = $v['point'];
+            // 原点
+            $x1 = $point[0];
+            $y1 = -$point[1];
+
+            // 任意坐标点
+            $x2 = $value[$k][0];
+            $y2 = -$value[$k][1];
+
+            // 旋转角度 正 逆时针 负顺时针
+            $angle = -$point[8];
+
+            // 顺时针旋转后的点
+            // $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
+            // $y3 = ($y2 - $y1) * cos($angle) + ($x2 - $x1) * sin($angle) + $y1;
+
+            // 逆时针旋转后的点
+            $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
+            $y3 = ($x2 - $x1) * sin($angle) + ($y2 - $y1) * cos($angle) + $y1;
+            $y3_abs = abs($y3);
+            if (($x3 >= $point[0] && $x3 <= $point[2]) && ($y3_abs >= $point[1] && $y3_abs <= $point[7])) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function get($expire = 0)
     {
+
         $data = $this->draw();
 
-        imagepng($this->im, __DIR__.'/../../tests/poster/click.png');
+        imagepng($this->im, __DIR__ . '/../../tests/poster/click.png');
         // imagejpeg($this->im, __DIR__.'/../../tests/poster/click.jpg',20);
 
         $baseData = $this->baseData($this->im, 'jpg');
 
-        $key = uniqid('input:'.$this->configs['type'].mt_rand(0, 9999), true);
+        $key = uniqid('input:' . $this->configs['type'] . mt_rand(0, 9999), true);
 
-        if(class_exists(Cache::class)){
-            Cache::put($key , json_encode($data['contents']), $expire ?: $this->expire);
+        if (class_exists(Cache::class)) {
+            Cache::put($key, json_encode($data['contents']), $expire ?: $this->expire);
         }
+
+        // print_r(json_encode($data['contents']));
+        print_r(json_encode($data));
+
 
         return [
             'img' => $baseData,
-            'y'   => 296
+            'content_width' => $data['content_width'],
+            'content_height' => $data['content_height'],
+            'x' => $data['x'],
+            'y' => $data['y'],
         ];
     }
 
@@ -107,13 +154,14 @@ class Click extends MyCaptcha
         return $data;
     }
 
-    public function getContents($contentsLen){
+    public function getContents($contentsLen)
+    {
 
         $contents = [];
 
-        if($this->configs['contents']) {
+        if ($this->configs['contents']) {
 
-            for ($i=0; $i < $contentsLen; $i++) {
+            for ($i = 0; $i < $contentsLen; $i++) {
                 $contents[$i]['contents'] = mb_substr($this->configs['contents'], $i, 1);
             }
 
@@ -121,7 +169,7 @@ class Click extends MyCaptcha
 
             $str = $this->getChar('text');
 
-            for ($i=0; $i < $contentsLen; $i++) {
+            for ($i = 0; $i < $contentsLen; $i++) {
                 $contents[$i]['contents'] = mb_substr($str, mt_rand(0, 299), 1);
             }
 
@@ -130,7 +178,8 @@ class Click extends MyCaptcha
         return $contents;
     }
 
-    public function getSpace($contentsLen){
+    public function getSpace($contentsLen)
+    {
 
         $font = $this->configs['font_size'] + 15;
         $bg_width = $this->configs['bg_width'];
@@ -139,44 +188,44 @@ class Click extends MyCaptcha
         switch ($contentsLen) {
             case 2:
                 $space[] = [
-                    mt_rand($font, $bg_width/2 - $font),
+                    mt_rand($font, $bg_width / 2 - $font),
                     mt_rand($font, $bg_height),
                 ];
                 $space[] = [
-                    mt_rand($bg_width/2, $bg_width - $font),
+                    mt_rand($bg_width / 2, $bg_width - $font),
                     mt_rand($font, $bg_height),
                 ];
                 break;
             case 3:
                 $space[] = [
-                    mt_rand($font, $bg_width/2 - $font),
-                    mt_rand($font, $bg_height/2),
+                    mt_rand($font, $bg_width / 2 - $font),
+                    mt_rand($font, $bg_height / 2),
                 ];
                 $space[] = [
-                    mt_rand($bg_width/2, $bg_width - $font),
-                    mt_rand($font, $bg_height/2),
+                    mt_rand($bg_width / 2, $bg_width - $font),
+                    mt_rand($font, $bg_height / 2),
                 ];
                 $space[] = [
                     mt_rand($font, $bg_width - $font),
-                    mt_rand($bg_height/2, $bg_height),
+                    mt_rand($bg_height / 2, $bg_height),
                 ];
                 break;
             default:
                 $space[] = [
-                    mt_rand($font, $bg_width/2 - $font),
-                    mt_rand($font, $bg_height/2),
+                    mt_rand($font, $bg_width / 2 - $font),
+                    mt_rand($font, $bg_height / 2),
                 ];
                 $space[] = [
-                    mt_rand($bg_width/2, $bg_width - $font),
-                    mt_rand($font, $bg_height/2),
+                    mt_rand($bg_width / 2, $bg_width - $font),
+                    mt_rand($font, $bg_height / 2),
                 ];
                 $space[] = [
-                    mt_rand($font, $bg_width/2- $font),
-                    mt_rand($bg_height/2 + $font, $bg_height),
+                    mt_rand($font, $bg_width / 2 - $font),
+                    mt_rand($bg_height / 2 + $font, $bg_height),
                 ];
                 $space[] = [
-                    mt_rand($bg_width/2, $bg_width - $font),
-                    mt_rand($bg_height/2 + $font, $bg_height),
+                    mt_rand($bg_width / 2, $bg_width - $font),
+                    mt_rand($bg_height / 2 + $font, $bg_height),
                 ];
                 break;
         }
@@ -184,7 +233,8 @@ class Click extends MyCaptcha
         return $space;
     }
 
-    public function drawText(){
+    public function drawText()
+    {
         $font_family = $this->configs['font_family'];
         $font = $this->configs['font_size'];
 
@@ -199,22 +249,31 @@ class Click extends MyCaptcha
 
         $content = "";
 
-        foreach ($contents as $k => $v){
+        foreach ($contents as $k => $v) {
             $content .= $v['contents'];
-            $spaceKey =mt_rand(0, count($spaces) - 1);
+            $spaceKey = mt_rand(0, count($spaces) - 1);
             $space = array_splice($spaces, $spaceKey, 1);
+            $angle = mt_rand(0, 45);
+            $fontBox = imagettfbbox($font, 0, $font_family, $v['contents']); // 计算文字长宽
+            $font_width = $fontBox[2]; // 字体宽
+            $font_height = abs($fontBox[7]);// 字体高
             $x = $space[0][0];
             $y = $space[0][1];
-            $angle = mt_rand(0, 45);
             $contents[$k]['point'] = [
-                $x,
-                $y,
-                $angle
+                $x + $fontBox[0], // 左下角,X 位置
+                $y + $fontBox[1], // 左下角，Y 位置
+                $x + $fontBox[0] + $font_width, // 右下角，X 位置
+                $y + $fontBox[1], // 右下角，Y 位置
+                $x + $fontBox[0] + $font_width, // 右上角，X 位置
+                $y + $fontBox[1] + $font_height, // 右上角，Y 位置
+                $x + $fontBox[0], // 左上角，X 位置
+                $y + $fontBox[1] + $font_height, // 左上角，Y 位置
+                $angle, // 旋转角度
             ];
             imagettftext($this->im, $font, $angle, $x, $y, $color, $font_family, $v['contents']);
             // 加粗字体
             $ttfCount = 6;
-            for ($j=1; $j <= $ttfCount; $j ++) {
+            for ($j = 1; $j <= $ttfCount; $j++) {
                 $ttfColor = $this->PosterBase->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
                 imagettftext($this->im, $font - ($j * 2), $angle, $x + $j, $y - $j, $ttfColor, $font_family, $v['contents']);
             }
@@ -222,17 +281,25 @@ class Click extends MyCaptcha
 
         $color = $this->PosterBase->createColorAlpha($this->im, [0, 0, 0, 1]);
 
-        imagettftext($this->im, 32, 0, 10, 296, $color, $font_family, $content);
+        $viewFont = 22; // 显示字体大小
+        $fontBox = imagettfbbox($viewFont, 0, $font_family, $content); // 计算文字长宽
+        $viewHeight = 296;  // 显示字体y坐标
+        imagettftext($this->im, $viewFont, 0, 10, $viewHeight, $color, $font_family, $content);
 
+        $content_height = abs($fontBox[7]) + 1;
         return [
             'content' => $content,
-            'content_width' => 28 * ($contentsLen+1),
+            'content_width' => $fontBox[2],
+            'content_height' => $content_height,
+            'x' => 10,
+            'y' => $viewHeight - $content_height,
             'contents' => $contents,
         ];
 
     }
 
-    protected function getImBg(){
-        return __DIR__.'/../style/rotate_bg/rotate0'.mt_rand(1,5).'.jpg';
+    protected function getImBg()
+    {
+        return __DIR__ . '/../style/rotate_bg/rotate0' . mt_rand(1, 5) . '.jpg';
     }
 }

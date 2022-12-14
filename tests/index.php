@@ -16,7 +16,8 @@ require '../vendor/autoload.php';
 
 try {
     echo microtime().PHP_EOL;
-
+    // $data = PosterManager::Captcha()->type('click')->check(0, 0);
+    // exit;
     $data = PosterManager::Captcha()->get();
     // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();
