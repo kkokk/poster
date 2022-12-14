@@ -56,15 +56,23 @@ class Click extends MyCaptcha
 
     public function check($key, $value, $leeway = 0)
     {
-        if (class_exists(Cache::class)) {
-            $contents = Cache::pull($key);
-        } else {
-            return false;
-        }
+        // if (class_exists(Cache::class)) {
+        //     $contents = Cache::pull($key);
+        // } else {
+        //     return false;
+        // }
 
-        if (empty($contents)) return false;
+        // if (empty($contents)) return false;
+
+        $value = json_decode($value, true);
+
+        // print_r($value);exit;
+
+        $contents = '{"content":"红烧猪蹄","content_width":117,"content_height":20,"x":10,"y":276,"contents":[{"contents":"红","point":[134,63,190,63,190,100,134,100,1]},{"contents":"烧","point":[165,209,221,209,221,246,165,246,4]},{"contents":"猪","point":[60,98,116,98,116,135,60,135,35]},{"contents":"蹄","point":[71,221,127,221,127,257,71,257,12]}]}';
 
         $points = json_decode($contents, true);
+
+        if(count($points['contents']) != count($value)) return false;
 
         // 第四象限
         foreach ($points['contents'] as $k => $v) {
@@ -74,23 +82,35 @@ class Click extends MyCaptcha
             $y1 = -$point[1];
 
             // 任意坐标点
-            $x2 = $value[$k][0];
-            $y2 = -$value[$k][1];
+            $x2 = $value[$k]['x'];
+            $y2 = -$value[$k]['y'];
 
             // 旋转角度 正 逆时针 负顺时针
             $angle = -$point[8];
 
             // 顺时针旋转后的点
-            // $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
-            // $y3 = ($y2 - $y1) * cos($angle) + ($x2 - $x1) * sin($angle) + $y1;
+            $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
+            $y3 = ($y2 - $y1) * cos($angle) + ($x2 - $x1) * sin($angle) + $y1;
 
             // 逆时针旋转后的点
-            $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
-            $y3 = ($x2 - $x1) * sin($angle) + ($y2 - $y1) * cos($angle) + $y1;
+            // $x3 = ($x2 - $x1) * cos($angle) - ($y2 - $y1) * sin($angle) + $x1;
+            // $y3 = ($x2 - $x1) * sin($angle) + ($y2 - $y1) * cos($angle) + $y1;
             $y3_abs = abs($y3);
             if (($x3 >= $point[0] && $x3 <= $point[2]) && ($y3_abs >= $point[1] && $y3_abs <= $point[7])) {
                 continue;
             } else {
+                print_r($x3);
+                print_r(PHP_EOL);
+                print_r($point[0]);
+                print_r(PHP_EOL);
+                print_r($point[2]);
+                print_r(PHP_EOL);
+                print_r($y3_abs);
+                print_r(PHP_EOL);
+                print_r($point[1]);
+                print_r(PHP_EOL);
+                print_r($point[7]);
+                print_r($v['contents']);
                 return false;
             }
         }
