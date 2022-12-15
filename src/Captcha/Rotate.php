@@ -83,7 +83,7 @@ class Rotate extends MyCaptcha
 
         $this->im = $this->PosterBase->createIm($im_width, $im_height, [], true);
 
-        $this->drawImage($this->configs['src']); // 背景图
+        $this->drawImage($this->configs['src'], true); // 背景图
 
         // 旋转角度
         $angle = mt_rand(45, 315);
