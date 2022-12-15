@@ -7,36 +7,25 @@
  */
 
 namespace Kkokk\Poster\Cache;
+
+use Kkokk\Poster\Exception\PosterException;
 use Illuminate\Support\Facades\Cache as LaravelCache;
 use think\Cache as ThinkCache5;
 use think\facade\Cache as ThinkCache6;
 
 class Repository
 {
-    public function put(string $key, $value, $ttl = null){
-        $res = false;
+    function __call($method, $params){
         if (class_exists(LaravelCache::class)) {
-            $res = LaravelCache::put($key, $value, $ttl);
+            $connector = LaravelCache::class;
         } elseif(class_exists(ThinkCache5::class)){
-            $res = LaravelCache::set($key, $value, $ttl);
+            $connector = ThinkCache5::class;
         } elseif(class_exists(ThinkCache6::class)){
-            $res = LaravelCache::set($key, $value, $ttl);
+            $connector = ThinkCache6::class;
+        } else {
+            throw new PosterException('no cacheDriver');
         }
-
-        return $res;
+        return call_user_func_array([$connector, $method], $params);
     }
 
-    public function pull(string $key, mixed $default = null){
-
-        $value = null;
-        if (class_exists(LaravelCache::class)) {
-            $value = LaravelCache::pull($key);
-        } elseif(class_exists(ThinkCache5::class)){
-            $value = ThinkCache5::pull($key);
-        } elseif(class_exists(ThinkCache6::class)){
-            $value = ThinkCache6::pull($key);
-        }
-
-        return $value;
-    }
 }
