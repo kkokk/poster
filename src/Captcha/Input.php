@@ -94,6 +94,7 @@ class Input extends MyCaptcha
         }
 
         return [
+            'key' => $key,
             'img' => $baseData,
         ];
     }

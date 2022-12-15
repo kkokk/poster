@@ -127,6 +127,7 @@ class Click extends MyCaptcha
         }
 
         return [
+            'key' => $key,
             'img' => $baseData,
             'content_width' => $data['content_width'],
             'content_height' => $data['content_height'],
