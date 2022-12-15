@@ -45,13 +45,23 @@ lang
 
 2022-12 
 
-增加了旋转图片验证
+##### **增加了输入验证码验证**
+
+数字、算术、中文、字母加数字
+
+##### **点击图片验证**
+
+<img src="tests/1223015613615230151165.gif" alt="输入图片说明" style="zoom: 33%;" />
+
+##### 旋转图片验证
 
 <img src="tests/1223015613610230151165.gif" alt="输入图片说明" style="zoom: 33%;" />
 
-增加了生成滑块验证图片
+##### 生成滑块验证图片
 
 <img src="tests/122301561368230151165-1.gif" alt="输入图片说明" style="zoom: 33%;" />
+
+##### 海报生成图片示例
 
 <img src="https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large" alt="输入图片说明" title="在这里输入图片标题" style="zoom:50%;" />
 
@@ -351,14 +361,16 @@ $qr = PosterManager::Poster()->Qr('http://www.520yummy.com','poster/1.png'); # �
 
 #### 验证码使用说明
 
-##### 滑块验证
+##### 滑块图片验证
 
 ```php
-# 滑块自定义参数
+# 自定义参数
 $params = [
     'src'           => '',  // 背景图片，尺寸 340 * 191
     'im_width'      => 340, // 画布宽度
     'im_height'     => 251, // 画布高度
+    'im_type'       => 'png', // png 默认 jpg quality 质量
+    'quality'       => 80,    // jpg quality 质量
     'bg_width'      => 340, // 背景宽度
     'bg_height'     => 191, // 背景高度
     'slider_width'  => 50,  // 滑块宽度
@@ -369,7 +381,7 @@ $params = [
 $type = 'slider';
 
 /**
-  * 获取滑块验证参数
+  * 获取验证参数
   * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key 、滑块高度
   * @param string $type   验证码类型
   * @param array  $params 验证码自定义参数
@@ -378,7 +390,7 @@ $type = 'slider';
 $data = PosterManager::Captcha()->type($type)->config($params)->get();
 
 /** 
-  * 验证滑块
+  * 验证
   * 前端根据相关滑块操作进行处理, 返回x坐标，返回 true 则验证成功
   * @param string     $key     缓存key
   * @param string|int $value   前端传回来的x坐标
@@ -391,17 +403,19 @@ $res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
 ##### 旋转图片验证
 
 ```php
-# 滑块自定义参数
+# 自定义参数
 $params = [
         'src'           => '',  // 背景图片，尺寸 350 * 350 正方形都可 
         'im_width'      => 350, // 画布宽度
         'im_height'     => 350, // 画布高度
+    	'im_type'       => 'png', // png 默认 jpg quality 质量
+        'quality'       => 80,    // jpg quality 质量
     ];
 
 $type = 'rotate';
 
 /**
-  * 获取滑块验证参数
+  * 获取验证参数
   * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key
   * @param string $type   验证码类型
   * @param array  $params 验证码自定义参数
@@ -410,7 +424,7 @@ $type = 'rotate';
 $data = PosterManager::Captcha()->type($type)->config($params)->get();
 
 /** 
-  * 验证滑块
+  * 验证
   * 前端根据相关滑块操作进行处理, 返回x坐标，返回 true 则验证成功
   * @param string     $key     缓存key
   * @param string|int $value   前端传回来的旋转角度
@@ -420,19 +434,110 @@ $data = PosterManager::Captcha()->type($type)->config($params)->get();
 $res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
 ```
 
+##### 点击图片验证
+
+```php
+# 自定义参数
+$params = [
+        'src'         => '',
+        'im_type'     => 'png', // png 默认 jpg quality 质量
+        'quality'     => 80,    // jpg quality 质量
+        'font_family' => '', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
+        'contents'    => '', // 自定义文字
+        'font_count'  => 0,  // 文字长度
+        'font_size'   => 42, // 字体大小
+        'line_count'  => 0,  // 干扰线数量
+        'char_count'  => 0,  // 干扰字符数量
+    ];
+
+$type = 'click';
+
+/**
+  * 获取验证参数
+  * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key
+  * @param string $type   验证码类型
+  * @param array  $params 验证码自定义参数
+  * @return arary
+  */
+$data = PosterManager::Captcha()->type($type)->config($params)->get();
+
+/** 
+  * 验证
+  * 前端根据相关点击操作进行处理, 返回点击坐标数组，返回 true 则验证成功
+  * @param string            $key     缓存key
+  * @param string|int|array  $value   前端传回来的坐标数组
+  * @return boolean
+  */
+$res = PosterManager::Captcha()->type($type)->check($key, $value);
+```
+
+##### 手动输入验证
+
+```php
+# 自定义参数
+$params = [
+        'src'         => '',
+        'im_width'    => 256,
+        'im_height'   => 64,
+        'im_type'     => 'png', // png 默认 jpg quality 质量
+        'quality'     => 80,    // jpg quality 质量
+        'type'        => 'number', // type = number 数字 alpha_num 字母和数字 math 计算 text 文字
+        'font_family' => '', // 可自定义炫酷字体文件
+        'font_size'   => 32, // 字体大小
+        'font_count'  => 4,  // 字体长度
+        'line_count'  => 5,  // 干扰线数量
+        'char_count'  => 10,  // 干扰字符数量
+    ];
+
+$type = 'click';
+
+/**
+  * 获取验证参数
+  * 内部使用了 laravel 的 cache 缓存，返回的是图片的 base64 、 缓存key
+  * @param string $type   验证码类型
+  * @param array  $params 验证码自定义参数
+  * @return arary
+  */
+$data = PosterManager::Captcha()->type($type)->config($params)->get();
+
+/** 
+  * 验证
+  * 前端根据相关输入, 返回输入结果，返回 true 则验证成功
+  * @param string            $key     缓存key
+  * @param string|int|array  $value   输入结果
+  * @return boolean
+  */
+$res = PosterManager::Captcha()->type($type)->check($key, $value);
+```
+
 #### 示例
 
-##### 滑块验证
+##### 图片验证
 
 ```php
 	use Kkokk\Poster\PosterManager;
 	use Kkokk\Poster\Exception\PosterException;
 	
 	try {
-
-		$data = PosterManager::Captcha()->type('slider')->get();
-		
-		$res = PosterManager::Captcha()->type('slider')->check($key, $value);
+        # 滑块验证
+		$type = 'slider';
+		$data = PosterManager::Captcha()->type($type)->get();
+		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+        
+        # 旋转图片验证
+		$type = 'rotate';
+		$data = PosterManager::Captcha()->type($type)->get();
+		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+        
+        # 点击验证
+		$type = 'click';
+		$data = PosterManager::Captcha()->type($type)->get();
+		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+        
+        # 输入验证
+		$type = 'input';
+		$data = PosterManager::Captcha()->type($type)->get();
+		$res = PosterManager::Captcha()->type($type)->check($key, $value);
 		
 	} catch (PosterException $e) {
 		print_r($e->getMessage())
