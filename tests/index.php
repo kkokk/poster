@@ -16,10 +16,10 @@ require '../vendor/autoload.php';
 
 try {
     echo microtime().PHP_EOL;
-    $json = '[{"x":93,"y":77},{"x":105,"y":189},{"x":200,"y":103},{"x":156,"y":196}]';
-    $data = PosterManager::Captcha()->type('click')->check(0, $json);
-    var_dump($data);
-    exit;
+    // $json = '[{"x":102,"y":98},{"x":106,"y":191},{"x":236,"y":101},{"x":196,"y":212}]';
+    // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true));
+    // var_dump($data);
+    // exit;
     $data = PosterManager::Captcha()->get();
     // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();

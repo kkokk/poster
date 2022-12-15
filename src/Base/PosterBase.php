@@ -1561,7 +1561,7 @@ class PosterBase
     protected function destroyImage($Resource)
     {
 
-        !is_resource($this->im) || imagedestroy($Resource);
+        !is_resource($Resource) || imagedestroy($Resource);
     }
 
     /**

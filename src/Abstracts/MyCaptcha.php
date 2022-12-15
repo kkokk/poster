@@ -20,20 +20,51 @@ abstract class MyCaptcha
     abstract public function draw();
 
     protected $PosterBase; // PosterBase
+    protected $Common; // PosterBase
     protected $im; // im
     protected $expire = 180; // 过期时间
     protected $leeway = 5;   // 误差值
 
     function __construct(){
         $this->PosterBase = new PosterBase();
+        $this->Common = new Common;
     }
 
-    // 转base64
+    /**
+     * 转base64
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/15
+     * Time: 10:38
+     * @param $im
+     * @param string $type
+     * @return string
+     */
     protected function baseData($im, $type='png'){
-        $Common = new Common;
-        return $Common->baseData($im, $type);
+        return $this->Common->baseData($im, $type);
     }
 
+    public function imOutput($im, $dir='', $type='png', $quality=75){
+        $yes = 0; // 控制是否生成图片，开始时方便查看
+        return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
+    }
+
+    /**
+     * 画布填充图片
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/15
+     * Time: 10:37
+     * @param string $src
+     * @param false $resize
+     * @param int $dst_x
+     * @param int $dst_y
+     * @param int $src_x
+     * @param int $src_y
+     * @param int $src_width
+     * @param int $src_height
+     * @throws PosterException
+     */
     protected function drawImage($src = '', $resize = false, $dst_x = 0 , $dst_y = 0 , $src_x = 0 , $src_y = 0, $src_width = 0, $src_height = 0){
         $src = $src ?: $this->getImBg();
 
@@ -59,16 +90,26 @@ abstract class MyCaptcha
         } else {
             imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $Width, $Height);
         }
-        imagedestroy($pic);
+        $this->destroyImage($pic);
     }
 
-    public function drawLine()
+    /**
+     * 干扰线
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/15
+     * Time: 10:37
+     * @param int $width
+     * @param int $height
+     * @throws PosterException
+     */
+    public function drawLine($width = 0, $height = 0)
     {
         $lineCount = $this->configs['line_count'];
 
         if($lineCount > 0){
-            $im_width = $this->configs['im_width'];
-            $im_height = $this->configs['im_height'];
+            $im_width = $width ?: $this->configs['im_width'];
+            $im_height = $height ?: $this->configs['im_height'];
 
             for ($i = 0; $i <= $lineCount; $i++) {
                 $color = $this->PosterBase->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
@@ -83,7 +124,17 @@ abstract class MyCaptcha
         }
     }
 
-    public function drawChar()
+    /**
+     * 干扰文字
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/15
+     * Time: 10:37
+     * @param int $width
+     * @param int $height
+     * @throws PosterException
+     */
+    public function drawChar($width = 0, $height = 0)
     {
         $charCount = $this->configs['char_count'];
 
@@ -95,8 +146,8 @@ abstract class MyCaptcha
 
             $color = $this->PosterBase->createColorAlpha($this->im, [255, 255, 255, 1]);
 
-            $im_width = $this->configs['im_width'];
-            $im_height = $this->configs['im_height'];
+            $im_width = $width ?: $this->configs['im_width'];
+            $im_height = $height ?: $this->configs['im_height'];
 
             for ($i = 0; $i < $charCount; $i++) {
                 $content = mb_substr($contents, mt_rand(0, mb_strlen($contents) - 1), 1);
@@ -126,5 +177,27 @@ abstract class MyCaptcha
         }
 
         return $str;
+    }
+
+    /**
+     * 释放resource
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/15
+     * Time: 10:38
+     * @param $Resource
+     */
+    protected function destroyImage($Resource)
+    {
+
+        !is_resource($Resource) || imagedestroy($Resource);
+    }
+
+    /**
+     * 析构方法，用于销毁 im 图像资源
+     */
+    public function __destruct()
+    {
+        empty($this->im) || !is_resource($this->im) || imagedestroy($this->im);
     }
 }
