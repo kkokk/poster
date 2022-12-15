@@ -10,6 +10,7 @@ namespace Kkokk\Poster\Captcha;
 
 use Kkokk\Poster\Abstracts\MyCaptcha;
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Facades\Cache;
 
 class Click extends MyCaptcha
 {
@@ -70,21 +71,17 @@ class Click extends MyCaptcha
 
     public function check($key, $value, $leeway = 0)
     {
-        if (class_exists(Cache::class)) {
-            $contents = Cache::pull($key);
-        } else {
-            return false;
-        }
-
         if (!is_array($value)) throw new PosterException('array format required');
+
+        $contents = Cache::pull($key);
 
         if (empty($contents)) return false;
 
         $points = json_decode($contents, true);
 
-        if (count($points['contents']) != count($value)) return false;
+        if (count($points) != count($value)) return false;
 
-        foreach ($points['contents'] as $k => $v) {
+        foreach ($points as $k => $v) {
             $point = $v['point'];
 
             // 任意坐标点
@@ -122,10 +119,8 @@ class Click extends MyCaptcha
 
         $key = uniqid('click' . mt_rand(0, 9999), true);
 
-        if (class_exists(Cache::class)) {
-            Cache::put($key, json_encode($data['contents']), $expire ?: $this->expire);
-        }
-
+        Cache::put($key, json_encode($data['contents']), $expire ?: $this->expire);
+        
         return [
             'key' => $key,
             'img' => $baseData,

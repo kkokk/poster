@@ -8,7 +8,7 @@
 
 namespace Kkokk\Poster\Captcha;
 
-
+use Kkokk\Poster\Facades\Cache;
 use Kkokk\Poster\Abstracts\MyCaptcha;
 
 class Input extends MyCaptcha
@@ -62,11 +62,7 @@ class Input extends MyCaptcha
 
     public function check($key, $value, $leeway = 0)
     {
-        if (class_exists(Cache::class)) {
-            $x = Cache::pull($key);
-        } else {
-            return false;
-        }
+        $x = Cache::pull($key);
 
         if (empty($x)) return false;
 
@@ -80,7 +76,7 @@ class Input extends MyCaptcha
 
         $this->imOutput(
             $this->im,
-            __DIR__ . '/../../tests/poster/input' . $this->configs['type'] . '.' . $this->configs['im_type'],
+            __DIR__ . '/../../tests/poster/input' . $this->configs['im_type'],
             $this->configs['im_type'],
             $this->configs['quality']
         );
@@ -89,9 +85,7 @@ class Input extends MyCaptcha
 
         $key = uniqid('input:' . $this->configs['type'] . mt_rand(0, 9999), true);
 
-        if (class_exists(Cache::class)) {
-            Cache::put($key, $data['value'], $expire ?: $this->expire);
-        }
+        Cache::put($key, $data['value'], $expire ?: $this->expire);
 
         return [
             'key' => $key,

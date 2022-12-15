@@ -9,7 +9,7 @@
 namespace Kkokk\Poster\Captcha;
 
 use Kkokk\Poster\Abstracts\MyCaptcha;
-use Illuminate\Support\Facades\Cache;
+use Kkokk\Poster\Facades\Cache;
 
 class Slider extends MyCaptcha
 {
@@ -73,9 +73,7 @@ class Slider extends MyCaptcha
 
         $key = uniqid('slider' . mt_rand(0, 9999), true);
 
-        if (class_exists(Cache::class)) {
-            Cache::put($key, $data['x'], $expire ?: $this->expire);
-        }
+        Cache::put($key, $data['x'], $expire ?: $this->expire);
 
         return [
             'img' => $baseData,
@@ -98,11 +96,7 @@ class Slider extends MyCaptcha
      */
     public function check($key, $value, $leeway = 0)
     {
-        if (class_exists(Cache::class)) {
-            $x = Cache::pull($key);
-        } else {
-            return false;
-        }
+        $x = Cache::pull($key);
 
         if (empty($x)) return false;
 
