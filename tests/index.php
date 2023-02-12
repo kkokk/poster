@@ -15,27 +15,27 @@ require '../vendor/autoload.php';
  */
 
 try {
-    echo microtime().PHP_EOL;
+    // echo microtime().PHP_EOL;
     // $json = '[{"x":102,"y":98},{"x":106,"y":191},{"x":236,"y":101},{"x":196,"y":212}]';
     // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true));
     // var_dump($data);
     // exit;
-    $data = PosterManager::Captcha()->get();
-    // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
-    $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();
-    $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
-    $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
-    $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
-    $data = PosterManager::Captcha()->type('input')->config(['type'=>'math'])->get();
+    // $data = PosterManager::Captcha()->get();
+    // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
+    // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();
+    // $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
+    // $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
+    // $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
+    // $data = PosterManager::Captcha()->type('input')->config(['type'=>'math'])->get();
     // $data = PosterManager::Captcha()->type('rotate')->get();
 
     // print_r($data);
 
-    echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
-    echo microtime().PHP_EOL;
-    echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
-    print_r(getrusage()).PHP_EOL;
-    exit;
+    // echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
+    // echo microtime().PHP_EOL;
+    // echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
+    // print_r(getrusage()).PHP_EOL;
+    // exit;
 
 	/**
 	 * [buildIm description] 创建画布
@@ -213,7 +213,8 @@ try {
         [0, 0, 255],
         [255, 0, 255]], 'alpha'=>1, 'to'=>'left top', 'radius'=>'0'],true, 'center', 'center', 0, 0 ,
         function($im){
-            $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
+            $im->buildLine(10,10,100,10, [0,0,0,1],10);
+            $im->buildText('明月几时有', ['custom', 'center', 0, 300],['custom', 'center', 0, 200],20,[0, 0, 0, 50]);
         })
     ->getPoster();
 

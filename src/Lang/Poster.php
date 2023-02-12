@@ -18,6 +18,12 @@ use Kkokk\Poster\Interfaces\MyPoster;
  */
 class Poster extends PosterBase implements MyPoster
 {
+    public function config($params = []){
+
+        $this->setConfig($params);
+        return $this;
+    }
+
     /**
      * [buildIm description] 创建画布
      * @Author   lang
@@ -130,6 +136,25 @@ class Poster extends PosterBase implements MyPoster
                 $this->CopyImage($value['src'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h'], $value['alpha'], $value['type']);
             }
         }
+        return $this;
+    }
+
+    /**
+     * 合成直线
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2023/2/12
+     * Time: 下午9:30
+     * @param $x1 int 起点x坐标
+     * @param $y1 int 起点y坐标
+     * @param $x2 int 终点x坐标
+     * @param $y2 int 终点y坐标
+     * @param array $rgba 颜色
+     * @param int $weight 线粗细
+     * @return $this
+     */
+    public function buildLine($x1, $y1, $x2, $y2, $rgba = [], $weight = 1) {
+        $this->CopyLine($x1, $y1, $x2, $y2, $rgba, $weight);
         return $this;
     }
 
@@ -262,7 +287,7 @@ class Poster extends PosterBase implements MyPoster
      */
     public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0)
     {
-        return $this->creatQr($text, $outfile, $level, $size, $margin, $saveAndPrint);
+        return $this->createQr($text, $outfile, $level, $size, $margin, $saveAndPrint);
     }
 
     /**

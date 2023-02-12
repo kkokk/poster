@@ -37,6 +37,21 @@ class PosterBase
         'wbmp' => 'imagewbmp'
     ];
 
+    /**
+     * 设置基本配置
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2023/2/12
+     * Time: 下午10:09
+     * @param array $params
+     * @throws PosterException
+     */
+    public function setConfig($params = [])
+    {
+        isset($params['path']) && !empty($params['path']) && $this->setFilePath($params['path']);
+        isset($params['font_family']) && !empty($params['font_family']) && $this->font_family = $params['font_family'];
+    }
+
     public function __construct($params = [])
     {
         $params = is_array($params) ? $params : [$params];
@@ -137,7 +152,8 @@ class PosterBase
      * @Author lang
      * @Date   2022-03-10T15:42:38+0800
      */
-    private function getDocumentRoot(){
+    private function getDocumentRoot()
+    {
         return iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
     }
 
@@ -203,7 +219,8 @@ class PosterBase
      * Time: 9:47
      * @return string
      */
-    protected function getBaseData(){
+    protected function getBaseData()
+    {
         $common = new Common();
         if (empty($this->type)) $this->type = 'png';
         return $common->baseData($this->im, $this->type);
@@ -591,12 +608,12 @@ class PosterBase
             for ($y = 0; $y < $h; $y++) {
                 $color = imagecolorat($im, $x, $y);
                 if (($x >= $leftTopRadius || $y >= $leftTopRadius)
-                && (($x <= ($w - $rightTopRadius) || $y >= $rightTopRadius))
-                && (($x >= $leftBottomRadius || $y <= ($h - $leftBottomRadius)))
-                && (($x <= ($w - $rightBottomRadius)) || $y <= ($h - $rightBottomRadius))) {
+                    && (($x <= ($w - $rightTopRadius) || $y >= $rightTopRadius))
+                    && (($x >= $leftBottomRadius || $y <= ($h - $leftBottomRadius)))
+                    && (($x <= ($w - $rightBottomRadius)) || $y <= ($h - $rightBottomRadius))) {
                     //不在四角的范围内,直接画
                     imagesetpixel($newIm, $x, $y, $color);
-                }else{
+                } else {
                     // 上左
                     $y_x = $leftTopRadius;
                     $y_y = $leftTopRadius;
@@ -641,38 +658,39 @@ class PosterBase
      * @param $len
      * @return false[]|float[]
      */
-    protected function getRadiusType($radius, $len){
-        if(is_string($radius)){
+    protected function getRadiusType($radius, $len)
+    {
+        if (is_string($radius)) {
             // 把字符串格式转数组
             $radius = preg_replace('~\s+~', ' ', trim($radius, ' '));
             $radius = explode(' ', $radius);
         } elseif (is_numeric($radius)) {
             // 整形转数组
             $radius = [$radius, $radius, $radius, $radius];
-        }else{
-            if(!is_array($radius)) throw new PosterException('圆角参数类型错误');
+        } else {
+            if (!is_array($radius)) throw new PosterException('圆角参数类型错误');
         }
         // [20] 四个角
         // [20,30] 第一个值 左上 右下 第二个值 右上 左下
         // [20,30,20] 第一个值 左上 第二个值 右上 左下 第三个值 右下
         // [20,30,20,10]  左上 右上 右下  左下
         $radiusCount = count($radius);
-        if($radiusCount==1){
+        if ($radiusCount == 1) {
             $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
             $rightTopRadius = $this->getMaxRadius($len, $radius[0]);
             $leftBottomRadius = $this->getMaxRadius($len, $radius[0]);
             $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
-        }elseif($radiusCount==2){
+        } elseif ($radiusCount == 2) {
             $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
             $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
             $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
             $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
-        }elseif($radiusCount==3){
+        } elseif ($radiusCount == 3) {
             $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
             $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
             $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
             $rightBottomRadius = $this->getMaxRadius($len, $radius[2]);
-        }else{
+        } else {
             $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
             $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
             $leftBottomRadius = $this->getMaxRadius($len, $radius[2]);
@@ -692,7 +710,8 @@ class PosterBase
      * @param $radius
      * @return false|float
      */
-    protected function getMaxRadius($len, $radius){
+    protected function getMaxRadius($len, $radius)
+    {
         return $radius < $len ? floor($radius) : floor($len);
     }
 
@@ -795,8 +814,9 @@ class PosterBase
      * @param int $y
      * @return mixed
      */
-    protected function linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0){
-        $total = $toi + $toj + 1; // 对角线最大循环次数
+    protected function linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0)
+    {
+        $total = $toi + $toj + 1;    // 对角线最大循环次数
         $isRectangle = $toi != $toj; // 判断是否是长方形
         // 获取中间位置数值
         $centerNum = !$isRectangle ? $this->centerNumSquare($total) : $this->centerNumRectangle($toi, $toj);
@@ -805,19 +825,19 @@ class PosterBase
 
         $toiTag = 'ii'; // 默认宽大于长
         $tojTag = 'jj'; // 默认宽大于长
-        if($toj > $toi){  // 长大于宽
+        if ($toj > $toi) {  // 长大于宽
             $toiTag = 'jj';
             $tojTag = 'ii';
         }
 
-        if($isRectangle){ // 长方形
-            for ($i=0; $i < $total; $i++) {
+        if ($isRectangle) { // 长方形
+            for ($i = 0; $i < $total; $i++) {
                 $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointRectangle($im, $i, $centerNum, $total, $color, $toiTag, $tojTag, $x, $y);
             }
         } else {
             // 正方形
-            for ($i=0; $i < $total; $i++) {
+            for ($i = 0; $i < $total; $i++) {
                 $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointSquare($im, $i, $centerNum, $color, $x, $y);
             }
@@ -835,8 +855,9 @@ class PosterBase
      * @param $num
      * @return float|int
      */
-    protected function centerNumSquare($num){
-        return $num / 2 ;
+    protected function centerNumSquare($num)
+    {
+        return $num / 2;
     }
 
     /**
@@ -849,7 +870,8 @@ class PosterBase
      * @param $y
      * @return int
      */
-    protected function centerNumRectangle($x, $y){
+    protected function centerNumRectangle($x, $y)
+    {
         return $x > $y ? $y + 1 : $x + 1;
     }
 
@@ -870,26 +892,27 @@ class PosterBase
      * @param int $y
      * @return mixed
      */
-    protected function getPointRectangle($im, $num, $centerNum, $total, $color, $toiTag, $tojTag, $x=0, $y=0){
+    protected function getPointRectangle($im, $num, $centerNum, $total, $color, $toiTag, $tojTag, $x = 0, $y = 0)
+    {
 
         $len = $total - $centerNum * 2; // 求取对角线上相交线坐标到边的最大宽度数量
 
-        $min = $centerNum; // 从第几次循环开始保持最大宽度
+        $min = $centerNum;  // 从第几次循环开始保持最大宽度
         $max = $min + $len; // 到第几结束
 
-        if($num >= $min && $num <= $max){
+        if ($num >= $min && $num <= $max) {
             $ii = $num - $centerNum + 1;
-            for ($jj=$centerNum - 1; $jj >= 0; $jj--) {
+            for ($jj = $centerNum - 1; $jj >= 0; $jj--) {
                 imagesetpixel($im, ceil($$toiTag), abs($y - floor($$tojTag)), $color);
                 $ii++;
             }
 
-        } elseif ($num > $max){
+        } elseif ($num > $max) {
 
             $num = $num - $centerNum;
-            $ii = $num+1;
+            $ii = $num + 1;
             $jj = $max - $len - 1;
-            for ($i=$max; $i > $num; $i--) {
+            for ($i = $max; $i > $num; $i--) {
                 imagesetpixel($im, ceil($$toiTag), abs($y - floor($$tojTag)), $color);
                 $ii++;
                 $jj--;
@@ -897,8 +920,8 @@ class PosterBase
 
         } else {
 
-            for ($i=0; $i <= $num; $i++) {
-                imagesetpixel($im, $i,  abs($y - ($num-$i)), $color);
+            for ($i = 0; $i <= $num; $i++) {
+                imagesetpixel($im, $i, abs($y - ($num - $i)), $color);
             }
 
         }
@@ -920,20 +943,21 @@ class PosterBase
      * @param int $y
      * @return mixed
      */
-    protected function getPointSquare($im, $num, $centerNum, $color, $x=0, $y=0){
-        if($num > $centerNum){
+    protected function getPointSquare($im, $num, $centerNum, $color, $x = 0, $y = 0)
+    {
+        if ($num > $centerNum) {
             $num = $num - $centerNum;
             $ii = $num;
-            for ($i=$centerNum; $i >= $num; $i--) {
+            for ($i = $centerNum; $i >= $num; $i--) {
                 // $arr[] = [ceil($ii) , floor($i)];
                 imagesetpixel($im, ceil($ii), abs($y - floor($i)), $color);
                 $ii++;
             }
         } else {
 
-            for ($i=0; $i <= $num; $i++) {
+            for ($i = 0; $i <= $num; $i++) {
                 // $arr[] = [$i , $num-$i];
-                imagesetpixel($im, $i, abs($y - ($num-$i)), $color);
+                imagesetpixel($im, $i, abs($y - ($num - $i)), $color);
             }
         }
         return $im;
@@ -953,7 +977,7 @@ class PosterBase
 
         if ($dst_x == '0') {
             return $dst_x;
-        } elseif ($dst_x == 'center') {
+        } elseif ($dst_x === 'center') {
 
             $dst_x = ceil(($imWidth - $bgWidth) / 2);
 
@@ -1065,7 +1089,7 @@ class PosterBase
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
 
         // 如果设置了圆角则画圆角
-        if($radius) {
+        if ($radius) {
             $pic = $this->setPixelRadius($pic, $w, $h, $radius);
         }
 
@@ -1179,7 +1203,7 @@ class PosterBase
         if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
-        if($getGdVersion && (float) $matches[1] < 2 && $bgType == 'gif') {
+        if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
             $pic = imagecreatefromstring(file_get_contents($path . $src));
         } else {
             $fun = 'imagecreatefrom' . $bgType;
@@ -1389,7 +1413,7 @@ class PosterBase
 
         if ($content == '') return true;
 
-        if(!empty($font_family)) {
+        if (!empty($font_family)) {
             $isAbsolute = $this->isAbsolute($font_family);
             $font_family = !$isAbsolute ? $this->getDocumentRoot() . $font_family : realpath($font_family);
         } else {
@@ -1409,6 +1433,7 @@ class PosterBase
             $letter[] = mb_substr($content, $i, 1);
         }
 
+        $line = 1;
         foreach ($letter as $l) {
             $teststr = $contents . ' ' . $l;
             $fontBox = imagettfbbox($font, 0, $font_family, $teststr);
@@ -1421,19 +1446,14 @@ class PosterBase
 
             if (($fontBox[2] > $max_ws) && ($contents !== '')) {
                 $contents .= "\n";
+                $line++;
             }
             $contents .= $l;
         }
 
-        if ($dst_x == 'center') {
-            $dst_x = ceil(($this->im_w - $fontBox[2]) / 2);
-        } elseif (is_array($dst_x)) {
+        $dst_x = $this->calcTextDstX($dst_x, $fontBox);
 
-            if ($dst_x[0] == 'center') {
-
-                $dst_x = ceil(($this->im_w - $fontBox[2]) / 2) + $dst_x[1];
-            }
-        }
+        $dst_y = $this->calcTextDstY($dst_y, $fontBox, $line);
 
         # 自定义间距
         if ($space > 0) {
@@ -1459,6 +1479,95 @@ class PosterBase
             }
         }
 
+    }
+
+    protected function calcTextDstX($dst_x, $fontBox, $x1 = NULL, $x2 = NULL)
+    {
+        $fontBoxWidth = $fontBox[2];
+        $imWidth = ($x1 && $x2) ?
+            ($x2 + $x1)
+            : $this->im_w;
+        if ($dst_x === 'center') {
+            $dst_x = ceil($imWidth / 2);
+        } elseif (is_array($dst_x)) {
+
+            switch ($dst_x[0]) {
+                case 'center':
+                    $dst_x = ceil(($imWidth - $fontBoxWidth) / 2) + $dst_x[1];
+                    break;
+                case 'left': // 左对齐 且 左右偏移
+                    $x1 = $x1 ?: 0;
+                    $dst_x = $x1 + $dst_x[1];
+                    break;
+                case 'right': // 右对齐 且 左右偏移
+                    $dst_x = ceil(($imWidth - $fontBoxWidth)) + $dst_x[1];
+                    break;
+                case 'custom': // 设置 自定义宽度居中 ['custom', 'center|top|bottom', $x1, $x2, $offset] $x1 区间起点宽度 $x2 区间终点宽度 $offset 偏移
+                    $custom = [$dst_x[1], isset($dst_x[4]) ? $dst_x[4] : 0];
+                    $dst_x = $this->calcTextDstX($custom, $fontBox, $dst_x[2], $dst_x[3]);
+                    break;
+                default:
+                    $dst_x = 0;
+            }
+
+        }
+
+        return $dst_x;
+    }
+
+    /**
+     *
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2023/2/12
+     * Time: 下午10:43
+     * @param $dst_y array|int|string
+     * @param $fontBox
+     * @param $line
+     * @return false|float|int|mixed
+     */
+    protected function calcTextDstY($dst_y, $fontBox, $line, $y1 = NULL, $y2 = NULL)
+    {
+
+        $fontBoxHeight = $fontBox[1] * $line; // 文字加换行数的高度
+        $imHeight = ($y1 && $y2) ?
+            ($y2 - $fontBoxHeight + $y1)
+            : $this->im_h;
+        if ($dst_y === 'center') {
+            $dst_y = ceil(($imHeight - $fontBoxHeight) / 2);
+        } elseif (is_array($dst_y)) {
+            $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
+            switch ($dst_y[0]) {
+                case 'center':
+                    $dst_y = ceil(($imHeight - $fontBoxHeight) / 2) + $dst_y[1];
+                    break;
+                case 'top': // 顶对齐 且 上下偏移
+
+                    $y1 = $y1 ?: 0;
+
+                    $dst_y = $y1 + $dst_y[1];
+                    break;
+                case 'bottom': // 底对齐 且 上下偏移
+                    $dst_y = ceil(($imHeight - $fontBoxHeight)) + $dst_y[1];
+                    break;
+                case 'custom': // 设置 自定义高度居中 ['custom', 'center|top|bottom', $y1, $y2, $offset] $y1 区间起点高度 $y2 区间终点高度 $offset 偏移
+                    $custom = [$dst_y[1], isset($dst_y[4]) ? $dst_y[4] : 0];
+                    $dst_y = $this->calcTextDstY($custom, $fontBox, $line, $dst_y[2], $dst_y[3]);
+                    break;
+                default:
+                    $dst_y = 0;
+            }
+
+        }
+
+        return $dst_y;
+    }
+
+    protected function CopyLine($x1, $y1, $x2, $y2, $rgba = [], $weight = 1)
+    {
+        imagesetthickness($this->im, $weight); // 划线的线宽加粗
+        $color = $this->createColorAlpha($this->im, $rgba);
+        imageline($this->im, $x1, $y1, $x2, $y2, $color);
     }
 
     /**
@@ -1540,7 +1649,7 @@ class PosterBase
      * @param  [type]                   $saveAndPrint [保存二维码图片并显示出来，$outfile必须传递图片路径]
      * @return []                                     [description]
      */
-    protected function creatQr($text, $outfile, $level, $size, $margin, $saveAndPrint)
+    protected function createQr($text, $outfile, $level, $size, $margin, $saveAndPrint)
     {
         if ($outfile) {
             $this->setPath($outfile);
