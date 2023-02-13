@@ -76,6 +76,16 @@ use Kkokk\Poster\Exception\Exception;
 $poster = PosterManager::Poster();
 ```
 
+##### 基础配置
+
+```php
+$params = [
+    'path' => $path, // 设置路径
+    'font_family' => $font_family // 统一设置文字字体，字体绝对路径
+];
+$poster->config($params);
+```
+
 ##### 设置路径
 
 ```php
@@ -245,10 +255,61 @@ $poster->buildQrMany($qrs); # 批量合成二维码
 
 参数说明：与**合成二维码**参数一致。
 
+##### 合成线段
+
+```php
+$poster->buildLine($x1, $y1, $x2, $y2, $rgba, $type, $weight);
+```
+
+| 变量   | 类型   | 可选值                                     | 必填 | 注释                                                   |
+| ------ | ------ | ------------------------------------------ | ---- | ------------------------------------------------------ |
+| x1     | int    |                                            | 是   | 起始点x坐标                                            |
+| y1     | int    |                                            | 是   | 起始点y坐标                                            |
+| x2     | int    |                                            | 是   | 结束点x坐标                                            |
+| y2     | int    |                                            | 是   | 结束点y坐标                                            |
+| rgba   | array  |                                            | 否   | 默认透明                                               |
+| type   | string | 默认line ( rectangle \| filled_rectangle ) | 否   | 默认线， rectangle  矩形， filled_rectangle 矩形并填充 |
+| weight | int    |                                            | 否   | 默认1粗细                                              |
+
+##### 合成圆弧
+
+```php
+$poster->buildArc($cx, $cy, $w, $h, $s, $e, $rgba, $type, $style, $weight);
+```
+
+| 变量   | 类型   | 可选值                                                       | 必填 | 注释                                |
+| ------ | ------ | ------------------------------------------------------------ | ---- | ----------------------------------- |
+| cx     | int    |                                                              | 是   | 原点x坐标                           |
+| cy     | int    |                                                              | 是   | 原点y坐标                           |
+| w      | int    |                                                              | 是   | 圆宽度                              |
+| h      | int    |                                                              | 是   | 圆高度                              |
+| s      | int    |                                                              | 是   | 起始点角度                          |
+| e      | int    |                                                              | 是   | 结束点角度                          |
+| rgba   | array  |                                                              | 否否 | 默认透明                            |
+| type   | string | 默认圆弧 ( filled_arc )                                      | 否   | 默认圆弧线， filled_arc  圆弧并填充 |
+| style  | string | 默认**`IMG_ARC_PIE`**（**`IMG_ARC_PIE`** | **`IMG_ARC_CHORD`** | **`IMG_ARC_NOFILL`** |    **`IMG_ARC_EDGED`**） | 否   | 填充类型才生效                      |
+| weight | int    |                                                              | 否   | 默认1粗细                           |
+
 ##### 合成文字
 
 ```php
 $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight,$space); # 合成文字
+
+// 新增文字宽度定位
+$dst_x = "center | left | right"; // 特殊值：center 居中 left 靠左 right 靠右
+$dst_x = ['center', 10]; // 居中且向右偏移10 负数向左偏移
+$dst_x = ['left', 10]; // 靠左且向右偏移10 负数向左偏移
+$dst_x = ['right', 10]; // 靠左且向右偏移10 负数向左偏移
+// 自定义宽度定位， center left right 
+$dst_x = ['custom', 'center', 100, 200, 0]; // 在图像对象的x坐标100到200之间居中, 偏移0
+
+// 新增文字高度定位
+$dst_y = "center | top | bottom"; // 特殊值：center 居中 top 靠顶 bottom 靠底
+$dst_y = ['center', 10]; // 居中且向下偏移10 负数向上偏移
+$dst_y = ['top', 10]; // 靠顶且向下偏移10 负数向上偏移
+$dst_y = ['bottom', 10]; // 靠底且向下偏移10 负数向上偏移
+// 自定义高度定位， center top bottom 
+$dst_y = ['custom', 'center', 100, 200, 0]; // 在图像对象的y坐标100到200之间居中, 偏移0
 ```
 
 参数说明
@@ -256,7 +317,7 @@ $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weigh
 | 变量        | 类型                  | 必填 | 注释                                                         |
 | ----------- | --------------------- | ---- | ------------------------------------------------------------ |
 | content     | string                | 是   | 内容，例如：http://www.520yummy.com                          |
-| dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5] |
+| dst_x       | number\|string\|array | 否   | 画布位置x ；特殊值 center 居中；居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]，上面注释 |
 | dst_y       | number                | 否   | 画布位置y，默认0                                             |
 | font        | number                | 否   | 字体大小，默认16                                             |
 | rgba        | array                 | 否   | 颜色rbga，[255,255,255,1]                                    |
