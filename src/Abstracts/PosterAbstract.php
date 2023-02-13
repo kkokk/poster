@@ -48,7 +48,9 @@ abstract class PosterAbstract extends PosterBase
 
     abstract public function buildImageMany($arr = []);
 
-    abstract public function buildLine($x1, $y1, $x2, $y2, $rgba = [], $weight = 1);
+    abstract public function buildLine($x1=0, $y1=0, $x2=0, $y2=0, $rgba = [], $type = '', $weight = 1);
+
+    abstract public function buildArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1);
 
     abstract public function buildText($content, $dst_x = 0, $dst_y = 0, $font = 16, $rgba = [], $max_w = 0, $font_family = '', $weight = 1, $space = 0);
 

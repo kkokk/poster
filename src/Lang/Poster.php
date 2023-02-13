@@ -18,7 +18,8 @@ use Kkokk\Poster\Interfaces\MyPoster;
  */
 class Poster extends PosterBase implements MyPoster
 {
-    public function config($params = []){
+    public function config($params = [])
+    {
 
         $this->setConfig($params);
         return $this;
@@ -153,8 +154,15 @@ class Poster extends PosterBase implements MyPoster
      * @param int $weight 线粗细
      * @return $this
      */
-    public function buildLine($x1, $y1, $x2, $y2, $rgba = [], $weight = 1) {
-        $this->CopyLine($x1, $y1, $x2, $y2, $rgba, $weight);
+    public function buildLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
+    {
+        $this->CopyLine($x1, $y1, $x2, $y2, $rgba, $type, $weight);
+        return $this;
+    }
+
+    public function buildArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
+    {
+        $this->CopyArc($cx, $cy, $w, $h, $s, $e, $rgba, $type, $style, $weight);
         return $this;
     }
 
@@ -335,7 +343,8 @@ class Poster extends PosterBase implements MyPoster
         return $this->setData();
     }
 
-    public function baseData(){
+    public function baseData()
+    {
         return $this->getBaseData();
     }
 }

@@ -214,7 +214,7 @@ try {
             [0, 0, 255],
             [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
             function ($im) {
-                $im->buildLine(10, 10, 100, 10, [0, 0, 0, 1], '', 10);
+                $im->buildLine(10, 10, 100, 10);
                 $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
                 $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
                 $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);

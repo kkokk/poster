@@ -1391,8 +1391,8 @@ class PosterBase
      * 合并文字
      * Author: lang
      * Email: 732853989@qq.com
-     * Date: 2022/10/18
-     * Time: 16:20
+     * Date: 2023/2/13
+     * Time: 15:33
      * @param $content
      * @param $dst_x
      * @param $dst_y
@@ -1444,7 +1444,7 @@ class PosterBase
                 $max_ws = $max_w;
             }
 
-            if (($fontBox[2] > $max_ws) && ($contents !== '')) {
+            if ((abs($fontBox[2] - $fontBox[0]) > $max_ws) && ($contents !== '')) {
                 $contents .= "\n";
                 $line++;
             }
@@ -1479,28 +1479,41 @@ class PosterBase
             }
         }
 
+        return true;
     }
 
+    /**
+     * 计算文字x轴坐标
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/2/13
+     * Time: 14:15
+     * @param $dst_x
+     * @param $fontBox
+     * @param null $x1
+     * @param null $x2
+     * @return false|float|int|mixed
+     */
     protected function calcTextDstX($dst_x, $fontBox, $x1 = NULL, $x2 = NULL)
     {
-        $fontBoxWidth = $fontBox[2];
-        $imWidth = ($x1 && $x2) ?
-            ($x2 + $x1)
+        $fontBoxWidth = abs($fontBox[2] - $fontBox[0]);
+        $imWidth = ($x1 !== null && $x2 !== null) ?
+            ($x2 - $x1)
             : $this->im_w;
         if ($dst_x === 'center') {
             $dst_x = ceil($imWidth / 2);
         } elseif (is_array($dst_x)) {
-
+            $dst_x[1] = isset($dst_x[1]) ? $dst_x[1] : 0;
+            $x1 = $x1 !== null ? $x1 : 0;
             switch ($dst_x[0]) {
                 case 'center':
-                    $dst_x = ceil(($imWidth - $fontBoxWidth) / 2) + $dst_x[1];
+                    $dst_x = ceil(($imWidth - $fontBoxWidth) / 2) + $x1 + $dst_x[1];
                     break;
                 case 'left': // 左对齐 且 左右偏移
-                    $x1 = $x1 ?: 0;
                     $dst_x = $x1 + $dst_x[1];
                     break;
                 case 'right': // 右对齐 且 左右偏移
-                    $dst_x = ceil(($imWidth - $fontBoxWidth)) + $dst_x[1];
+                    $dst_x = ceil(($imWidth - $fontBoxWidth)) + $x1 + $dst_x[1];
                     break;
                 case 'custom': // 设置 自定义宽度居中 ['custom', 'center|top|bottom', $x1, $x2, $offset] $x1 区间起点宽度 $x2 区间终点宽度 $offset 偏移
                     $custom = [$dst_x[1], isset($dst_x[4]) ? $dst_x[4] : 0];
@@ -1516,39 +1529,38 @@ class PosterBase
     }
 
     /**
-     *
-     * @Author lang
-     * @Email: 732853989@qq.com
-     * Date: 2023/2/12
-     * Time: 下午10:43
-     * @param $dst_y array|int|string
+     * 计算文字y轴坐标
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/2/13
+     * Time: 14:14
+     * @param $dst_y
      * @param $fontBox
      * @param $line
+     * @param null $y1
+     * @param null $y2
      * @return false|float|int|mixed
      */
     protected function calcTextDstY($dst_y, $fontBox, $line, $y1 = NULL, $y2 = NULL)
     {
-
-        $fontBoxHeight = $fontBox[1] * $line; // 文字加换行数的高度
-        $imHeight = ($y1 && $y2) ?
-            ($y2 - $fontBoxHeight + $y1)
+        $fontBoxHeight = (abs($fontBox[1] - $fontBox[7])) * $line; // 文字加换行数的高度
+        $imHeight = ($y1 !== null && $y2 !== null) ?
+            ($y2 - $y1)
             : $this->im_h;
         if ($dst_y === 'center') {
             $dst_y = ceil(($imHeight - $fontBoxHeight) / 2);
         } elseif (is_array($dst_y)) {
             $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
+            $y1 = $y1 !== null ? $y1 : 0;
             switch ($dst_y[0]) {
                 case 'center':
-                    $dst_y = ceil(($imHeight - $fontBoxHeight) / 2) + $dst_y[1];
+                    $dst_y = ceil(($imHeight - $fontBoxHeight) / 2) + $y1 + $dst_y[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
-
-                    $y1 = $y1 ?: 0;
-
                     $dst_y = $y1 + $dst_y[1];
                     break;
                 case 'bottom': // 底对齐 且 上下偏移
-                    $dst_y = ceil(($imHeight - $fontBoxHeight)) + $dst_y[1];
+                    $dst_y = ceil(($imHeight - $fontBoxHeight)) + $y1 + $dst_y[1];
                     break;
                 case 'custom': // 设置 自定义高度居中 ['custom', 'center|top|bottom', $y1, $y2, $offset] $y1 区间起点高度 $y2 区间终点高度 $offset 偏移
                     $custom = [$dst_y[1], isset($dst_y[4]) ? $dst_y[4] : 0];
@@ -1563,11 +1575,45 @@ class PosterBase
         return $dst_y;
     }
 
-    protected function CopyLine($x1, $y1, $x2, $y2, $rgba = [], $weight = 1)
+    protected function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
         $color = $this->createColorAlpha($this->im, $rgba);
-        imageline($this->im, $x1, $y1, $x2, $y2, $color);
+
+        switch ($type) {
+            case 'rectangle':
+                imagerectangle($this->im, $x1, $y1, $x2, $y2, $color);
+                break;
+            case 'filled_rectangle':
+            case 'filledRectangle':
+                imagerectangle($this->im, $x1, $y1, $x2, $y2, $color);
+                imagefilledrectangle($this->im, $x1, $y1, $x2, $y2, $color);
+                break;
+            default:
+                imageline($this->im, $x1, $y1, $x2, $y2, $color);
+                break;
+        }
+    }
+
+    protected function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1){
+        imagesetthickness($this->im, $weight); // 划线的线宽加粗
+        $color = $this->createColorAlpha($this->im, $rgba);
+
+        switch ($type) {
+            case 'filled_arc':
+            case 'filledArc':
+                imagearc($this->im, $cx, $cy, $w, $h, $s, $e, $color);
+                $style = $style ?: IMG_ARC_PIE;
+                // IMG_ARC_PIE
+                // IMG_ARC_CHORD
+                // IMG_ARC_NOFILL
+                // IMG_ARC_EDGED
+                imagefilledarc($this->im, $cx, $cy, $w, $h, $s, $e, $color, $style);
+                break;
+            default:
+                imagearc($this->im, $cx, $cy, $w, $h, $s, $e, $color);
+                break;
+        }
     }
 
     /**
