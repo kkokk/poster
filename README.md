@@ -49,11 +49,11 @@ lang
 
 ##### 海报生成图片示例
 
-<img src="https://cdn.learnku.com/uploads/images/202110/20/54036/Kvt1cV5ygB.png!large" alt="输入图片说明" title="在这里输入图片标题" style="zoom:50%;" />
+<img src="tests/Kvt1cV5ygB.png" alt="输入图片说明" title="在这里输入图片标题" style="zoom:50%;" />
 
 <img src="tests/YRG3X4WgSZ3lLlwULkxZ3W3LLGgZ4b.jpeg" alt="输入图片说明" style="zoom:50%;" />
 
-![输入图片说明](https://cdn.learnku.com/uploads/images/202210/19/54036/JoJhekR1um.png!large "在这里输入图片标题")
+![输入图片说明](tests/JoJhekR1um.png"在这里输入图片标题")
 
 演示地址：暂无
 
