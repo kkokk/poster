@@ -22,6 +22,8 @@ composer config -g repo.packagist composer https://repo.packagist.org
 lang
 732853989@qq.com
 
+[点击链接加入群聊【海报图片验证交流群】](https://jq.qq.com/?_wv=1027&k=k374FhrR)
+
 #### 安装或更新教程
 
 1.  composer require kkokk/poster
