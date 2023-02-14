@@ -1505,7 +1505,7 @@ class PosterBase
             ($x2 - $x1)
             : $this->im_w;
         if ($dst_x === 'center') {
-            $dst_x = ceil($imWidth / 2);
+            $dst_x = ceil(($imWidth - $fontBoxWidth) / 2);
         } elseif (is_array($dst_x)) {
             $dst_x[1] = isset($dst_x[1]) ? $dst_x[1] : 0;
             $x1 = $x1 !== null ? $x1 : 0;
