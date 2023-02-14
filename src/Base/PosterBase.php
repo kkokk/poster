@@ -1453,7 +1453,7 @@ class PosterBase
 
         $dst_x = $this->calcTextDstX($dst_x, $fontBox);
 
-        $dst_y = $this->calcTextDstY($dst_y, $fontBox, $line);
+        $dst_y = $this->calcTextDstY($dst_y, $fontBox);
 
         # 自定义间距
         if ($space > 0) {
@@ -1536,14 +1536,13 @@ class PosterBase
      * Time: 14:14
      * @param $dst_y
      * @param $fontBox
-     * @param $line
      * @param null $y1
      * @param null $y2
      * @return false|float|int|mixed
      */
-    protected function calcTextDstY($dst_y, $fontBox, $line, $y1 = NULL, $y2 = NULL)
+    protected function calcTextDstY($dst_y, $fontBox, $y1 = NULL, $y2 = NULL)
     {
-        $fontBoxHeight = (abs($fontBox[1] - $fontBox[7])) * $line; // 文字加换行数的高度
+        $fontBoxHeight = (abs($fontBox[1] - $fontBox[7])); // 文字加换行数的高度
         $imHeight = ($y1 !== null && $y2 !== null) ?
             ($y2 - $y1)
             : $this->im_h;
@@ -1564,7 +1563,7 @@ class PosterBase
                     break;
                 case 'custom': // 设置 自定义高度居中 ['custom', 'center|top|bottom', $y1, $y2, $offset] $y1 区间起点高度 $y2 区间终点高度 $offset 偏移
                     $custom = [$dst_y[1], isset($dst_y[4]) ? $dst_y[4] : 0];
-                    $dst_y = $this->calcTextDstY($custom, $fontBox, $line, $dst_y[2], $dst_y[3]);
+                    $dst_y = $this->calcTextDstY($custom, $fontBox, $dst_y[2], $dst_y[3]);
                     break;
                 default:
                     $dst_y = 0;
