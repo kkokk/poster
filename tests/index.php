@@ -199,7 +199,7 @@ try {
 
     # 实例化调用
     // 合成图片
-    $PosterManager = new PosterManager('poster/poster_user1');
+    $PosterManager = new PosterManager();
     $result = $PosterManager
         // ->buildIm(638,826,[255,255,255,127],false)
         // ->buildImageMany($buildImageManyArr)

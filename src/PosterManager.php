@@ -18,7 +18,7 @@ class PosterManager
     protected static $connector; // 实例化类
     protected static $className; // 实现调用类名
 
-	public function __construct($options=[])
+	public function __construct($options = [] )
 	{
         if (!empty($options)) {
             self::$options = !is_array($options) ? [$options] : $options;
@@ -63,8 +63,11 @@ class PosterManager
             if (!class_exists(self::$className)) {
                 throw new SystemException("the class name does not exist . class : " . self::$className);
             }
-
-            self::$connector = new self::$className(...self::$options);
+            if(empty(self::$options)){
+                self::$connector = new self::$className(self::$options);
+            } else {
+                self::$connector = new self::$className(...self::$options);
+            }
         }
         return self::$connector;
     }
