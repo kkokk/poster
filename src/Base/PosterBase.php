@@ -1409,6 +1409,8 @@ class PosterBase
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
+        $calcSpace = $space > $font ? ( $space - $font ) : 0; // 获取间距计算值
+
         $font = ($font * 3) / 4; // px 转化为 pt
 
         if ($content == '') return true;
@@ -1433,24 +1435,26 @@ class PosterBase
             $letter[] = mb_substr($content, $i, 1);
         }
 
+        $max_ws = $this->im_w;
+        if (isset($max_w) && !empty($max_w)) {
+            $max_ws = $max_w;
+        }
+
         $line = 1;
+        $calcSpaceRes = 0;
         foreach ($letter as $l) {
             $teststr = $contents . ' ' . $l;
             $fontBox = imagettfbbox($font, 0, $font_family, $teststr);
             // $testbox = imagettfbbox($fontsize, $angle, $fontface, $teststr);
             // 判断拼接后的字符串是否超过预设的宽度
-            $max_ws = $this->im_w;
-            if (isset($max_w) && !empty($max_w)) {
-                $max_ws = $max_w;
-            }
-
-            if ((abs($fontBox[2] - $fontBox[0]) > $max_ws) && ($contents !== '')) {
+            if ((abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes > $max_ws) && ($contents !== '')) {
                 $contents .= "\n";
                 $line++;
             }
             $contents .= $l;
+            $line === 1 && $calcSpaceRes+=$calcSpace;
         }
-
+        $fontBox[] = $calcSpaceRes; // 间距
         $dst_x = $this->calcTextDstX($dst_x, $fontBox);
 
         $dst_y = $this->calcTextDstY($dst_y, $fontBox);
@@ -1463,7 +1467,7 @@ class PosterBase
 
                 if (mb_substr($contents, $j, 1) == "\n") {
                     $dst_x = $dst_x_old;
-                    $dst_y += 2 * $font;
+                    $dst_y += 1.75 * $font;
                     continue;
                 }
                 for ($i = 0; $i < $weight; $i++) {
@@ -1496,7 +1500,7 @@ class PosterBase
      */
     protected function calcTextDstX($dst_x, $fontBox, $x1 = NULL, $x2 = NULL)
     {
-        $fontBoxWidth = abs($fontBox[2] - $fontBox[0]);
+        $fontBoxWidth = abs($fontBox[2] - $fontBox[0]) + $fontBox[8];
         $imWidth = ($x1 !== null && $x2 !== null) ?
             ($x2 - $x1)
             : $this->im_w;

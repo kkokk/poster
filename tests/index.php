@@ -205,7 +205,7 @@ try {
         // ->buildImageMany($buildImageManyArr)
         // ->buildTextMany($buildTextManyArr)
         // ->buildQrMany($buildQrManyArr)
-            ->config(['font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+        ->config(['font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
         ->buildBg(400, 500, ['color' => [[255, 0, 0],
             [255, 125, 0],
             [255, 255, 0],
@@ -218,8 +218,8 @@ try {
                 // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
                 // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
                 // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年，', ['custom', 'right', 0, 400], ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50]);
-                $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
+                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', ['custom', 'center', 0, 400], ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
+                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
             })
         ->getPoster();
 
