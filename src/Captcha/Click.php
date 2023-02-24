@@ -16,20 +16,20 @@ class Click extends MyCaptcha
 {
 
     protected $configs = [
-        'src'         => '',
-        'im_width'    => 256,
-        'im_height'   => 306,
-        'im_type'     => 'png', // png 默认 jpg quality 质量
-        'quality'     => 80,    // jpg quality 质量
-        'bg_width'    => 256,
-        'bg_height'   => 256,
-        'type'        => 'text', // text 汉字 number 数字 alpha_num 字母和数字
+        'src' => '',
+        'im_width' => 256,
+        'im_height' => 306,
+        'im_type' => 'png', // png 默认 jpg quality 质量
+        'quality' => 80,    // jpg quality 质量
+        'bg_width' => 256,
+        'bg_height' => 256,
+        'type' => 'text', // text 汉字 number 数字 alpha_num 字母和数字
         'font_family' => __DIR__ . '/../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
-        'contents'    => '',   // 自定义文字
-        'font_size'   => 42,  // 字体大小
-        'font_count'  => 0,  // 字体大小
-        'line_count'  => 0,  // 干扰线数量
-        'char_count'  => 0,  // 干扰字符数量
+        'contents' => '',   // 自定义文字
+        'font_size' => 42,  // 字体大小
+        'font_count' => 0,  // 字体大小
+        'line_count' => 0,  // 干扰线数量
+        'char_count' => 0,  // 干扰字符数量
     ];  // 验证码图片配置
 
     public function config($param = [])
@@ -69,15 +69,19 @@ class Click extends MyCaptcha
         return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
     }
 
-    public function check($key, $value, $leeway = 0)
+    public function check($key, $value, $leeway = 0, $secret = null)
     {
         if (!is_array($value)) throw new PosterException('array format required');
 
-        $contents = Cache::pull($key);
+        $contents = $this->getCache($key) ?: $secret;
 
-        if (empty($contents)) return false;
+        if (!$contents) return false;
 
-        $points = json_decode($contents, true);
+        if (!is_array($contents)) {
+            $points = json_decode($contents, true);
+        } else {
+            $points = $contents;
+        }
 
         if (count($points) != count($value)) return false;
 
@@ -119,9 +123,7 @@ class Click extends MyCaptcha
 
         $key = uniqid('click' . mt_rand(0, 9999), true);
 
-        Cache::put($key, json_encode($data['contents']), $expire ?: $this->expire);
-        
-        return [
+        $res = [
             'key' => $key,
             'img' => $baseData,
             'content_width' => $data['content_width'],
@@ -129,6 +131,11 @@ class Click extends MyCaptcha
             'x' => $data['x'],
             'y' => $data['y'],
         ];
+
+        $setCache = $this->setCache($key, json_encode($data['contents']), $expire);
+        if (!$setCache) $res['secret'] = json_encode($data['contents']);
+
+        return $res;
     }
 
     public function draw()
@@ -192,11 +199,11 @@ class Click extends MyCaptcha
             case 2:
                 $space[] = [
                     mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($font, $bg_height),
+                    mt_rand($font, $bg_height - $font / 2 - 12),
                 ];
                 $space[] = [
                     mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($font, $bg_height),
+                    mt_rand($font, $bg_height - $font / 2 - 12),
                 ];
                 break;
             case 3:
@@ -210,7 +217,7 @@ class Click extends MyCaptcha
                 ];
                 $space[] = [
                     mt_rand($font, $bg_width - $font),
-                    mt_rand($bg_height / 2, $bg_height),
+                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
                 ];
                 break;
             default:
@@ -224,11 +231,11 @@ class Click extends MyCaptcha
                 ];
                 $space[] = [
                     mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($bg_height / 2 + $font, $bg_height),
+                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
                 ];
                 $space[] = [
                     mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($bg_height / 2 + $font, $bg_height),
+                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
                 ];
                 break;
         }
@@ -257,7 +264,7 @@ class Click extends MyCaptcha
             // 随机获取位置
             $spaceKey = mt_rand(0, count($spaces) - 1);
             $space = array_splice($spaces, $spaceKey, 1);
-            $angle = mt_rand(0, 80); // 旋转角度
+            $angle = mt_rand(-80, 80); // 旋转角度
             $fontBox = imagettfbbox($font, $angle, $font_family, $v['contents']); // 计算文字方框坐标
             $x = $space[0][0]; // 起始x坐标
             $y = $space[0][1]; // 起始y坐标

@@ -15,17 +15,17 @@ class Input extends MyCaptcha
 {
 
     protected $configs = [
-        'src'         => '',
-        'im_width'    => 256,
-        'im_height'   => 64,
-        'im_type'     => 'png', // png 默认 jpg quality 质量
-        'quality'     => 80,    // jpg quality 质量
-        'type'        => 'number', // type = number 数字 alpha_num 字母和数字 math 计算 text 文字
+        'src' => '',
+        'im_width' => 256,
+        'im_height' => 64,
+        'im_type' => 'png', // png 默认 jpg quality 质量
+        'quality' => 80,    // jpg quality 质量
+        'type' => 'number', // type = number 数字 alpha_num 字母和数字 math 计算 text 文字
         'font_family' => __DIR__ . '/../style/simkai.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件
-        'font_size'   => 32, // 字体大小
-        'font_count'  => 4,  // 字体长度
-        'line_count'  => 5,  // 干扰线数量
-        'char_count'  => 10,  // 干扰字符数量
+        'font_size' => 32, // 字体大小
+        'font_count' => 4,  // 字体长度
+        'line_count' => 5,  // 干扰线数量
+        'char_count' => 10,  // 干扰字符数量
     ];
 
     public function config($param = [])
@@ -60,9 +60,9 @@ class Input extends MyCaptcha
         return $this;
     }
 
-    public function check($key, $value, $leeway = 0)
+    public function check($key, $value, $leeway = 0, $secret = null)
     {
-        $x = Cache::pull($key);
+        $x = $this->getCache($key) ?: $secret;
 
         if (empty($x)) return false;
 
@@ -85,12 +85,15 @@ class Input extends MyCaptcha
 
         $key = uniqid('input:' . $this->configs['type'] . mt_rand(0, 9999), true);
 
-        Cache::put($key, $data['value'], $expire ?: $this->expire);
-
-        return [
+        $res = [
             'key' => $key,
             'img' => $baseData,
         ];
+
+        $setCache = $this->setCache($key, $data['value'], $expire);
+        if (!$setCache) $res['secret'] = $data['value'];
+
+        return $res;
     }
 
     public function draw()

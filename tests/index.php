@@ -16,26 +16,27 @@ require '../vendor/autoload.php';
 
 try {
     // echo microtime().PHP_EOL;
-    // $json = '[{"x":102,"y":98},{"x":106,"y":191},{"x":236,"y":101},{"x":196,"y":212}]';
-    // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true));
+    // $json = '[{"x":186,"y":182},{"x":94,"y":157}]';
+    // $secret = '[{"contents":"\u7ea2","point":[157,169,185,215,215,197,187,151,-58]},{"contents":"\u70e7","point":[61,150,95,193,123,172,89,129,-51]}]';
+    // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true), 0, $secret);
     // var_dump($data);
     // exit;
     // $data = PosterManager::Captcha()->get();
     // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
-    // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧猪蹄'])->get();
+    $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'math'])->get();
     // $data = PosterManager::Captcha()->type('rotate')->get();
 
-    // print_r($data);
+    print_r($data);
 
     // echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
     // echo microtime().PHP_EOL;
     // echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
     // print_r(getrusage()).PHP_EOL;
-    // exit;
+    exit;
 
     /**
      * [buildIm description] 创建画布
