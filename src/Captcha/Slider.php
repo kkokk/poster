@@ -73,13 +73,16 @@ class Slider extends MyCaptcha
 
         $key = uniqid('slider' . mt_rand(0, 9999), true);
 
-        Cache::put($key, $data['x'], $expire ?: $this->expire);
-
-        return [
+        $res = [
             'img' => $baseData,
             'key' => $key,
             'y' => $data['y'],
         ];
+
+        $setCache = $this->setCache($key, $data['x'], $expire);
+        if(!$setCache) $res['secret'] = $data['x'];
+
+        return $res;
     }
 
     /**
@@ -94,11 +97,11 @@ class Slider extends MyCaptcha
      * @param int $leeway
      * @return bool
      */
-    public function check($key, $value, $leeway = 0)
+    public function check($key, $value, $leeway = 0, $secret = null)
     {
-        $x = Cache::pull($key);
+        $x = $this->getCache($key) ? : $secret;
 
-        if (empty($x)) return false;
+        if (empty($x) ) return false;
 
         $leeway = $leeway ?: $this->leeway;
 

@@ -11,11 +11,12 @@ namespace Kkokk\Poster\Abstracts;
 use Kkokk\Poster\Base\PosterBase;
 use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Facades\Cache;
 
 abstract class MyCaptcha
 {
     abstract public function config($param = []);
-    abstract public function check($key , $value , $leeway = 0);
+    abstract public function check($key , $value , $leeway = 0, $secret = null);
     abstract public function get($expire = 0);
     abstract public function draw();
 
@@ -45,8 +46,29 @@ abstract class MyCaptcha
     }
 
     public function imOutput($im, $dir='', $type='png', $quality=75){
-        $yes = 0; // 控制是否生成图片，开始时方便查看
+        $yes = 0; // 控制是否生成图片，测试时方便查看
         return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
+    }
+
+    // 获取缓存
+    public function getCache($key){
+        try {
+            $contents = Cache::pull($key);
+        } catch (PosterException $e) {
+            // 如果未定义缓存器则返回false, 需要传递自行保存的密码进行比对
+            return false;
+        }
+        return $contents;
+    }
+    // 设置缓存
+    public function setCache($key, $value, $expire){
+        try {
+            Cache::put($key, $value, $expire ?: $this->expire);
+        } catch (PosterException $e){
+            // 未查询到缓存器，则返回密码，自行保存
+            return false;
+        }
+        return true;
     }
 
     /**

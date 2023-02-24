@@ -12,11 +12,7 @@ use Kkokk\Poster\Exception\PosterException;
 
 class Captcha
 {
-    protected $className;
-
-    function __construct($type = 'slider'){
-        $this->className = ucfirst($type);
-    }
+    protected $className = 'slider';
 
     public function type($type = 'slider'){
         $this->className = ucfirst($type);

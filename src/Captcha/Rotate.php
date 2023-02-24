@@ -41,9 +41,9 @@ class Rotate extends MyCaptcha
         return $this;
     }
 
-    public function check($key, $value, $leeway = 3)
+    public function check($key, $value, $leeway = 3, $secret = null)
     {
-        $x = Cache::pull($key);
+        $x = $this->getCache($key) ?: $secret;
 
         if (empty($x)) return false;
 
@@ -67,12 +67,15 @@ class Rotate extends MyCaptcha
 
         $key = uniqid('rotate' . mt_rand(0, 9999), true);
 
-        Cache::put($key, $data['angle'], $expire ?: $this->expire);
-
-        return [
+        $res = [
             'img' => $baseData,
             'key' => $key,
         ];
+
+        $setCache = $this->setCache($key, $data['angle'], $expire);
+        if(!$setCache) $res['secret'] = $data['angle'];
+
+        return $res;
     }
 
     public function draw()
