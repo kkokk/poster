@@ -344,7 +344,7 @@ $texts = [
         'space'       => $space
     ]
 ];
-$poster->buildQrMany($texts); # 批量合成文字
+$poster->buildTextMany($texts); # 批量合成文字
 ```
 
 参数说明：与**合成文字**参数一致。
