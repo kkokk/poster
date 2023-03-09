@@ -64,7 +64,7 @@ abstract class PosterAbstract extends PosterBase
 
     abstract public function path($path);
 
-    abstract public function getPoster();
+    abstract public function getPoster($path = '');
 
     abstract public function setPoster();
 

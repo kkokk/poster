@@ -56,7 +56,7 @@ interface MyPoster
 
     public function path($path);
 
-    public function getPoster();
+    public function getPoster($path = '');
 
     public function setPoster();
 

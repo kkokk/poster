@@ -193,8 +193,11 @@ class PosterBase
      * @Date   2020-08-14T14:06:27+0800
      * @return [type]
      */
-    protected function getData()
+    protected function getData($path = '')
     {
+        if($path){
+            $this->setFilePath($path);
+        }
         if (empty($this->type)) $this->type = 'png';
         return $this->returnImage($this->type);
     }
@@ -1148,7 +1151,7 @@ class PosterBase
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 127];
-        if (count($rgba) != 4) throw new PosterException('The length is 4');
+        if (count($rgba) != 4) throw new PosterException('The length of the rgba parameter is 4');
         foreach ($rgba as $k => $value) {
             if (!is_int($rgba[$k])) {
                 throw new PosterException('The value must be an integer');
@@ -1169,7 +1172,7 @@ class PosterBase
     {
 
         if (empty($rgba)) $rgba = [255, 255, 255, 1];
-        if (count($rgba) < 4) throw new PosterException('The text rgba length is 4');
+        if (count($rgba) < 4) throw new PosterException('The length of the rgba parameter is 4');
         foreach ($rgba as $k => $value) {
             if (!is_int($rgba[$k])) {
                 throw new PosterException('The text value must be an integer');
