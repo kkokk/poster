@@ -311,10 +311,10 @@ class AbstractTest extends PosterAbstract
      * @DateTime 2020-08-16T15:45:57+0800
      * @return   [type]   [description]
      */
-    public function getPoster()
+    public function getPoster($path = '')
     {
 
-        return $this->getData();
+        return $this->getData($path);
     }
 
     /**
