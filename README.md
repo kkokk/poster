@@ -68,14 +68,28 @@ lang
 文档地址：http://www.520yummy.com/composer/poster/doc.html
 
 ```php
-use Kkokk\Poster\PosterManager;
+use Kkokk\Poster\PosterManager; // 使用 PosterManager 调用
+use Kkokk\Poster\Facades\Poster; // 使用 Facades\Poster 调用
 use Kkokk\Poster\Exception\Exception;
 ```
 
 #### 海报使用说明
 
 ```php
+// 使用 PosterManager 调用
 $poster = PosterManager::Poster();
+
+// 使用 Facades\Poster 调用
+$result = Poster::config($params)
+    ->buildIm($w,$h,$rgba,$alpha) # 创建画布
+    ->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type) # 合成图片
+    ->getPoster(); # 获取合成后图片文件地址
+// 技巧 也可以分开使用
+$Poster = Poster::config($params);
+$Poster = $Poster->buildIm($w,$h,$rgba,$alpha); # 创建画布
+$Poster = $Poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type); # 合成图片
+$result = $Poster->getPoster(); # 获取合成后图片文件地址
+
 ```
 
 ##### 基础配置
