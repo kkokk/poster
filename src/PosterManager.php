@@ -1,4 +1,5 @@
 <?php
+
 namespace Kkokk\Poster;
 
 /**
@@ -9,21 +10,22 @@ namespace Kkokk\Poster;
  * @Last Modified by:   lang
  * @Last Modified time: 2021-09-08 10:23:08
  */
+
 use Kkokk\Poster\Exception\SystemException;
 
-class PosterManager 
+class PosterManager
 {
 
     protected static $options;   // 参数
     protected static $connector; // 实例化类
     protected static $className; // 实现调用类名
 
-	public function __construct($options = [] )
-	{
+    public function __construct($options = [])
+    {
         if (!empty($options)) {
             self::$options = !is_array($options) ? [$options] : $options;
         }
-	}
+    }
 
     public function __call($method, $params)
     {
@@ -41,7 +43,7 @@ class PosterManager
     public static function __callStatic($method, $params)
     {
         self::$options = $params;
-        self::$className = __NAMESPACE__ . '\\Lang\\'.$method; // 使用接口类实现 只是测试不同方式实现
+        self::$className = __NAMESPACE__ . '\\Lang\\' . $method; // 使用接口类实现 只是测试不同方式实现
         return self::buildConnector();
     }
 
@@ -51,9 +53,9 @@ class PosterManager
      * @return mixed
      * @throws SystemException
      */
-    private function create(string $method, array $params)
+    private function create($method, $params)
     {
-        return call_user_func_array([self::buildConnector(),$method], $params);
+        return call_user_func_array([self::buildConnector(), $method], $params);
     }
 
     private static function buildConnector()
@@ -63,7 +65,7 @@ class PosterManager
             if (!class_exists(self::$className)) {
                 throw new SystemException("the class name does not exist . class : " . self::$className);
             }
-            if(empty(self::$options)){
+            if (empty(self::$options)) {
                 self::$connector = new self::$className(self::$options);
             } else {
                 self::$connector = new self::$className(...self::$options);

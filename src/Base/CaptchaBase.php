@@ -6,20 +6,14 @@
  * Time: 18:10
  */
 
-namespace Kkokk\Poster\Abstracts;
+namespace Kkokk\Poster\Base;
 
-use Kkokk\Poster\Base\PosterBase;
 use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Facades\Cache;
 
-abstract class MyCaptcha
+class CaptchaBase
 {
-    abstract public function config($param = []);
-    abstract public function check($key , $value , $leeway = 0, $secret = null);
-    abstract public function get($expire = 0);
-    abstract public function draw();
-
     protected $PosterBase; // PosterBase
     protected $Common; // PosterBase
     protected $im; // im

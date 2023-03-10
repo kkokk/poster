@@ -8,10 +8,11 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Abstracts\MyCaptcha;
 use Kkokk\Poster\Facades\Cache;
+use Kkokk\Poster\Base\CaptchaBase;
+use Kkokk\Poster\Interfaces\MyCaptcha;
 
-class Slider extends MyCaptcha
+class Slider extends CaptchaBase implements MyCaptcha
 {
 
     protected $configs = [
@@ -27,31 +28,31 @@ class Slider extends MyCaptcha
         'slider_border' => 2,
     ];  // 验证码图片配置
 
-    public function config($param = [])
+    public function config($params = [])
     {
-        if (empty($param)) return $this;
+        if (empty($params)) return $this;
         if (PHP_VERSION < 7) {
-            $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
-            $this->configs['im_width'] = isset($param['im_width']) ? $param['im_width'] : $this->configs['im_width'];
-            $this->configs['im_height'] = isset($param['im_height']) ? $param['im_height'] : $this->configs['im_height'];
-            $this->configs['im_type'] = isset($param['im_type']) ? $param['im_type'] : $this->configs['im_type'];
-            $this->configs['quality'] = isset($param['quality']) ? $param['quality'] : $this->configs['quality'];
-            $this->configs['bg_width'] = isset($param['bg_width']) ? $param['bg_width'] : $this->configs['bg_width'];
-            $this->configs['bg_height'] = isset($param['bg_height']) ? $param['bg_height'] : $this->configs['bg_height'];
-            $this->configs['slider_width'] = isset($param['slider_width']) ? $param['slider_width'] : $this->configs['slider_width'];
-            $this->configs['slider_height'] = isset($param['slider_height']) ? $param['slider_height'] : $this->configs['slider_height'];
-            $this->configs['slider_border'] = isset($param['slider_border']) ? $param['slider_border'] : $this->configs['slider_border'];
+            $this->configs['src'] = isset($params['src']) ? $params['src'] : $this->configs['src'];
+            $this->configs['im_width'] = isset($params['im_width']) ? $params['im_width'] : $this->configs['im_width'];
+            $this->configs['im_height'] = isset($params['im_height']) ? $params['im_height'] : $this->configs['im_height'];
+            $this->configs['im_type'] = isset($params['im_type']) ? $params['im_type'] : $this->configs['im_type'];
+            $this->configs['quality'] = isset($params['quality']) ? $params['quality'] : $this->configs['quality'];
+            $this->configs['bg_width'] = isset($params['bg_width']) ? $params['bg_width'] : $this->configs['bg_width'];
+            $this->configs['bg_height'] = isset($params['bg_height']) ? $params['bg_height'] : $this->configs['bg_height'];
+            $this->configs['slider_width'] = isset($params['slider_width']) ? $params['slider_width'] : $this->configs['slider_width'];
+            $this->configs['slider_height'] = isset($params['slider_height']) ? $params['slider_height'] : $this->configs['slider_height'];
+            $this->configs['slider_border'] = isset($params['slider_border']) ? $params['slider_border'] : $this->configs['slider_border'];
         } else {
-            $this->configs['src'] = $param['src'] ?? $this->configs['src'];
-            $this->configs['im_width'] = $param['im_width'] ?? $this->configs['im_width'];
-            $this->configs['im_height'] = $param['im_height'] ?? $this->configs['im_height'];
-            $this->configs['im_type'] = $param['im_type'] ?? $this->configs['im_type'];
-            $this->configs['quality'] = $param['quality'] ?? $this->configs['quality'];
-            $this->configs['bg_width'] = $param['bg_width'] ?? $this->configs['bg_width'];
-            $this->configs['bg_height'] = $param['bg_height'] ?? $this->configs['bg_height'];
-            $this->configs['slider_width'] = $param['slider_width'] ?? $this->configs['slider_width'];
-            $this->configs['slider_height'] = $param['slider_height'] ?? $this->configs['slider_height'];
-            $this->configs['slider_border'] = $param['slider_border'] ?? $this->configs['slider_border'];
+            $this->configs['src'] = $params['src'] ?? $this->configs['src'];
+            $this->configs['im_width'] = $params['im_width'] ?? $this->configs['im_width'];
+            $this->configs['im_height'] = $params['im_height'] ?? $this->configs['im_height'];
+            $this->configs['im_type'] = $params['im_type'] ?? $this->configs['im_type'];
+            $this->configs['quality'] = $params['quality'] ?? $this->configs['quality'];
+            $this->configs['bg_width'] = $params['bg_width'] ?? $this->configs['bg_width'];
+            $this->configs['bg_height'] = $params['bg_height'] ?? $this->configs['bg_height'];
+            $this->configs['slider_width'] = $params['slider_width'] ?? $this->configs['slider_width'];
+            $this->configs['slider_height'] = $params['slider_height'] ?? $this->configs['slider_height'];
+            $this->configs['slider_border'] = $params['slider_border'] ?? $this->configs['slider_border'];
         }
 
         return $this;

@@ -9,25 +9,49 @@
 namespace Kkokk\Poster\Lang;
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Interfaces\MyCaptcha;
 
-class Captcha
+class Captcha implements MyCaptcha
 {
-    protected $className = 'slider';
+    protected $channel = 'slider';
+    protected $channels = [];
 
-    public function type($type = 'slider'){
-        $this->className = ucfirst($type);
-        return $this;
+    public function config($param = [])
+    {
+        return $this->driver()->config($param);
+    }
+
+    public function check($key, $value, $leeway = 0, $secret = null)
+    {
+        return $this->driver()->check($key, $value, $leeway, $secret);
+    }
+
+    public function get($expire = 0)
+    {
+        return $this->driver()->get($expire);
+    }
+
+    public function type($channel = null)
+    {
+        return $this->driver($channel);
+    }
+
+    public function driver($channel = null)
+    {
+        return $this->instance($channel ?: $this->channel);
+    }
+
+    public function instance($channel)
+    {
+
+        $className = '\\Kkokk\\Poster\Captcha\\' . $channel;
+        if (!class_exists($className)) throw new PosterException('class not found');
+
+        return $this->channels[$channel] = new $className;
     }
 
     function __call($method, $arguments)
     {
-        $className = '\\Kkokk\\Poster\Captcha\\' . $this->className;
-
-        if(!class_exists($className)) throw new PosterException('class not found');
-
-        $instance = new $className;
-
-        return $instance->$method(...$arguments);
-
+        return $this->driver()->$method(...$arguments);
     }
 }

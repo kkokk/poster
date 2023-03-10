@@ -8,11 +8,12 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Abstracts\MyCaptcha;
-use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Facades\Cache;
+use Kkokk\Poster\Base\CaptchaBase;
+use Kkokk\Poster\Interfaces\MyCaptcha;
+use Kkokk\Poster\Exception\PosterException;
 
-class Click extends MyCaptcha
+class Click extends CaptchaBase implements MyCaptcha
 {
 
     protected $configs = [
@@ -32,41 +33,34 @@ class Click extends MyCaptcha
         'char_count' => 0,  // 干扰字符数量
     ];  // 验证码图片配置
 
-    public function config($param = [])
+    public function config($params = [])
     {
-        if (empty($param)) return $this;
+        if (empty($params)) return $this;
         if (PHP_VERSION < 7) {
-            $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
-            $this->configs['im_type'] = isset($param['im_type']) ? $param['im_type'] : $this->configs['im_type'];
-            $this->configs['quality'] = isset($param['quality']) ? $param['quality'] : $this->configs['quality'];
-            $this->configs['contents'] = isset($param['contents']) ? $param['contents'] : $this->configs['contents'];
-            $this->configs['font_family'] = isset($param['font_family']) ? $param['font_family'] : $this->configs['font_family'];
-            $this->configs['font_size'] = isset($param['font_size']) ? $param['font_size'] : $this->configs['font_size'];
-            $this->configs['font_count'] = isset($param['font_count']) ? $param['font_count'] : $this->configs['font_count'];
-            $this->configs['line_count'] = isset($param['line_count']) ? $param['line_count'] : $this->configs['line_count'];
-            $this->configs['char_count'] = isset($param['char_count']) ? $param['line_count'] : $this->configs['char_count'];
+            $this->configs['src'] = isset($params['src']) ? $params['src'] : $this->configs['src'];
+            $this->configs['im_type'] = isset($params['im_type']) ? $params['im_type'] : $this->configs['im_type'];
+            $this->configs['quality'] = isset($params['quality']) ? $params['quality'] : $this->configs['quality'];
+            $this->configs['contents'] = isset($params['contents']) ? $params['contents'] : $this->configs['contents'];
+            $this->configs['font_family'] = isset($params['font_family']) ? $params['font_family'] : $this->configs['font_family'];
+            $this->configs['font_size'] = isset($params['font_size']) ? $params['font_size'] : $this->configs['font_size'];
+            $this->configs['font_count'] = isset($params['font_count']) ? $params['font_count'] : $this->configs['font_count'];
+            $this->configs['line_count'] = isset($params['line_count']) ? $params['line_count'] : $this->configs['line_count'];
+            $this->configs['char_count'] = isset($params['char_count']) ? $params['line_count'] : $this->configs['char_count'];
         } else {
-            $this->configs['src'] = $param['src'] ?? $this->configs['src'];
-            $this->configs['im_type'] = $param['im_type'] ?? $this->configs['im_type'];
-            $this->configs['quality'] = $param['quality'] ?? $this->configs['quality'];
-            $this->configs['contents'] = $param['contents'] ?? $this->configs['contents'];
-            $this->configs['font_family'] = $param['font_family'] ?? $this->configs['font_family'];
-            $this->configs['font_size'] = $param['font_size'] ?? $this->configs['font_size'];
-            $this->configs['font_count'] = $param['font_count'] ?? $this->configs['font_count'];
-            $this->configs['line_count'] = $param['line_count'] ?? $this->configs['line_count'];
-            $this->configs['char_count'] = $param['char_count'] ?? $this->configs['char_count'];
+            $this->configs['src'] = $params['src'] ?? $this->configs['src'];
+            $this->configs['im_type'] = $params['im_type'] ?? $this->configs['im_type'];
+            $this->configs['quality'] = $params['quality'] ?? $this->configs['quality'];
+            $this->configs['contents'] = $params['contents'] ?? $this->configs['contents'];
+            $this->configs['font_family'] = $params['font_family'] ?? $this->configs['font_family'];
+            $this->configs['font_size'] = $params['font_size'] ?? $this->configs['font_size'];
+            $this->configs['font_count'] = $params['font_count'] ?? $this->configs['font_count'];
+            $this->configs['line_count'] = $params['line_count'] ?? $this->configs['line_count'];
+            $this->configs['char_count'] = $params['char_count'] ?? $this->configs['char_count'];
         }
 
         if ($this->configs['contents']) $this->configs['font_count'] = mb_strlen($this->configs['contents']);
 
         return $this;
-    }
-
-    // 计算 三个点的叉乘 |p1 p2| X |p1 p|
-    public function getCross($p1, $p2, $p)
-    {
-        // (p2.x - p1.x) * (p.y - p1.y) -(p.x - p1.x) * (p2.y - p1.y);
-        return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
     }
 
     public function check($key, $value, $leeway = 0, $secret = null)
@@ -162,6 +156,13 @@ class Click extends MyCaptcha
         $data = $this->drawText(); // 字
 
         return $data;
+    }
+
+    // 计算 三个点的叉乘 |p1 p2| X |p1 p|
+    public function getCross($p1, $p2, $p)
+    {
+        // (p2.x - p1.x) * (p.y - p1.y) -(p.x - p1.x) * (p2.y - p1.y);
+        return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
     }
 
     public function getContents($contentsLen)
