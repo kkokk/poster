@@ -204,7 +204,8 @@ class AbstractTest extends PosterAbstract
                 $value['max_w'] = isset($value['max_w']) ? $value['max_w'] : 0;
                 $value['font_family'] = isset($value['font_family']) ? $value['font_family'] : '';
                 $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
-                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight']);
+                $value['space'] = isset($value['space']) ? $value['space'] : 0;
+                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space']);
             }
         } else {
             foreach ($arr as $value) {
@@ -215,10 +216,10 @@ class AbstractTest extends PosterAbstract
                 $value['max_w'] = $value['max_w'] ?? 0;
                 $value['font_family'] = $value['font_family'] ?? '';
                 $value['weight'] = $value['weight'] ?? 1;
-                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight']);
+                $value['space'] = $value['space'] ?? 0;
+                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space']);
             }
         }
-
         return $this;
     }
 

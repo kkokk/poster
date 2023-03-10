@@ -8,10 +8,11 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Abstracts\MyCaptcha;
 use Kkokk\Poster\Facades\Cache;
+use Kkokk\Poster\Base\CaptchaBase;
+use Kkokk\Poster\Interfaces\MyCaptcha;
 
-class Rotate extends MyCaptcha
+class Rotate extends CaptchaBase implements MyCaptcha
 {
     protected $configs = [
         'src' => '',
@@ -21,21 +22,21 @@ class Rotate extends MyCaptcha
         'quality' => 80,    // jpg quality 质量
     ];  // 验证码图片配置
 
-    public function config($param = [])
+    public function config($params = [])
     {
-        if (empty($param)) return $this;
+        if (empty($params)) return $this;
         if (PHP_VERSION < 7) {
-            $this->configs['src'] = isset($param['src']) ? $param['src'] : $this->configs['src'];
-            $this->configs['im_width'] = isset($param['im_width']) ? $param['im_width'] : $this->configs['im_width'];
-            $this->configs['im_height'] = isset($param['im_height']) ? $param['im_height'] : $this->configs['im_height'];
-            $this->configs['im_type'] = isset($param['im_type']) ? $param['im_type'] : $this->configs['im_type'];
-            $this->configs['quality'] = isset($param['quality']) ? $param['quality'] : $this->configs['quality'];
+            $this->configs['src'] = isset($params['src']) ? $params['src'] : $this->configs['src'];
+            $this->configs['im_width'] = isset($params['im_width']) ? $params['im_width'] : $this->configs['im_width'];
+            $this->configs['im_height'] = isset($params['im_height']) ? $params['im_height'] : $this->configs['im_height'];
+            $this->configs['im_type'] = isset($params['im_type']) ? $params['im_type'] : $this->configs['im_type'];
+            $this->configs['quality'] = isset($params['quality']) ? $params['quality'] : $this->configs['quality'];
         } else {
-            $this->configs['src'] = $param['src'] ?? $this->configs['src'];
-            $this->configs['im_width'] = $param['im_width'] ?? $this->configs['im_width'];
-            $this->configs['im_height'] = $param['im_height'] ?? $this->configs['im_height'];
-            $this->configs['im_type'] = $param['im_type'] ?? $this->configs['im_type'];
-            $this->configs['quality'] = $param['quality'] ?? $this->configs['quality'];
+            $this->configs['src'] = $params['src'] ?? $this->configs['src'];
+            $this->configs['im_width'] = $params['im_width'] ?? $this->configs['im_width'];
+            $this->configs['im_height'] = $params['im_height'] ?? $this->configs['im_height'];
+            $this->configs['im_type'] = $params['im_type'] ?? $this->configs['im_type'];
+            $this->configs['quality'] = $params['quality'] ?? $this->configs['quality'];
         }
 
         return $this;

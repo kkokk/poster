@@ -4,6 +4,8 @@ namespace Kkokk\Tests;
 
 use Kkokk\Poster\Exception\Exception;
 use Kkokk\Poster\PosterManager;
+use Kkokk\Poster\Facades\Poster;
+use Kkokk\Poster\Facades\Captcha;
 
 require '../vendor/autoload.php';
 /**
@@ -21,9 +23,10 @@ try {
     // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true), 0, $secret);
     // var_dump($data);
     // exit;
-    // $data = PosterManager::Captcha()->get();
+    $data = PosterManager::Captcha()->get();
+    // $data = Captcha::type('input')->config(['contents'=>'红烧'])->get();
     // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
-    $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();
+    // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'number'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'alpha_num'])->get();
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'text'])->get();
@@ -37,71 +40,6 @@ try {
     // echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
     // print_r(getrusage()).PHP_EOL;
     exit;
-
-    /**
-     * [buildIm description] 创建画布
-     * @Author   lang
-     * @DateTime 2020-08-14T20:52:41+0800
-     * @param number $w [description] 画布宽
-     * @param number $h [description] 画布高
-     * @param array $rgba [description] 颜色rbga
-     * @param boolean $alpha [description] 是否透明
-     */
-
-    /**
-     * [buildImDst description] 创建指定图片为画布
-     * @Author   lang
-     * @DateTime 2020-08-15T11:14:48+0800
-     * @param    [src]                    $src   [description] 图像资源
-     * @param integer $w [description]
-     * @param integer $h [description]
-     * @param array $rgba [description]
-     * @param boolean $alpha [description]
-     * @return   [type]                          [description]
-     */
-    /**
-     * [buildImage description] 合成图片
-     * @Author   lang
-     * @DateTime 2020-08-14T20:52:41+0800
-     * @param    [string]                 $src   [description] 路径，支持网络图片（带http或https）
-     * @param number $dst_x [description] 目标x轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
-     * @param number $dst_y [description] 目标y轴 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
-     * @param number $src_x [description] 图片x轴
-     * @param number $src_y [description] 图片y轴
-     * @param number $src_w [description] 图片自定义宽
-     * @param number $src_h [description] 图片自定义高
-     * @param string $type [description] 图片变形类型 'normal' 正常形状 'circle' 圆形
-     * @param boolean $alpha [description] 是否透明 是 true
-     * @return   array                           [description] 返回相对路径,数组
-     */
-
-    /**
-     * [buildQr description] 合成二维码
-     * @Author lang
-     * @Date   2020-10-14T12:14:06+0800
-     * @param  [type]                   $text   [内容]
-     * @param integer $dst_x [目标位置x] 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
-     * @param integer $dst_y [目标位置y] 特殊值 center 居中 支持百分比20% 支持自定义  支持正负
-     * @param integer $src_x [图片x轴]
-     * @param integer $src_y [图片y轴]
-     * @param integer $size [大小]
-     * @param integer $margin [百变大小]
-     * @return [type]                           [description]
-     */
-
-    /**
-     * [buildText description] 合成文字
-     * @Author   lang
-     * @DateTime 2020-08-14T22:09:20+0800
-     * @param    [type]                   $content     [description]
-     * @param integer $dst_x [description]
-     * @param integer $dst_y [description]
-     * @param integer $font [description] 字体大小
-     * @param array $rgba [description]
-     * @param integer $max_w [description] 最大换行高度
-     * @param string $font_family [description] 字体，可不填，有默认 (相对路径为项目根目录)
-     * @return   [type]                                [description]
-     */
 
     # 静态调用
     // 合成图片
@@ -200,20 +138,42 @@ try {
 
     # 实例化调用
     // 合成图片
-    $PosterManager = new PosterManager();
-    $result = $PosterManager
-        // ->buildIm(638,826,[255,255,255,127],false)
-        // ->buildImageMany($buildImageManyArr)
-        // ->buildTextMany($buildTextManyArr)
-        // ->buildQrMany($buildQrManyArr)
-        ->config(['font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    // $PosterManager = new PosterManager();
+    // $result = $PosterManager
+    //     // ->buildIm(638,826,[255,255,255,127],false)
+    //     // ->buildImageMany($buildImageManyArr)
+    //     // ->buildTextMany($buildTextManyArr)
+    //     // ->buildQrMany($buildQrManyArr)
+    //     ->config(['font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    //     ->buildBg(400, 500, ['color' => [[255, 0, 0],
+    //         [255, 125, 0],
+    //         [255, 255, 0],
+    //         [0, 255, 0],
+    //         [0, 255, 255],
+    //         [0, 0, 255],
+    //         [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
+    //         function ($im) {
+    //             $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+    //             // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
+    //             // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
+    //             // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
+    //             $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
+    //             // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
+    //         })
+    //     ->getPoster();
+
+    $result = Poster::config(['path'=>'poster/test.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+        ->buildIm(638,826,[255,255,255,1],true)
+        ->buildImageMany($buildImageManyArr)
+        ->buildTextMany($buildTextManyArr)
+        ->buildQrMany($buildQrManyArr)
         ->buildBg(400, 500, ['color' => [[255, 0, 0],
             [255, 125, 0],
             [255, 255, 0],
             [0, 255, 0],
             [0, 255, 255],
             [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
+            [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
             function ($im) {
                 $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
                 // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
@@ -223,7 +183,6 @@ try {
                 // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
             })
         ->getPoster();
-
     echo (memory_get_usage() / 1024 / 1024) . 'M' . PHP_EOL;
     echo microtime() . PHP_EOL;
     echo (memory_get_peak_usage() / 1024 / 1024) . 'M' . PHP_EOL;
