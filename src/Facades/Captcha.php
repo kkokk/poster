@@ -10,9 +10,9 @@ namespace Kkokk\Poster\Facades;
 
 /**
  * @method static \Kkokk\Poster\Interfaces\MyCaptcha type(string $channel = null)
- * @method static object config()
- * @method static boolean check()
- * @method static array get()
+ * @method static object config($params = [])
+ * @method static boolean check($key , $value , $leeway = 0, $secret = null)
+ * @method static array get($expire = 0)
  *
  * @see \Kkokk\Poster\Lang\Captcha
  */

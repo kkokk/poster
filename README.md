@@ -341,6 +341,7 @@ $dst_y = ['custom', 'center', 100, 200, 0]; // 在图像对象的y坐标100到20
 | font_family | string                | 否   | 字体，可不填，有默认 (相对路径为项目根目录)                  |
 | weight      | integer               | 否   | 字体粗细 默认字体大小                                        |
 | space       | integer               | 否   | 字体间距 默认无                                              |
+| angle       | integer               | 否   | 旋转角度                                                     |
 
 ##### 批量合成文字
 
@@ -355,7 +356,8 @@ $texts = [
         'max_w'       => $max_w,
         'font_family' => $font_family,
         'weight'      => $weight,
-        'space'       => $space
+        'space'       => $space,
+        'angle'       => $angle,
     ]
 ];
 $poster->buildTextMany($texts); # 批量合成文字
@@ -366,7 +368,7 @@ $poster->buildTextMany($texts); # 批量合成文字
 ##### 获取海报
 
 ```php
-$poster->getPoster(); # 获取合成后图片文件地址
+$poster->getPoster($path = ''); # 获取合成后图片文件地址
 ```
 
 参数说明：无。

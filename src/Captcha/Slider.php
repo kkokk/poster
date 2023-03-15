@@ -26,6 +26,7 @@ class Slider extends CaptchaBase implements MyCaptcha
         'slider_width' => 50,
         'slider_height' => 50,
         'slider_border' => 2,
+        'slider_bg' => 1,
     ];  // 验证码图片配置
 
     public function config($params = [])
@@ -42,6 +43,7 @@ class Slider extends CaptchaBase implements MyCaptcha
             $this->configs['slider_width'] = isset($params['slider_width']) ? $params['slider_width'] : $this->configs['slider_width'];
             $this->configs['slider_height'] = isset($params['slider_height']) ? $params['slider_height'] : $this->configs['slider_height'];
             $this->configs['slider_border'] = isset($params['slider_border']) ? $params['slider_border'] : $this->configs['slider_border'];
+            $this->configs['slider_bg'] = isset($params['slider_bg']) ? $params['slider_bg'] : $this->configs['slider_bg'];
         } else {
             $this->configs['src'] = $params['src'] ?? $this->configs['src'];
             $this->configs['im_width'] = $params['im_width'] ?? $this->configs['im_width'];
@@ -53,6 +55,7 @@ class Slider extends CaptchaBase implements MyCaptcha
             $this->configs['slider_width'] = $params['slider_width'] ?? $this->configs['slider_width'];
             $this->configs['slider_height'] = $params['slider_height'] ?? $this->configs['slider_height'];
             $this->configs['slider_border'] = $params['slider_border'] ?? $this->configs['slider_border'];
+            $this->configs['slider_bg'] = $params['slider_bg'] ?? $this->configs['slider_bg'];
         }
 
         return $this;
@@ -139,12 +142,6 @@ class Slider extends CaptchaBase implements MyCaptcha
         $y1 = mt_rand(0, $bg_height - $h);
         $y2 = $y1 + $h;
 
-        $xx1 = mt_rand(30, $bg_width - $w);
-        // $xx2 = $xx1 + $slider_width;
-
-        $yy1 = mt_rand(0, $bg_height - $h);
-        // $yy2 = $yy1 + $slider_height;
-
         for ($i = 0; $i < $bg_width; $i++) {
             for ($j = 0; $j < $bg_height; $j++) {
                 // 矩形抠图
@@ -158,7 +155,18 @@ class Slider extends CaptchaBase implements MyCaptcha
         }
 
         imagecopy($this->im, $bg, $x1, $y1, 0, 0, $slider_width, $slider_height);
-        imagecopy($this->im, $bg, $xx1, $yy1, 0, 0, $slider_width, $slider_height);
+
+        $bgCount = 1;
+        $maxCount = min($this->configs['slider_bg'], 4);
+        $maxCount = max($maxCount, 1);
+        while ($bgCount < $maxCount) {
+            // 额外滑块背景
+            $x = mt_rand(30, $bg_width - $w);
+            $y = mt_rand(0, $bg_height - $h);
+            imagecopy($this->im, $bg, $x, $y, 0, 0, $slider_width, $slider_height);
+            $bgCount++;
+        }
+
         imagecopy($this->im, $ims, 5, 196, 0, 0, $slider_width, $slider_width);
 
         $this->destroyImage($bg);

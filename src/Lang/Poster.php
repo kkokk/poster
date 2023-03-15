@@ -179,12 +179,12 @@ class Poster extends PosterBase implements MyPoster
      * @param string $font_family 字体
      * @param integer $weight 粗细
      * @param integer $space 字间距
+     * @param integer $angle 字旋转角度
      * @return   [type]                                [description]
      */
-    public function buildText($content, $dst_x = 0, $dst_y = 0, $font = 16, $rgba = [], $max_w = 0, $font_family = '', $weight = 1, $space = 0)
+    public function buildText($content, $dst_x = 0, $dst_y = 0, $font = 16, $rgba = [], $max_w = 0, $font_family = '', $weight = 1, $space = 0, $angle = 0)
     {
-
-        $this->CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w, $font_family, $weight, $space);
+        $this->CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w, $font_family, $weight, $space, $angle);
         return $this;
     }
 
@@ -207,7 +207,8 @@ class Poster extends PosterBase implements MyPoster
                 $value['font_family'] = isset($value['font_family']) ? $value['font_family'] : '';
                 $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
                 $value['space'] = isset($value['space']) ? $value['space'] : 0;
-                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space']);
+                $value['angle'] = isset($value['angle']) ? $value['angle'] : 0;
+                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space'], $value['angle']);
             }
         } else {
             foreach ($arr as $value) {
@@ -219,7 +220,8 @@ class Poster extends PosterBase implements MyPoster
                 $value['font_family'] = $value['font_family'] ?? '';
                 $value['weight'] = $value['weight'] ?? 1;
                 $value['space'] = $value['space'] ?? 0;
-                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space']);
+                $value['angle'] = $value['angle'] ?? 0;
+                $this->CopyText($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space'], $value['angle']);
             }
         }
         return $this;
