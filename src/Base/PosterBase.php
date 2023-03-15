@@ -195,7 +195,7 @@ class PosterBase
      */
     protected function getData($path = '')
     {
-        if($path){
+        if ($path) {
             $this->setFilePath($path);
         }
         if (empty($this->type)) $this->type = 'png';
@@ -1408,11 +1408,11 @@ class PosterBase
      * @return bool
      * @throws PosterException
      */
-    protected function CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w = 0, $font_family = '', $weight = 1, $space = 0)
+    protected function CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w = 0, $font_family = '', $weight = 1, $space = 0, $angle = 0)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $calcSpace = $space > $font ? ( $space - $font ) : 0; // 获取间距计算值
+        $calcSpace = $space > $font ? ($space - $font) : 0; // 获取间距计算值
 
         $font = ($font * 3) / 4; // px 转化为 pt
 
@@ -1455,7 +1455,7 @@ class PosterBase
                 $line++;
             }
             $contents .= $l;
-            $line === 1 && $calcSpaceRes+=$calcSpace;
+            $line === 1 && $calcSpaceRes += $calcSpace;
         }
         $fontBox[] = $calcSpaceRes; // 间距
         $dst_x = $this->calcTextDstX($dst_x, $fontBox);
@@ -1473,20 +1473,37 @@ class PosterBase
                     $dst_y += 1.75 * $font;
                     continue;
                 }
-                for ($i = 0; $i < $weight; $i++) {
-                    imagettftext($this->im, $font, 0, $dst_x + ($i * 0.25), $dst_y + $font + ($i * 0.25), $color, $font_family, mb_substr($contents, $j, 1));
-                }
+                $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, $contents);
                 $dst_x += $space;
             }
 
 
         } else {
-            for ($i = 0; $i < $weight; $i++) {
-                imagettftext($this->im, $font, 0, $dst_x + ($i * 0.25), $dst_y + $font + ($i * 0.25), $color, $font_family, $contents);
-            }
+            $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, $contents);
         }
 
         return true;
+    }
+
+    /**
+     * 字体加粗
+     */
+    private function fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, $contents)
+    {
+        for ($i = 0; $i < $weight; $i++) {
+
+            if ($weight % 2 == 0 && $i > 0) {
+                $really_dst_x = $dst_x + ($i * 0.25);
+                $really_dst_y = $dst_y;
+            } elseif($weight % 2 != 0 && $i > 0) {
+                $really_dst_x = $dst_x;
+                $really_dst_y = $dst_y + ($i * 0.25);
+            } else {
+                $really_dst_x = $dst_x;
+                $really_dst_y = $dst_y;
+            }
+            imagettftext($this->im, $font, $angle, $really_dst_x, $really_dst_y, $color, $font_family, $contents);
+        }
     }
 
     /**
@@ -1554,13 +1571,13 @@ class PosterBase
             ($y2 - $y1)
             : $this->im_h;
         if ($dst_y === 'center') {
-            $dst_y = ceil(($imHeight - $fontBoxHeight) / 2);
+            $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ));
         } elseif (is_array($dst_y)) {
             $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
             $y1 = $y1 !== null ? $y1 : 0;
             switch ($dst_y[0]) {
                 case 'center':
-                    $dst_y = ceil(($imHeight - $fontBoxHeight) / 2) + $y1 + $dst_y[1];
+                    $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 )) + $y1 + $dst_y[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
                     $dst_y = $y1 + $dst_y[1];
@@ -1601,7 +1618,8 @@ class PosterBase
         }
     }
 
-    protected function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1){
+    protected function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
+    {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
         $color = $this->createColorAlpha($this->im, $rgba);
 
