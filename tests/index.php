@@ -23,7 +23,8 @@ try {
     // $data = PosterManager::Captcha()->type('click')->check(0, json_decode($json, true), 0, $secret);
     // var_dump($data);
     // exit;
-    $data = PosterManager::Captcha()->get();
+    // $data = PosterManager::Captcha()->get();
+    $data = Captcha::get();
     // $data = Captcha::type('input')->config(['contents'=>'红烧'])->get();
     // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();

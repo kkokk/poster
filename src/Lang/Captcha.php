@@ -14,6 +14,12 @@ use Kkokk\Poster\Interfaces\MyCaptcha;
 class Captcha implements MyCaptcha
 {
     protected $channel = 'slider';
+    protected $store = [
+        'input' => \Kkokk\Poster\Captcha\Input::class, // 输入类验证
+        'click' => \Kkokk\Poster\Captcha\Click::class, // 点击验证
+        'rotate' => \Kkokk\Poster\Captcha\Rotate::class, // 旋转验证
+        'slider' => \Kkokk\Poster\Captcha\Slider::class, // 滑块验证
+    ];
     protected $channels = [];
 
     public function config($param = [])
@@ -43,9 +49,8 @@ class Captcha implements MyCaptcha
 
     public function instance($channel)
     {
-
-        $className = '\\Kkokk\\Poster\Captcha\\' . $channel;
-        if (!class_exists($className)) throw new PosterException('class not found');
+        if(!isset($this->store[$channel])) throw new PosterException('the ' . $channel . ' type not found');
+        $className = $this->store[$channel];
 
         return $this->channels[$channel] = new $className;
     }
