@@ -441,6 +441,7 @@ $params = [
     'slider_width'  => 50,  // 滑块宽度
     'slider_height' => 50,  // 滑块高度
     'slider_border' => 2,   // 滑块边框
+    'slider_bg'     => 1,   // 滑块背景数量
 ];
 
 $type = 'slider';
