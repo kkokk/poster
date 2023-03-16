@@ -1446,9 +1446,8 @@ class PosterBase
         $line = 1;
         $calcSpaceRes = 0;
         foreach ($letter as $l) {
-            $teststr = $contents . ' ' . $l;
-            $fontBox = imagettfbbox($font, 0, $font_family, $teststr);
-            // $testbox = imagettfbbox($fontsize, $angle, $fontface, $teststr);
+            $textStr = $contents . ' ' . $l;
+            $fontBox = imagettfbbox($font, $angle, $font_family, $textStr);
             // 判断拼接后的字符串是否超过预设的宽度
             if ((abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes > $max_ws) && ($contents !== '')) {
                 $contents .= "\n";
@@ -1494,13 +1493,13 @@ class PosterBase
 
             if ($weight % 2 == 0 && $i > 0) {
                 $really_dst_x = $dst_x + ($i * 0.25);
-                $really_dst_y = $dst_y;
+                $really_dst_y = $dst_y + $font;
             } elseif($weight % 2 != 0 && $i > 0) {
                 $really_dst_x = $dst_x;
-                $really_dst_y = $dst_y + ($i * 0.25);
+                $really_dst_y = $dst_y + $font + ($i * 0.25);
             } else {
                 $really_dst_x = $dst_x;
-                $really_dst_y = $dst_y;
+                $really_dst_y = $dst_y + $font;
             }
             imagettftext($this->im, $font, $angle, $really_dst_x, $really_dst_y, $color, $font_family, $contents);
         }
@@ -1571,13 +1570,13 @@ class PosterBase
             ($y2 - $y1)
             : $this->im_h;
         if ($dst_y === 'center') {
-            $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ));
+            $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ) - $fontBoxHeight);
         } elseif (is_array($dst_y)) {
             $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
             $y1 = $y1 !== null ? $y1 : 0;
             switch ($dst_y[0]) {
                 case 'center':
-                    $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 )) + $y1 + $dst_y[1];
+                    $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ) - $fontBoxHeight) + $y1 + $dst_y[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
                     $dst_y = $y1 + $dst_y[1];
