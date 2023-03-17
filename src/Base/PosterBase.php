@@ -1467,12 +1467,13 @@ class PosterBase
             $dst_x_old = $dst_x;
             for ($j = 0; $j < mb_strlen($contents); $j++) {
 
-                if (mb_substr($contents, $j, 1) == "\n") {
+                $spaceStr = mb_substr($contents, $j, 1);
+                if ($spaceStr == "\n") {
                     $dst_x = $dst_x_old;
                     $dst_y += 1.75 * $font;
                     continue;
                 }
-                $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, mb_substr($contents, $j, 1));
+                $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, $spaceStr);
                 $dst_x += $space;
             }
 
