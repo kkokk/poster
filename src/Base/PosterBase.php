@@ -1472,7 +1472,7 @@ class PosterBase
                     $dst_y += 1.75 * $font;
                     continue;
                 }
-                $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, $contents);
+                $this->fontWeight($weight, $font, $angle, $dst_x, $dst_y, $color, $font_family, mb_substr($contents, $j, 1));
                 $dst_x += $space;
             }
 
