@@ -29,7 +29,7 @@ try {
     // var_dump($data);
     // exit;
     // $data = PosterManager::Captcha()->get();
-    $data = Captcha::config(['slider_bg'=>-1])->get();
+    // $data = Captcha::config(['slider_bg'=>-1])->get();
     // $data = Captcha::type('input')->config(['contents'=>'红烧'])->get();
     // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();
@@ -39,13 +39,13 @@ try {
     // $data = PosterManager::Captcha()->type('input')->config(['type'=>'math'])->get();
     // $data = PosterManager::Captcha()->type('rotate')->get();
 
-    print_r($data['img']);
+    // print_r($data['img']);
 
     // echo (memory_get_usage() / 1024 / 1024).'M'.PHP_EOL;
     // echo microtime().PHP_EOL;
     // echo (memory_get_peak_usage() / 1024 / 1024).'M'.PHP_EOL;
     // print_r(getrusage()).PHP_EOL;
-    exit;
+    // exit;
 
     # 静态调用
     // 合成图片
@@ -185,7 +185,7 @@ try {
                 // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
                 // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
                 // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
+                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 10, 25);
                 // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
             })
         ->getPoster();
