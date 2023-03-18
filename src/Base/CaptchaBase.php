@@ -44,6 +44,10 @@ class CaptchaBase
         return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
     }
 
+    public function getCross($p1, $p2, $p){
+        return $this->Common->getCross($p1, $p2, $p);
+    }
+
     // 获取缓存
     public function getCache($key){
         try {
