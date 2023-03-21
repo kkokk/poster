@@ -14,14 +14,14 @@ use Kkokk\Poster\Facades\Cache;
 
 class CaptchaBase
 {
-    protected $PosterBase; // PosterBase
-    protected $Common; // PosterBase
+    protected $PosterBase; // GdBase
+    protected $Common; // GdBase
     protected $im; // im
     protected $expire = 180; // 过期时间
     protected $leeway = 5;   // 误差值
 
     function __construct(){
-        $this->PosterBase = new PosterBase();
+        $this->PosterBase = new GdBase();
         $this->Common = new Common;
     }
 

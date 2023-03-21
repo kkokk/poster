@@ -3,7 +3,7 @@
 namespace Kkokk\Poster\Abstracts;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Base\PosterBase;
+use Kkokk\Poster\Base\GdBase;
 
 /**
  * @Author: lang
@@ -17,7 +17,7 @@ use Kkokk\Poster\Base\PosterBase;
 /**
  * 执行
  */
-abstract class PosterAbstract extends PosterBase
+abstract class GdAbstract extends GdBase
 {
     abstract public function config($params = []);
     /**

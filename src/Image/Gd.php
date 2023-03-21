@@ -1,23 +1,18 @@
 <?php
+namespace Kkokk\Poster\Image;
 
-namespace Kkokk\Poster\Lang;
-
-use Kkokk\Poster\Abstracts\GdAbstract;
+use Kkokk\Poster\Base\GdBase;
+use Kkokk\Poster\Interfaces\MyPoster;
 
 /**
  * @Author: lang
  * @Email:  732853989@qq.com
- * @Date:   2020-08-14 11:49:51
- * @Last Modified by:   lang
- * @Last Modified time: 2021-09-09 10:35:19
+ * @Date:   2023-03-22 11:18:03
+ * Class Gd
+ * @package Kkokk\Poster\Image
  */
-
-/**
- *
- */
-class AbstractTest extends GdAbstract
+class Gd extends GdBase implements MyPoster
 {
-
     public function config($params = [])
     {
 
@@ -45,11 +40,11 @@ class AbstractTest extends GdAbstract
      * [buildImDst description] 创建指定图片为画布
      * @Author   lang
      * @DateTime 2020-08-15T11:14:48+0800
-     * @param    [src]                    $src   [description] 图像资源
-     * @param integer $w [description]
-     * @param integer $h [description]
-     * @param array $rgba [description]
-     * @param boolean $alpha [description]
+     * @param    [src]                    $src   图像资源
+     * @param integer $w 宽
+     * @param integer $h 高
+     * @param array $rgba 颜色[255,255,255,1]
+     * @param boolean $alpha 是否透明
      * @return   [type]                          [description]
      */
     public function buildImDst($src, $w = 0, $h = 0)
@@ -77,20 +72,21 @@ class AbstractTest extends GdAbstract
         return $this;
     }
 
+
     /**
      * [buildImage description] 合成图片
      * @Author   lang
      * @DateTime 2020-08-14T20:56:54+0800
-     * @param    [type]                   $src   [description]
-     * @param integer $dst_x [description]
-     * @param integer $dst_y [description]
-     * @param integer $src_x [description]
-     * @param integer $src_y [description]
-     * @param integer $src_w [description]
-     * @param integer $src_h [description]
-     * @param string $type [description]
-     * @param boolean $alpha [description] 透明
-     * @return   [type]                          [description]
+     * @param string $src 图像资源
+     * @param integer $dst_x 从画布x轴开始绘制
+     * @param integer $dst_y 从画布y轴开始绘制
+     * @param integer $src_x 从自身x轴开始绘制
+     * @param integer $src_y 从自身y轴开始绘制
+     * @param integer $src_w 自定义宽度
+     * @param integer $src_h 自定义高度
+     * @param boolean $alpha 透明 true
+     * @param string $type 不改变形状normal 圆形circle
+     * @return   [type]
      */
     public function buildImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
     {
@@ -136,12 +132,11 @@ class AbstractTest extends GdAbstract
                 $this->CopyImage($value['src'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h'], $value['alpha'], $value['type']);
             }
         }
-
         return $this;
     }
 
     /**
-     * 合成直线、斜线、矩形
+     * 合成直线
      * @Author lang
      * @Email: 732853989@qq.com
      * Date: 2023/2/12
@@ -170,18 +165,20 @@ class AbstractTest extends GdAbstract
      * [buildText description] 合成文字
      * @Author   lang
      * @DateTime 2020-08-14T22:09:20+0800
-     * @param    [type]                   $content     [description]
-     * @param integer $dst_x [description]
-     * @param integer $dst_y [description]
-     * @param integer $font [description]
-     * @param array $rgba [description]
-     * @param integer $max_w [description]
-     * @param string $font_family [description]
+     * @param    [type]                   $content     文字内容
+     * @param integer $dst_x x轴位置
+     * @param integer $dst_y y轴位置
+     * @param integer $font 字体大小
+     * @param array $rgba 颜色
+     * @param integer $max_w 自定义换行宽度
+     * @param string $font_family 字体
+     * @param integer $weight 粗细
+     * @param integer $space 字间距
+     * @param integer $angle 字旋转角度
      * @return   [type]                                [description]
      */
     public function buildText($content, $dst_x = 0, $dst_y = 0, $font = 16, $rgba = [], $max_w = 0, $font_family = '', $weight = 1, $space = 0, $angle = 0)
     {
-
         $this->CopyText($content, $dst_x, $dst_y, $font, $rgba, $max_w, $font_family, $weight, $space, $angle);
         return $this;
     }
@@ -244,6 +241,13 @@ class AbstractTest extends GdAbstract
         return $this;
     }
 
+    /**
+     * buildQrMany 批量合成二维码
+     * @Author lang
+     * @Date   2021-09-09T10:33:24+0800
+     * @param array $arr 参数与合成二维码对应
+     * @return [type]                        [description]
+     */
     public function buildQrMany($arr = [])
     {
         if (PHP_VERSION <= 7) {
@@ -271,7 +275,6 @@ class AbstractTest extends GdAbstract
                 $this->CopyQr($value['text'], $value['size'], $value['margin'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h']);
             }
         }
-
         return $this;
     }
 
@@ -312,7 +315,7 @@ class AbstractTest extends GdAbstract
      * [getPoster description] 获取合成后图片地址
      * @Author   lang
      * @DateTime 2020-08-16T15:45:57+0800
-     * @return   [type]   [description]
+     * @return   [type]                   [description]
      */
     public function getPoster($path = '')
     {
@@ -321,14 +324,10 @@ class AbstractTest extends GdAbstract
     }
 
     /**
-     * [getPoster description] 返回文件流
-     * @Author   lang
-     * @DateTime 2020-08-16T15:45:57+0800
-     * @return   [type]   [description]
+     *
      */
     public function stream()
     {
-
         return $this->getStream();
     }
 
