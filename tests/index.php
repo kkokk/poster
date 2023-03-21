@@ -17,11 +17,11 @@ require '../vendor/autoload.php';
  */
 
 try {
-    Poster::config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-        ->buildIm(400,400,[255,255,255, 1],true)
-        ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
-        ->getPoster();
-    exit;
+    // Poster::config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    //     ->buildIm(400,400,[255,255,255, 1],true)
+    //     ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
+    //     ->getPoster();
+    // exit;
     // echo microtime().PHP_EOL;
     // $json = '[{"x":186,"y":182},{"x":94,"y":157}]';
     // $secret = '[{"contents":"\u7ea2","point":[157,169,185,215,215,197,187,151,-58]},{"contents":"\u70e7","point":[61,150,95,193,123,172,89,129,-51]}]';
@@ -125,7 +125,8 @@ try {
     // ->buildBg(638,826,[0,0,0,50],true)
     // ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,32,[255, 255, 255, 1])
     // ->getPoster();
-    echo microtime() . PHP_EOL;
+    $startAt = microtime(true);
+    echo $startAt . PHP_EOL;
     // $result = PosterManager::Poster('poster/poster_user')
     //     ->buildIm(638,826,[255,255,255,1],true)
     //     ->buildImageMany($buildImageManyArr)
@@ -190,9 +191,12 @@ try {
             })
         ->getPoster();
     echo (memory_get_usage() / 1024 / 1024) . 'M' . PHP_EOL;
-    echo microtime() . PHP_EOL;
     echo (memory_get_peak_usage() / 1024 / 1024) . 'M' . PHP_EOL;
     print_r(getrusage()) . PHP_EOL;
+
+    $endAt = microtime(true);
+    echo $endAt . PHP_EOL;
+    echo $endAt - $startAt . PHP_EOL;
 
     //给图片添加水印
     // $PosterManager = new PosterManager();
