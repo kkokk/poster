@@ -52,9 +52,9 @@ interface MyPoster
 
     public function buildQrMany($arr = []);
 
-    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
-
     public function path($path);
+
+    public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
 
     public function getPoster($path = '');
 

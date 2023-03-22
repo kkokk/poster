@@ -24,7 +24,8 @@ class Captcha implements MyCaptcha
 
     public function config($param = [])
     {
-        return $this->driver()->config($param);
+        $this->driver()->config($param);
+        return $this;
     }
 
     public function check($key, $value, $leeway = 0, $secret = null)
