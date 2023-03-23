@@ -11,8 +11,6 @@ namespace Kkokk\Poster\Image;
 
 interface ExtensionInterface
 {
-    public function config($params = []);
-
     public function buildIm($w, $h, $rgba = [], $alpha = false);
 
     public function buildImDst($src, $w = 0, $h = 0);

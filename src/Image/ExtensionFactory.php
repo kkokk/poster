@@ -22,8 +22,9 @@ class ExtensionFactory
     {
         switch ($name) {
             case 'gd':
-                // return
+                return new GdExtension;
             case 'imagick':
+                return new ImagickExtension;
         }
 
         throw new PosterException("Unsupported extension [{$name}].");

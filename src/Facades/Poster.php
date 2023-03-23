@@ -8,9 +8,9 @@
 
 namespace Kkokk\Poster\Facades;
 
-use Kkokk\Poster\Lang\Poster as PosterManager;
+use Kkokk\Poster\Image\PosterManager;
 /**
- * @method static PosterManager channel($channel = "");
+ * @method static PosterManager extension($channel = "");
  * @method static PosterManager config($params = []);
  * @method static PosterManager buildIm($w, $h, $rgba = [], $alpha = false);
  * @method static PosterManager buildImDst($w, $h, $rgba = [], $alpha = false);

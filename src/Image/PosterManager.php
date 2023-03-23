@@ -8,8 +8,6 @@
 
 namespace Kkokk\Poster\Image;
 
-use Kkokk\Poster\Image\Processors\ExtensionFactory;
-
 class PosterManager
 {
     protected $extensions = [];
@@ -21,8 +19,9 @@ class PosterManager
         $this->factory = new ExtensionFactory;
     }
 
-    public function extension($name)
+    public function extension($name  = null)
     {
+        $name = $this->parseConnectionName($name);
 
         if (! isset($this->extensions[$name])) {
             $this->extensions[$name] = $this->configure($this->makeExtension($name));
@@ -34,6 +33,12 @@ class PosterManager
     protected function configure(Extension $extension)
     {
         return $extension;
+    }
+
+    protected function parseConnectionName($name)
+    {
+        if(empty($name)) return $this->supportedExtensions()[0];
+        return $name;
     }
 
     /**
@@ -60,7 +65,7 @@ class PosterManager
     }
 
     /**
-     * 将方法动态传递给默认连接。
+     * 将方法动态传递给默认拓展。
      *
      * @param  string  $method
      * @param  array  $parameters

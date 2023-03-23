@@ -17,11 +17,13 @@ require '../vendor/autoload.php';
  */
 
 try {
-    // Poster::config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-    //     ->buildIm(400,400,[255,255,255, 1],true)
-    //     ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
-    //     ->getPoster();
-    // exit;
+    var_dump(Poster::extension());
+    exit;
+    Poster::extension()->config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+        ->buildIm(400,400,[255,255,255, 1],true)
+        ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
+        ->getPoster();
+    exit;
     // echo microtime().PHP_EOL;
     // $json = '[{"x":186,"y":182},{"x":94,"y":157}]';
     // $secret = '[{"contents":"\u7ea2","point":[157,169,185,215,215,197,187,151,-58]},{"contents":"\u70e7","point":[61,150,95,193,123,172,89,129,-51]}]';
@@ -29,7 +31,7 @@ try {
     // var_dump($data);
     // exit;
     // $data = PosterManager::Captcha()->get();
-    $data = Captcha::type()->config(['slider_bg'=>-1])->get();
+    // $data = Captcha::type()->config(['slider_bg'=>-1])->get();
     // $data = Captcha::type('input')->config(['contents'=>'红烧'])->get();
     // // $data = PosterManager::Captcha()->type('input')->config(['src'=>__DIR__.'/../src/style/slider_bg/layer01.jpg'])->get();
     // $data = PosterManager::Captcha()->type('click')->config(['contents'=>'红烧'])->get();
