@@ -8,8 +8,12 @@
 
 namespace Kkokk\Poster\Image;
 
+use Kkokk\Poster\Image\Queries\ImagickQuery;
 
 class ImagickExtension extends Extension
 {
-
+    public function getQueryInstance()
+    {
+        return new ImagickQuery;
+    }
 }

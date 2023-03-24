@@ -8,57 +8,99 @@
 
 namespace Kkokk\Poster\Image;
 
+use Kkokk\Poster\Exception\PosterException;
 
 class Extension implements ExtensionInterface
 {
 
+    protected $driver;
+
+    function __construct($driver)
+    {
+        $this->driver = $driver;
+    }
+
+    public function config($params = [])
+    {
+        return $this->query()->config($params);
+    }
+
     public function buildIm($w, $h, $rgba = [], $alpha = false)
     {
-        // TODO: Implement buildIm() method.
+        return $this->query()->buildIm($w, $h, $rgba, $alpha);
     }
 
     public function buildImDst($src, $w = 0, $h = 0)
     {
-        // TODO: Implement buildImDst() method.
+        return $this->query()->buildImDst($src, $w, $h);
     }
 
     public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '')
     {
-        // TODO: Implement buildBg() method.
+        return $this->query()->buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func);
     }
 
     public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0)
     {
-        // TODO: Implement Qr() method.
+        $query = $this->getQueryInstance()->getQrQuery($text, $outfile, $level, $size, $margin, $saveAndPrint);
+        return $this->getDriverInstance($query)->result;
     }
 
-    public function getPoster($path = '')
+    public function getPoster($query, $path)
     {
-        // TODO: Implement getPoster() method.
+        return $this->getDriverInstance($query)->getData($path);
     }
 
-    public function setPoster()
+    public function setPoster($query)
     {
-        // TODO: Implement setPoster() method.
+        return $this->getDriverInstance($query)->setData();
     }
 
-    public function stream()
+    public function stream($query)
     {
-        // TODO: Implement stream() method.
+        return $this->getDriverInstance($query)->getStream();
     }
 
-    public function baseData()
+    public function baseData($query)
     {
-        // TODO: Implement baseData() method.
+        return $this->getDriverInstance($query)->getBaseData();
     }
 
-    protected function run()
+    public function query()
     {
-
+        return new Builder(
+            $this,
+            $this->getQueryInstance()
+        );
     }
 
-    public function getExtension()
+    /**
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/3/24
+     * Time: 15:45
+     * @param $query
+     * @return \Kkokk\Poster\Image\Drivers\Driver
+     * @throws PosterException
+     */
+    protected function getDriverInstance($query)
     {
-        return $this->getDriver();
+        return $this->run($query, function($query) {
+            return $this->driver->execute($query);
+        });
+    }
+
+    protected function run($query, \Closure $callback)
+    {
+        try {
+
+            $result = $callback($query);
+
+        } catch (\Exception $e) {
+
+            throw new PosterException($e->getMessage());
+        }
+
+        return $result;
     }
 }

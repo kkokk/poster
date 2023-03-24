@@ -8,15 +8,19 @@
 
 namespace Kkokk\Poster\Facades;
 
+use Kkokk\Poster\Image\ExtensionInterface;
 use Kkokk\Poster\Image\PosterManager;
+use Kkokk\Poster\Image\Builder;
 /**
- * @method static PosterManager extension($channel = "");
- * @method static PosterManager config($params = []);
- * @method static PosterManager buildIm($w, $h, $rgba = [], $alpha = false);
- * @method static PosterManager buildImDst($w, $h, $rgba = [], $alpha = false);
- * @method static PosterManager buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
+ * @method static ExtensionInterface extension($channel = "");
+ * @method static Builder config($params = []);
+ * @method static Builder buildIm($w, $h, $rgba = [], $alpha = false);
+ * @method static Builder buildImDst($w, $h, $rgba = [], $alpha = false);
+ * @method static Builder buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
+ * @method static array Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
  *
- * @see PosterManager
+ * @see \Kkokk\Poster\Image\PosterManager
+ * @see \Kkokk\Poster\Image\Extension
  */
 class Poster extends Facade
 {

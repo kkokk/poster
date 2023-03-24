@@ -8,12 +8,12 @@
 
 namespace Kkokk\Poster\Image;
 
-use Kkokk\Poster\Image\Drivers\GdDriver;
+use Kkokk\Poster\Image\Queries\GdQuery;
 
 class GdExtension extends Extension
 {
-    protected function getDriver()
+    public function getQueryInstance()
     {
-        return new GdDriver;
+        return new GdQuery;
     }
 }

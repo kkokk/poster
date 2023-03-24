@@ -8,8 +8,9 @@
 
 namespace Kkokk\Poster\Image;
 
-
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Drivers\GdDriver;
+use Kkokk\Poster\Image\Drivers\ImagickDriver;
 
 class ExtensionFactory
 {
@@ -18,13 +19,25 @@ class ExtensionFactory
         return $this->createExtension($name);
     }
 
+    protected function createDriver($name)
+    {
+        switch ($name) {
+            case 'gd':
+                return new GdDriver();
+            case 'imagick':
+                return new ImagickDriver();
+        }
+
+        throw new PosterException("Unsupported driver [{$name}].");
+    }
+
     protected function createExtension($name)
     {
         switch ($name) {
             case 'gd':
-                return new GdExtension;
+                return new GdExtension($this->createDriver($name));
             case 'imagick':
-                return new ImagickExtension;
+                return new ImagickExtension($this->createDriver($name));
         }
 
         throw new PosterException("Unsupported extension [{$name}].");

@@ -17,13 +17,15 @@ require '../vendor/autoload.php';
  */
 
 try {
-    var_dump(Poster::extension());
-    exit;
-    Poster::extension()->config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-        ->buildIm(400,400,[255,255,255, 1],true)
-        ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
-        ->getPoster();
-    exit;
+    // $result = Poster::extension()->Qr('http://www.baidu.com','poster/1.png', 'L', 4, 1, 1);
+    // var_dump($result);
+    // exit;
+    // var_dump(Poster::extension()->config(['path'=>'poster/avatar1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    //     ->buildIm(400,400,[255,255,255, 1],true)
+    //     ->buildText('Poster', ['center', 22], 'center', 108, [52, 52, 52, 1], '', '', 20)
+    //     ->getPoster()
+    // );
+    // exit;
     // echo microtime().PHP_EOL;
     // $json = '[{"x":186,"y":182},{"x":94,"y":157}]';
     // $secret = '[{"contents":"\u7ea2","point":[157,169,185,215,215,197,187,151,-58]},{"contents":"\u70e7","point":[61,150,95,193,123,172,89,129,-51]}]';
@@ -175,22 +177,23 @@ try {
         ->buildIm(638,826,[255,255,255,1],true)
         ->buildImageMany($buildImageManyArr)
         ->buildTextMany($buildTextManyArr)
+        ->buildText('啊实打实大所大所大所多', 100, 200, 20, [255, 255, 255, 1])
         ->buildQrMany($buildQrManyArr)
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 10, 25);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
+        // ->buildBg(400, 500, ['color' => [[255, 0, 0],
+        //     [255, 125, 0],
+        //     [255, 255, 0],
+        //     [0, 255, 0],
+        //     [0, 255, 255],
+        //     [0, 0, 255],
+        //     [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
+        //     function ($im) {
+        //         $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+        //         // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
+        //         // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
+        //         // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
+        //         $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 10, 25);
+        //         // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
+        //     })
         ->getPoster();
     echo (memory_get_usage() / 1024 / 1024) . 'M' . PHP_EOL;
     echo (memory_get_peak_usage() / 1024 / 1024) . 'M' . PHP_EOL;
