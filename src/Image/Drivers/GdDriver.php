@@ -912,7 +912,7 @@ class GdDriver extends Driver
      * @param $alpha
      * @throws PosterException
      */
-    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '')
+    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
     {
         // 判断颜色是否渐变
         $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
@@ -939,17 +939,6 @@ class GdDriver extends Driver
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
 
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-
-        if ($func instanceof \Closure) {
-            // 闭包处理 由于设计原因。。。先克隆处理一下
-            $that = clone $this;
-            $that->im = $pic;
-            $that->im_w = $w;
-            $that->im_h = $h;
-            $func($that);
-            imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-            unset($that);
-        }
 
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
         unset($rgbaCount);

@@ -76,22 +76,20 @@ class Builder
 
     public function buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func)
     {
-
-        // if ($func instanceof \Closure) {
-        //
-        //     $that = clone $this;
-        //
-        //     $that = clone $this;
-        //     $that->im = $pic;
-        //     $that->im_w = $w;
-        //     $that->im_h = $h;
-        //     $func($that);
-        //     imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-        //     unset($that);
-        // }
-        $bg = [$w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func];
+        $bg = [$w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y];
         $this->bgs[] = $bg;
         $this->query->setQuery('bg', $bg);
+        if ($func instanceof \Closure) {
+            $that = clone $this;
+            $that->query->clearQuery(); // 清理 query
+            $func($that);
+
+            $this->query->setCallbackQuery($w, $h, $that->query->getQuery());
+            unset($that);
+
+            print_r($this->query->getQuery());
+            exit;
+        }
         return $this;
     }
 
@@ -224,5 +222,9 @@ class Builder
     {
         $this->qrs[] = $params;
         $this->query->setQuery('qrs', $params);
+    }
+
+    public function __clone(){
+        $this->query = clone $this->query;
     }
 }

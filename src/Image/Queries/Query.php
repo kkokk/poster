@@ -12,6 +12,11 @@ class Query
 {
     protected $query = [];
 
+    public function clearQuery()
+    {
+        $this->query = [];
+    }
+
     public function getQuery()
     {
         return $this->query;
@@ -20,6 +25,11 @@ class Query
     public function setQuery($type, $params)
     {
         $this->query[] = ['type'=>$type, 'params'=> $params];
+    }
+
+    public function setCallbackQuery($w, $h, $query)
+    {
+
     }
 
     public function getQrQuery(...$params)
