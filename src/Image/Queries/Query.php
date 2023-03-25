@@ -27,9 +27,9 @@ class Query
         $this->query[] = ['type'=>$type, 'params'=> $params];
     }
 
-    public function setCallbackQuery($w, $h, $query)
+    public function setPath($path)
     {
-
+        $this->query[] = ['type'=>'path', 'params' => $path];
     }
 
     public function getQrQuery(...$params)

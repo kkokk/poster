@@ -25,7 +25,7 @@ interface ExtensionInterface
 
     public function buildImDst($src, $w = 0, $h = 0);
 
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, \Closure $callback = null);
 
     /**
      * 生成二维码

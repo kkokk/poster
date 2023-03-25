@@ -15,7 +15,10 @@ use Kkokk\Poster\Image\Drivers\ImagickDriver;
 class ExtensionFactory
 {
 
-    public function make($name){
+    protected $path;
+
+    public function make($name, $path = null) {
+        $this->path = $path;
         return $this->createExtension($name);
     }
 
@@ -35,9 +38,9 @@ class ExtensionFactory
     {
         switch ($name) {
             case 'gd':
-                return new GdExtension($this->createDriver($name));
+                return new GdExtension($this->createDriver($name), $this->path);
             case 'imagick':
-                return new ImagickExtension($this->createDriver($name));
+                return new ImagickExtension($this->createDriver($name), $this->path);
         }
 
         throw new PosterException("Unsupported extension [{$name}].");

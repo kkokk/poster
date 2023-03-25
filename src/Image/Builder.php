@@ -45,12 +45,12 @@ class Builder
     /** @var string */
     public $path = null;
 
-    private $i = 0; // 顺序
-
-    public function __construct(ExtensionInterface $extension, Query $query)
+    public function __construct(ExtensionInterface $extension, Query $query, $path = null)
     {
         $this->extension = $extension;
         $this->query = $query;
+        $this->path = $path;
+        $this->query->setPath($path);
     }
 
     public function config($params = [])
@@ -74,22 +74,19 @@ class Builder
         return $this;
     }
 
-    public function buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func)
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, \Closure $callback = null)
     {
-        $bg = [$w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y];
-        $this->bgs[] = $bg;
-        $this->query->setQuery('bg', $bg);
-        if ($func instanceof \Closure) {
+        $query = [];
+        if ($callback) {
             $that = clone $this;
             $that->query->clearQuery(); // 清理 query
-            $func($that);
-
-            $this->query->setCallbackQuery($w, $h, $that->query->getQuery());
+            $callback($that);
+            $query = $that->query->getQuery(); // 获取闭包内生成的query
             unset($that);
-
-            print_r($this->query->getQuery());
-            exit;
         }
+
+        $bg = [$w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $query];
+        $this->query->setQuery('bg', $bg);
         return $this;
     }
 

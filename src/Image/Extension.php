@@ -15,9 +15,12 @@ class Extension implements ExtensionInterface
 
     protected $driver;
 
-    function __construct($driver)
+    protected $path;
+
+    function __construct($driver, $path)
     {
         $this->driver = $driver;
+        $this->path = $path;
     }
 
     public function config($params = [])
@@ -35,9 +38,9 @@ class Extension implements ExtensionInterface
         return $this->query()->buildImDst($src, $w, $h);
     }
 
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '')
+    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, \Closure $callback = null)
     {
-        return $this->query()->buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $func);
+        return $this->query()->buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $callback);
     }
 
     public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0)
@@ -70,7 +73,8 @@ class Extension implements ExtensionInterface
     {
         return new Builder(
             $this,
-            $this->getQueryInstance()
+            $this->getQueryInstance(),
+            $this->path
         );
     }
 

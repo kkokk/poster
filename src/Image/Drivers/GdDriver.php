@@ -22,7 +22,7 @@ class GdDriver extends Driver
     protected $type = '';
     protected $path;
     protected $source;
-    protected $font_family = __DIR__ . '/../style/simkai.ttf';
+    protected $font_family = __DIR__ . '/../../style/simkai.ttf';
     protected $poster_type = [
         'gif' => 'imagegif',
         'jpeg' => 'imagejpeg',
@@ -904,15 +904,19 @@ class GdDriver extends Driver
      * 创建背景
      * Author: lang
      * Email: 732853989@qq.com
-     * Date: 2022/10/17
-     * Time: 11:03
-     * @param $w
-     * @param $h
-     * @param $rgba
-     * @param $alpha
-     * @throws PosterException
+     * Date: 2023/3/25
+     * Time: 17:55
+     * @param int $w 宽
+     * @param int $h 高
+     * @param array $rgba 背景颜色
+     * @param false $alpha 是否透明
+     * @param int $dst_x
+     * @param int $dst_y
+     * @param int $src_x
+     * @param int $src_y
+     * @param array $query
      */
-    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0)
+    protected function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
     {
         // 判断颜色是否渐变
         $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
@@ -939,6 +943,16 @@ class GdDriver extends Driver
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
 
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        if (!empty($query)) {
+            $that = clone $this;
+            $that->im = $pic;
+            $that->im_w = $w;
+            $that->im_h = $h;
+            $that->execute($query, $that);
+            imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+            unset($that);
+        }
 
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
         unset($rgbaCount);
@@ -1533,49 +1547,53 @@ class GdDriver extends Driver
         if (isset($result) && is_resource($result)) $this->destroyImage($result);
     }
 
-    public function execute($query) {
+    public function execute($query, $driver = null) {
 
+        if(empty($driver)){
+            $driver = $this;
+        }
         foreach ($query as $item){
-            $this->run($item);
+            $driver->run($item, $driver);
         }
 
-        return $this;
+        return $driver;
     }
 
-    protected function run($item){
+    protected function run($item, Driver $driver)
+    {
         switch ($item['type']) {
             case 'im':
-                $this->Im(...$item['params']);
+                $driver->Im(...$item['params']);
                 break;
             case 'imDst':
-                $this->ImDst(...$item['params']);
+                $driver->ImDst(...$item['params']);
                 break;
             case 'bg':
-                $this->Bg(...$item['params']);
+                $driver->Bg(...$item['params']);
                 break;
             case 'config':
-                $this->setConfig($item['params']);
+                $driver->setConfig($item['params']);
                 break;
             case 'path':
-                $this->setFilePath($item['params']);
+                $driver->setFilePath($item['params']);
                 break;
             case 'image':
-                $this->CopyImage(...$item['params']);
+                $driver->CopyImage(...$item['params']);
                 break;
             case 'text':
-                $this->CopyText(...$item['params']);
+                $driver->CopyText(...$item['params']);
                 break;
             case 'line':
-                $this->CopyLine(...$item['params']);
+                $driver->CopyLine(...$item['params']);
                 break;
             case 'arc':
-                $this->CopyArc(...$item['params']);
+                $driver->CopyArc(...$item['params']);
                 break;
             case 'qrs':
-                $this->CopyQr(...$item['params']);
+                $driver->CopyQr(...$item['params']);
                 break;
             case 'qr':
-                $this->result = $this->createQr(...$item['params']);
+                $driver->result = $driver->createQr(...$item['params']);
                 break;
         }
     }

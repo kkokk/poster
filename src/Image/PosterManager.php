@@ -14,8 +14,11 @@ class PosterManager
 
     protected $factory;
 
-    function __construct()
+    protected $path;
+
+    function __construct($path = null) // 兼容老版本设置路径
     {
+        $this->path = $path;
         $this->factory = new ExtensionFactory;
     }
 
@@ -51,7 +54,7 @@ class PosterManager
      */
     protected function makeExtension($name)
     {
-        return $this->factory->make($name);
+        return $this->factory->make($name, $this->path);
     }
 
     /**
