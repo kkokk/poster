@@ -89,6 +89,7 @@ class Extension implements ExtensionInterface
      */
     protected function getDriverInstance($query)
     {
+
         return $this->run($query, function($query) {
             return $this->driver->execute($query);
         });
@@ -101,7 +102,7 @@ class Extension implements ExtensionInterface
             $result = $callback($query);
 
         } catch (\Exception $e) {
-
+            echo $e;exit;
             throw new PosterException($e->getMessage());
         }
 
