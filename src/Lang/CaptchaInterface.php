@@ -9,9 +9,9 @@
 namespace Kkokk\Poster\Lang;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Interfaces\MyCaptcha;
+use Kkokk\Poster\Interfaces\CaptchaInterface;
 
-class Captcha implements MyCaptcha
+class CaptchaInterface implements CaptchaInterface
 {
     protected $channel = 'slider';
     protected $store = [

@@ -8,11 +8,9 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Facades\Cache;
-use Kkokk\Poster\Base\CaptchaBase;
-use Kkokk\Poster\Interfaces\MyCaptcha;
+use Kkokk\Poster\Interfaces\CaptchaInterface;
 
-class Input extends CaptchaBase  implements MyCaptcha
+class Input extends CaptchaManager  implements CaptchaInterface
 {
 
     protected $configs = [

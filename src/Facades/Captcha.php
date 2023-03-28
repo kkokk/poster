@@ -7,13 +7,13 @@
  */
 
 namespace Kkokk\Poster\Facades;
-use Kkokk\Poster\Interfaces\MyCaptcha;
-use Kkokk\Poster\Lang\Captcha as CaptchaManager;
+use Kkokk\Poster\Interfaces\CaptchaInterface;
+use Kkokk\Poster\Lang\CaptchaInterface as CaptchaManager;
 /**
  * @method static CaptchaManager type(string $channel = null)
- * @method static MyCaptcha config($params = [])
- * @method static MyCaptcha check($key , $value , $leeway = 0, $secret = null)
- * @method static MyCaptcha get($expire = 0)
+ * @method static CaptchaInterface config($params = [])
+ * @method static CaptchaInterface check($key , $value , $leeway = 0, $secret = null)
+ * @method static CaptchaInterface get($expire = 0)
  *
  * @see CaptchaManager
  */

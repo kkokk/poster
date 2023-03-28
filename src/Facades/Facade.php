@@ -17,7 +17,7 @@ abstract class Facade
     protected static $store = [
         'cache' => \Kkokk\Poster\Cache\Repository::class,
         'poster' => \Kkokk\Poster\Image\PosterManager::class,
-        'captcha' => \Kkokk\Poster\Lang\Captcha::class,
+        'captcha' => \Kkokk\Poster\Lang\CaptchaInterface::class,
     ];
 
     protected static function getInstance()

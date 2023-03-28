@@ -18,10 +18,10 @@ class Repository
     function __call($method, $params){
         if (class_exists(LaravelCache::class)) {
             $connector = LaravelCache::class;
-        } elseif(class_exists(ThinkCache5::class)){
-            $connector = ThinkCache5::class;
         } elseif(class_exists(ThinkCache6::class)){
             $connector = ThinkCache6::class;
+        } elseif(class_exists(ThinkCache5::class)){
+            $connector = ThinkCache5::class;
         } else {
             throw new PosterException('no cacheDriver');
         }

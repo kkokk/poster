@@ -149,112 +149,52 @@ try {
 
     # 实例化调用
     // 合成图片
-    $PosterManager = PosterManager::Poster('poster/test1');//new PosterManager('poster/test1');
-    $result = $PosterManager
-        // ->buildIm(638,826,[255,255,255,127],false)
-        // ->buildImageMany($buildImageManyArr)
-        // ->buildTextMany($buildTextManyArr)
-        // ->buildQrMany($buildQrManyArr)
-        // ->config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
-            [255, 125, 0],
-            [255, 255, 0],
-            [0, 255, 0],
-            [0, 255, 255],
-            [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
-                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
-                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
-                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
-                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
-            })
-        ->getPoster();
-
-    // $result = Poster::config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-    //     ->buildIm(638,826,[255,255,255,1],true)
-    //     ->buildImageMany($buildImageManyArr)
-    //     ->buildTextMany($buildTextManyArr)
-    //     ->buildText('啊实打实大所大所大所多', 100, 200, 20, [255, 255, 255, 1])
-    //     ->buildQrMany($buildQrManyArr)
+    // $PosterManager = PosterManager::Poster('poster/test1');//new PosterManager('poster/test1');
+    // $result = $PosterManager
+    //     // ->buildIm(638,826,[255,255,255,127],false)
+    //     // ->buildImageMany($buildImageManyArr)
+    //     // ->buildTextMany($buildTextManyArr)
+    //     // ->buildQrMany($buildQrManyArr)
+    //     // ->config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
     //     ->buildBg(400, 500, ['color' => [[255, 0, 0],
     //         [255, 125, 0],
     //         [255, 255, 0],
     //         [0, 255, 0],
     //         [0, 255, 255],
     //         [0, 0, 255],
-    //         [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
+    //         [255, 0, 255]], 'alpha' => 1, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
     //         function ($im) {
     //             $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
     //             // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
     //             // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
     //             // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
-    //             $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 10, 25);
+    //             $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
     //             // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
     //         })
     //     ->getPoster();
+
+    $result = Poster::config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+        ->buildIm(638,826,[255,255,255,1],true)
+        ->buildImageMany($buildImageManyArr)
+        ->buildTextMany($buildTextManyArr)
+        ->buildText('啊实打实大所大所大所多', 100, 200, 20, [255, 255, 255, 1])
+        ->buildQrMany($buildQrManyArr)
+        ->buildBg(400, 500, ['color' => [[255, 0, 0],
+            [255, 125, 0],
+            [255, 255, 0],
+            [0, 255, 0],
+            [0, 255, 255],
+            [0, 0, 255],
+            [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
+            function ($im) {
+                $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+                // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
+                // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
+                // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);
+                $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 10, 25);
+                // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
+            })
+        ->getPoster();
     echo (memory_get_usage() / 1024 / 1024) . 'M' . PHP_EOL;
     echo (memory_get_peak_usage() / 1024 / 1024) . 'M' . PHP_EOL;
     print_r(getrusage()) . PHP_EOL;
