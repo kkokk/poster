@@ -25,7 +25,7 @@ class Driver
     /** @var int 画布尺寸高 */
     protected $im_h;
 
-    /** @var int[] 默认 x y 分辨率 默认是 72 */
+    /** @var int[] 默认 x y 分辨率 默认是 [72, 72] */
     protected $dpi = [];
 
     /** @var string 存储路径 */
@@ -45,6 +45,15 @@ class Driver
 
     /** @var string 图片类型 */
     protected $type = 'png';
+
+    /** @var string[] 图片类型 */
+    protected $poster_type = [
+        'gif'  => 'imagegif',
+        'jpeg' => 'imagejpeg',
+        'jpg'  => 'imagejpeg',
+        'png'  => 'imagepng',
+        'wbmp' => 'imagewbmp'
+    ];
 
     /** @var array|null 返回结果 */
     public $result = null;

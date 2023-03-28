@@ -8,6 +8,7 @@
 
 namespace Kkokk\Poster\Image\Drivers;
 
+use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
@@ -29,27 +30,123 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->im = $this->createIm($w, $h, $rgba, $alpha);
     }
 
+    public function ImDst($source, $w, $h)
+    {
+        // if (!is_file($source)) {
+        //     throw new PosterException('水印图像不存在');
+        // }
+        $this->source = $source;
+
+        $pic = $this->createImagick($source);
+        //获取水印图像信息
+        $info = @getimagesize($source);
+
+        if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
+            throw new PosterException('wrong source');
+        }
+
+        list($bgWidth, $bgHeight, $bgType) = $info;
+
+        $this->type = image_type_to_extension($bgType, false);
+        if (empty($this->type)) throw new PosterException('image resources cannot be empty (' . $source . ')');
+
+        //创建水印图像资源
+        $fun = 'imagecreatefrom' . $this->type;
+        $cut = @$fun($source);
+
+        //设定水印图像的混色模式
+        imagealphablending($cut, true);
+
+        if (!empty($w) && !empty($h)) {
+            $this->im_w = $w;
+            $this->im_h = $h;
+            $circle_new = $this->createIm($w, $h, [255, 255, 255, 127], $alpha = true);
+            imagecopyresized($circle_new, $cut, 0, 0, 0, 0, $w, $h, $bgWidth, $bgHeight);
+            $cut = $circle_new;
+            // $this->destroyImage($circle_new);
+        } else {
+            $this->im_w = $bgWidth;
+            $this->im_h = $bgHeight;
+        }
+
+        $this->im = $cut;
+    }
+
     public function getData($path = '')
     {
         if ($path) {
             $this->setFilePath($path);
         }
+        $this->setDPI();
         return $this->returnImage($this->type);
     }
 
     public function getStream()
     {
+        $this->setDPI();
         return $this->returnImage($this->type, false);
     }
 
     public function getBaseData()
     {
-        // TODO: Implement getBaseData() method.
+        $this->setDPI();
+        $common = new Common();
+        return $common->baseData($this->im->getImageBlob(), $this->type);
     }
 
     public function setData()
     {
+        $this->setDPI();
         // TODO: Implement setData() method.
+    }
+
+    public function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
+    {
+        // 判断颜色是否渐变
+        $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
+        $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
+        $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
+        $radius = isset($rgba['radius']) ? $rgba['radius'] : 0;
+        $rgbaCount = count($rgbaColor);
+
+        // im不存在则创建
+        if (empty($this->im)) {
+            $this->im($w, $h, [], $alpha);
+        }
+        // 渐变处理->直接处理im
+        // 计算颜色方向
+        $pic = $this->createIm($w, $h, [], $alpha);
+
+        $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
+
+        $pic->setImageAlpha(round((128 - $alphas) / 127, 2)); // 透明度
+
+        // if ($radius) {
+        //     // 暂不支持圆角处理
+        // }
+
+        $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
+        $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
+        // 裁剪图片
+        $this->cropImage($pic, $src_x, $src_y);
+        // 合并图片
+        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+
+        if (!empty($query)) {
+            $that = clone $this;
+            $that->im = $pic;
+            $that->im_w = $w;
+            $that->im_h = $h;
+            $that->execute($query, $that);
+
+            // 裁剪图片
+            $this->cropImage($pic, $src_x, $src_y);
+            // 合并图片
+            $this->im->compositeImage($that->im, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            unset($that);
+        }
+
+        $this->destroyImage($pic);
     }
 
     public function CopyImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
@@ -110,6 +207,8 @@ class ImagickDriver extends Driver implements DriverInterface
         # 处理目标 y 轴
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
 
+        // 裁剪图片
+        $this->cropImage($pic, $src_x, $src_y);
         // 合并图片
         $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
 
@@ -222,19 +321,23 @@ class ImagickDriver extends Driver implements DriverInterface
 
         $qr = \QRcode::re_png($text, $size, $margin);
 
+        $bgWidth = imagesx($qr);
+        $bgHeight = imagesy($qr);
+
+        ob_start(); // 打开一个输出缓冲区
+        $this->poster_type['png']($qr); // 将 GD 图像输出到缓冲区
+        $imageData = ob_get_clean(); // 从缓冲区中读取图像数据
+        ob_end_clean();
+
         $pic = $this->createImagick();
-        $pic->readImageFile($qr);
+        $pic->readImageBlob($imageData);
 
         if ($src_w > 0) {
             $bgWidth = $src_w;
-        } else {
-            $bgWidth = $pic->getImageWidth();
         }
 
         if ($src_h > 0) {
             $bgHeight = $src_h;
-        } else {
-            $bgHeight = $pic->getImageHeight();
         }
 
         # 处理目标 x 轴
@@ -248,11 +351,71 @@ class ImagickDriver extends Driver implements DriverInterface
             $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true);
         }
 
+        // 裁剪图片
+        $this->cropImage($pic, $src_x, $src_y);
         // 合并图片
         $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
 
         !is_resource($qr) || imagedestroy($qr);
         $this->destroyImage($pic);
+    }
+
+    /**
+     * 划线
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/3/28
+     * Time: 11:43
+     * @param int $x1
+     * @param int $y1
+     * @param int $x2
+     * @param int $y2
+     * @param array $rgba
+     * @param string $type
+     * @param int $weight
+     * @throws PosterException
+     */
+    public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
+    {
+        $color = $this->createColorAlpha($rgba);
+        $draw = $this->createImagickDraw();
+        $draw->setStrokeColor($color);
+        $draw->setStrokeWidth($weight);
+        switch ($type) {
+            case 'rectangle':
+                $draw->setFillColor($this->createColorAlpha());
+                $draw->rectangle($x1, $y1, $x2, $y2);
+                break;
+            case 'filled_rectangle':
+            case 'filledRectangle':
+                $draw->rectangle($x1, $y1, $x2, $y2);
+                break;
+            default:
+                $draw->line($x1, $y1, $x2, $y2);
+                break;
+        }
+        $this->im->drawImage($draw);
+    }
+
+    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
+    {
+        $color = $this->createColorAlpha($rgba);
+        $draw = $this->createImagickDraw();
+        $draw->setStrokeColor($color);
+        $draw->setStrokeWidth($weight);
+        $wr = $w / 2;
+        $hr = $h / 2;
+        switch ($type) {
+            case 'filled_arc':
+            case 'filledArc':
+                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
+                break;
+            default:
+                $draw->setFillColor($this->createColorAlpha());
+                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
+                break;
+        }
+        $this->im->drawImage($draw);
     }
 
     /**

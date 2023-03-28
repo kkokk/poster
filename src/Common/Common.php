@@ -19,14 +19,19 @@ class Common
     ];
 
     // 转base64
-    public function baseData($im, $type = 'png')
+    public function baseData($image, $type = 'png')
     {
-        ob_start();
-        $this->imType[$type]($im);
-        $data = ob_get_contents();
-        ob_end_clean();
-        $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        imagedestroy($im);
+        $baseData = '';
+        if (is_resource($image)) {
+            ob_start();
+            $this->imType[$type]($image);
+            $data = ob_get_contents();
+            ob_end_clean();
+            $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            imagedestroy($image);
+        } elseif (is_string($image)) {
+            $baseData = 'data:image/' . $type . ';base64,' . base64_encode($image);
+        }
         return $baseData;
     }
 
@@ -41,9 +46,9 @@ class Common
      * @param string $type
      * @param int $quality
      */
-    public function imOutput($im, $dir='', $type='png', $quality=75)
+    public function imOutput($im, $dir = '', $type = 'png', $quality = 75)
     {
-        if($type == 'jpg' || $type == 'jpeg'){
+        if ($type == 'jpg' || $type == 'jpeg') {
             $this->imType[$type]($im, $dir, $quality);
         } else {
             $this->imType[$type]($im, $dir);

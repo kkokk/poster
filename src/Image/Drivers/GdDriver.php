@@ -17,14 +17,6 @@ class GdDriver extends Driver implements DriverInterface
 {
     use GdTrait;
 
-    protected $poster_type = [
-        'gif'  => 'imagegif',
-        'jpeg' => 'imagejpeg',
-        'jpg'  => 'imagejpeg',
-        'png'  => 'imagepng',
-        'wbmp' => 'imagewbmp'
-    ];
-
     function __construct()
     {
 
@@ -40,14 +32,12 @@ class GdDriver extends Driver implements DriverInterface
 
     public function getStream()
     {
-        if (empty($this->type)) $this->type = 'png';
         return $this->returnImage($this->type, false);
     }
 
     public function getBaseData()
     {
         $common = new Common();
-        if (empty($this->type)) $this->type = 'png';
         return $common->baseData($this->im, $this->type);
     }
 
@@ -80,11 +70,12 @@ class GdDriver extends Driver implements DriverInterface
         $this->source = $source;
         //获取水印图像信息
         $info = @getimagesize($source);
-        list($bgWidth, $bgHeight, $bgType) = @getimagesize($source);
 
         if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
-            throw new PosterException('非法水印文件');
+            throw new PosterException('wrong source');
         }
+
+        list($bgWidth, $bgHeight, $bgType) = $info;
 
         $this->type = image_type_to_extension($bgType, false);
         if (empty($this->type)) throw new PosterException('image resources cannot be empty (' . $source . ')');
