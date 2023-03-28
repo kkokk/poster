@@ -126,11 +126,11 @@ class Builder
             $value['font'] = isset($value['font']) ? $value['font'] : 0;
             $value['rgba'] = isset($value['rgba']) ? $value['rgba'] : [];
             $value['max_w'] = isset($value['max_w']) ? $value['max_w'] : 0;
-            $value['font_family'] = isset($value['font_family']) ? $value['font_family'] : '';
+            $value['font'] = isset($value['font']) ? $value['font'] : '';
             $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
             $value['space'] = isset($value['space']) ? $value['space'] : 0;
             $value['angle'] = isset($value['angle']) ? $value['angle'] : 0;
-            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font_family'], $value['weight'], $value['space'], $value['angle']);
+            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font'], $value['weight'], $value['space'], $value['angle']);
         }
         return $this;
     }
