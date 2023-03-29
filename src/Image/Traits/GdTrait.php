@@ -27,12 +27,26 @@ trait GdTrait
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $this->type;
             }
+
             $this->poster_type[$type]($this->im, $this->path . $this->pathname . '/' . $this->filename);
 
             return ['url' => $this->pathname . '/' . $this->filename];
         }
         header('Content-Type:Image/' . $this->type);
         $this->poster_type[$type]($this->im);
+    }
+
+    protected function setImage($source){
+
+        if(strpos($source, 'http') === 0){
+            throw new PosterException("unable to set the remote source {$source}");
+        }
+
+        if (!empty($source)) {
+            return $this->poster_type[$this->type]($this->im, $source);
+        }
+
+        throw new PosterException("source not found {$source}");
     }
 
     /**

@@ -91,6 +91,7 @@ class Driver
         $path = is_array($path) ? $path : [$path];
         $pathFileName = isset($path[0]) ? $path[0] : '';
         $pathFileName = str_replace(['\\', '/'], '/', $pathFileName);
+
         $fileName = $pathFileName ?: time();
         if (strripos($pathFileName, '/') !== false) {
             $this->setPathName($pathFileName);
@@ -232,8 +233,6 @@ class Driver
      */
     protected function calcDstX($dst_x, $imWidth, $bgWidth)
     {
-
-
         if ($dst_x == '0') {
             return $dst_x;
         } elseif ($dst_x === 'center') {
@@ -292,7 +291,6 @@ class Driver
                 $dst_y = ceil(($imHeight - $bgHeight) / 2) + $dst_y[1];
 
             }
-
         } elseif (strpos($dst_y, '%') !== false) {
 
             if (substr($dst_y, 0, strpos($dst_y, '%')) < 0) {
@@ -304,7 +302,6 @@ class Driver
                 $dst_y = ceil($imHeight * substr($dst_y, 0, strpos($dst_y, '%')) / 100);
 
             }
-
         }
 
         return $dst_y;
@@ -351,6 +348,17 @@ class Driver
                     $dst_x = 0;
             }
 
+        } elseif (strpos($dst_x, '%') !== false) {
+
+            if (substr($dst_x, 0, strpos($dst_x, '%')) < 0) {
+
+                $dst_x = ceil($imWidth + ($imWidth * substr($dst_x, 0, strpos($dst_x, '%')) / 100));
+
+            } else {
+
+                $dst_x = ceil($imWidth * substr($dst_x, 0, strpos($dst_x, '%')) / 100);
+
+            }
         }
 
         return $dst_x;
@@ -397,6 +405,17 @@ class Driver
                     $dst_y = 0;
             }
 
+        } elseif (strpos($dst_y, '%') !== false) {
+
+            if (substr($dst_y, 0, strpos($dst_y, '%')) < 0) {
+
+                $dst_y = ceil($imHeight + (($imHeight * substr($dst_y, 0, strpos($dst_y, '%'))) / 100));
+
+            } else {
+
+                $dst_y = ceil($imHeight * substr($dst_y, 0, strpos($dst_y, '%')) / 100);
+
+            }
         }
 
         return $dst_y;

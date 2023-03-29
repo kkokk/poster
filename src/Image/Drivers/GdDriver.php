@@ -43,10 +43,7 @@ class GdDriver extends Driver implements DriverInterface
 
     public function setData()
     {
-        if (isset($this->source) && !empty($this->source)) {
-            return $this->poster_type[$this->type]($this->im, $this->source);
-        }
-        throw new PosterException('没有找到源文件');
+        return $this->setImage($this->source);
     }
 
     /**

@@ -38,38 +38,21 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->source = $source;
 
         $pic = $this->createImagick($source);
-        //获取水印图像信息
-        $info = @getimagesize($source);
 
-        if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
-            throw new PosterException('wrong source');
-        }
-
-        list($bgWidth, $bgHeight, $bgType) = $info;
-
-        $this->type = image_type_to_extension($bgType, false);
-        if (empty($this->type)) throw new PosterException('image resources cannot be empty (' . $source . ')');
-
-        //创建水印图像资源
-        $fun = 'imagecreatefrom' . $this->type;
-        $cut = @$fun($source);
-
-        //设定水印图像的混色模式
-        imagealphablending($cut, true);
+        $bgWidth = $pic->getImageWidth();
+        $bgHeight = $pic->getImageHeight();
+        $this->type = strtolower($pic->getImageFormat());
 
         if (!empty($w) && !empty($h)) {
             $this->im_w = $w;
             $this->im_h = $h;
-            $circle_new = $this->createIm($w, $h, [255, 255, 255, 127], $alpha = true);
-            imagecopyresized($circle_new, $cut, 0, 0, 0, 0, $w, $h, $bgWidth, $bgHeight);
-            $cut = $circle_new;
-            // $this->destroyImage($circle_new);
+            $pic->resizeImage($w, $h, $pic::FILTER_LANCZOS, 1, true);
         } else {
             $this->im_w = $bgWidth;
             $this->im_h = $bgHeight;
         }
 
-        $this->im = $cut;
+        $this->im = $pic;
     }
 
     public function getData($path = '')
@@ -97,7 +80,7 @@ class ImagickDriver extends Driver implements DriverInterface
     public function setData()
     {
         $this->setDPI();
-        // TODO: Implement setData() method.
+        return $this->setImage($this->source);
     }
 
     public function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
@@ -290,7 +273,7 @@ class ImagickDriver extends Driver implements DriverInterface
             'text_width' => $textWidth,
             'text_height' => abs($fontBox['textHeight'] + $fontBox['descender']),
         ];
-        $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+        $dst_x = $this->calcTextDstX($dst_x, $calcFont) - $fontBox['descender']; // 调整和 gd 的误差值
 
         $dst_y = $this->calcTextDstY($dst_y, $calcFont);
 

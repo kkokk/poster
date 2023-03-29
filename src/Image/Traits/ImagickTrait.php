@@ -42,6 +42,19 @@ trait ImagickTrait
         echo $this->im->getImageBlob();
     }
 
+    protected function setImage($source){
+
+        if(strpos($source, 'http') === 0){
+            throw new PosterException("unable to set the remote source {$source}");
+        }
+
+        if (!empty($source)) {
+            return $this->im->writeImage($source);
+        }
+
+        throw new PosterException("source not found {$source}");
+    }
+
     /**
      * 创建文字绘画类
      * Author: lang

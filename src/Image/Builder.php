@@ -67,7 +67,7 @@ class Builder
         return $this;
     }
 
-    public function buildImDst($src, $w, $h)
+    public function buildImDst($src, $w = 0, $h = 0)
     {
         $this->im = [$src, $w, $h];
         $this->query->setQuery('imDst', $this->im);
@@ -176,6 +176,7 @@ class Builder
     public function path($path)
     {
         $this->path = $path;
+        $this->query->setPath($path);
         return $this;
     }
 
