@@ -8,7 +8,7 @@
 
 namespace Kkokk\Poster\Interfaces;
 
-interface MyCaptcha
+interface CaptchaInterface
 {
     /**
      * 基础配置

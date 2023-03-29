@@ -6,13 +6,14 @@
  * Time: 18:10
  */
 
-namespace Kkokk\Poster\Base;
+namespace Kkokk\Poster\Captcha;
 
 use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Facades\Cache;
+use Kkokk\Poster\Image\Drivers\GdDriver;
 
-class CaptchaBase
+class CaptchaManager
 {
     protected $PosterBase; // GdBase
     protected $Common; // GdBase
@@ -21,7 +22,7 @@ class CaptchaBase
     protected $leeway = 5;   // 误差值
 
     function __construct(){
-        $this->PosterBase = new GdBase();
+        $this->PosterBase = new GdDriver();
         $this->Common = new Common;
     }
 

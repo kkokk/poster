@@ -156,6 +156,7 @@ try {
     //     // ->buildTextMany($buildTextManyArr)
     //     // ->buildQrMany($buildQrManyArr)
     //     // ->config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+
     //     ->buildBg(400, 500, ['color' => [[255, 0, 0],
     //         [255, 125, 0],
     //         [255, 255, 0],
