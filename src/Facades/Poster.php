@@ -8,18 +8,25 @@
 
 namespace Kkokk\Poster\Facades;
 
-use Kkokk\Poster\Lang\Poster as gdBuilder;
+use Kkokk\Poster\Image\ExtensionInterface;
+use Kkokk\Poster\Image\PosterManager;
+use Kkokk\Poster\Image\Builder;
+
 /**
- * @method static gdBuilder config($params = []);
- * @method static gdBuilder buildIm($w, $h, $rgba = [], $alpha = false);
- * @method static gdBuilder buildImDst($w, $h, $rgba = [], $alpha = false);
- * @method static gdBuilder buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
+ * @method static ExtensionInterface extension($channel = "");
+ * @method static Builder config($params = []);
+ * @method static Builder buildIm($w, $h, $rgba = [], $alpha = false);
+ * @method static Builder buildImDst($w, $h, $rgba = [], $alpha = false);
+ * @method static Builder buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
+ * @method static array Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
  *
- * @see gdBuilder;
+ * @see \Kkokk\Poster\Image\PosterManager
+ * @see \Kkokk\Poster\Image\Extension
  */
 class Poster extends Facade
 {
-    protected static function getFacadeModel(){
+    protected static function getFacadeModel()
+    {
         return 'poster';
     }
 }

@@ -10,7 +10,8 @@ namespace Kkokk\Poster\Facades;
 
 class Cache extends Facade
 {
-    protected static function getFacadeModel(){
+    protected static function getFacadeModel()
+    {
         return 'cache';
     }
 }
