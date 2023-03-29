@@ -24,19 +24,11 @@ class Query
 
     public function setQuery($type, $params)
     {
-        $this->query[] = ['type'=>$type, 'params'=> $params];
+        $this->query[] = ['type' => $type, 'params' => $params];
     }
 
     public function setPath($path)
     {
-        $this->query[] = ['type'=>'path', 'params' => $path];
-    }
-
-    public function getQrQuery(...$params)
-    {
-        $query = [];
-        $query['type'] = 'qr';
-        $query['params'] = $params;
-        return [$query];
+        $this->query[] = ['type' => 'path', 'params' => $path];
     }
 }

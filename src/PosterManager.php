@@ -31,7 +31,7 @@ class PosterManager
     {
         $lang = new self();
         // self::$className = __NAMESPACE__ . '\\Lang\\AbstractTest'; // 使用抽象类实现
-        self::$className = __NAMESPACE__ . '\\Lang\\Poster'; // 使用抽象类实现
+        self::$className = __NAMESPACE__ . '\\Lang\\Poster';
         return $lang->create($method, $params);
     }
 

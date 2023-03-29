@@ -17,7 +17,8 @@ class ExtensionFactory
 
     protected $path;
 
-    public function make($name, $path = null) {
+    public function make($name, $path = null)
+    {
         $this->path = $path;
         return $this->createExtension($name);
     }

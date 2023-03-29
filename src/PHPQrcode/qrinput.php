@@ -2,7 +2,7 @@
 /*
  * PHP QR Code encoder
  *
- * Input encoding class
+ * InputGenerator encoding class
  *
  * Based on libqrencode C library distributed under LGPL 2.1
  * Copyright (C) 2006, 2007, 2008, 2009 Kentaro Fukuchi <fukuchi@megaui.net>

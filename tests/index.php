@@ -234,7 +234,8 @@ try {
     //         })
     //     ->getPoster();
 
-    $result = Poster::config(['path'=>'poster/test1.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    $result = Poster::extension('imagick')
+        ->config(['path'=>'poster/test1.png', 'font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
         ->buildIm(638,826,[255,255,255,1],true)
         ->buildImageMany($buildImageManyArr)
         ->buildTextMany($buildTextManyArr)

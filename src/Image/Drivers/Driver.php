@@ -33,9 +33,20 @@ class Driver
 
     /** @var string 设置字体 */
     protected $font = __DIR__ . '/../../style/simkai.ttf';
-
     /** @var string 字体系列 例如 Microsoft YaHei */
     protected $font_family = '';
+    /** @var int 字体大小 */
+    protected $font_size = 16;
+    /** @var int[] 字体颜色 */
+    protected $font_rgba = [52, 52, 52, 1];
+    /** @var int 字体间距 */
+    protected $font_space = 0;
+    /** @var int 字体粗细 */
+    protected $font_weight = 1;
+    /** @var null 字体旋转角度 */
+    protected $font_angle = 0;
+    /** @var null 字体最大换行宽度 */
+    protected $font_max_w = 0;
 
     /** @var string 默认目录 */
     protected $pathname = 'poster';
@@ -48,10 +59,10 @@ class Driver
 
     /** @var string[] 图片类型 */
     protected $poster_type = [
-        'gif'  => 'imagegif',
+        'gif' => 'imagegif',
         'jpeg' => 'imagejpeg',
-        'jpg'  => 'imagejpeg',
-        'png'  => 'imagepng',
+        'jpg' => 'imagejpeg',
+        'png' => 'imagepng',
         'wbmp' => 'imagewbmp'
     ];
 
@@ -71,7 +82,14 @@ class Driver
     {
         isset($params['path']) && !empty($params['path']) && $this->setFilePath($params['path']);
         isset($params['font']) && !empty($params['font']) && $this->font = $params['font'];
-        isset($params['font_family']) && !empty($params['font_family']) && $this->font_family = $params['font_family'];
+        isset($params['font_family']) && !empty($params['font_family']) && $this->font = $params['font_family'];
+        isset($params['font_size']) && !empty($params['font_size']) && $this->font_size = $params['font_size'];
+        isset($params['font_rgba']) && !empty($params['font_rgba']) && $this->font_rgba = $params['font_rgba'];
+        isset($params['font_space']) && !empty($params['font_space']) && $this->font_space = $params['font_space'];
+        isset($params['font_weight']) && !empty($params['font_weight']) && $this->font_weight = $params['font_weight'];
+        isset($params['font_angle']) && !empty($params['font_angle']) && $this->font_angle = $params['font_angle'];
+        isset($params['font_max_w']) && !empty($params['font_max_w']) && $this->font_max_w = $params['font_max_w'];
+
         if (isset($params['dpi']) && !empty($params['dpi'])) {
             $this->dpi = is_numeric($params['dpi']) ? [$params['dpi'], $params['dpi']] : $params['dpi'];
         }
@@ -209,7 +227,7 @@ class Driver
      * @param  [type]                   $saveAndPrint [保存二维码图片并显示出来，$outfile必须传递图片路径]
      * @return array|void
      */
-    protected function createQr($text, $outfile, $level, $size, $margin, $saveAndPrint)
+    public function createQr($text, $outfile, $level, $size, $margin, $saveAndPrint)
     {
         if ($outfile) {
             $this->setPath($outfile);
@@ -383,13 +401,13 @@ class Driver
             ($y2 - $y1)
             : $this->im_h;
         if ($dst_y === 'center') {
-            $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ) - $fontBoxHeight);
+            $dst_y = ceil(($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight);
         } elseif (is_array($dst_y)) {
             $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
             $y1 = $y1 !== null ? $y1 : 0;
             switch ($dst_y[0]) {
                 case 'center':
-                    $dst_y = ceil(($imHeight/2) + ($fontBoxHeight / 2 ) - $fontBoxHeight) + $y1 + $dst_y[1];
+                    $dst_y = ceil(($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight) + $y1 + $dst_y[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
                     $dst_y = $y1 + $dst_y[1];
@@ -427,11 +445,11 @@ class Driver
      * Email: 732853989@qq.com
      * Date: 2023/3/27
      * Time: 16:46
-     * @param int $i        当前循环次数
-     * @param int $weight   循环次数
+     * @param int $i 当前循环次数
+     * @param int $weight 循环次数
      * @param int $fontSize 字体大小
-     * @param int $dst_x    x 位置
-     * @param int $dst_y    y 位置
+     * @param int $dst_x x 位置
+     * @param int $dst_y y 位置
      * @return array|float[]
      */
     protected function calcWeight($i, $weight, $fontSize, $dst_x, $dst_y)
@@ -439,7 +457,7 @@ class Driver
         if ($weight % 2 == 0 && $i > 0) {
             $really_dst_x = $dst_x + ($i * 0.25);
             $really_dst_y = $dst_y + $fontSize;
-        } elseif($weight % 2 != 0 && $i > 0) {
+        } elseif ($weight % 2 != 0 && $i > 0) {
             $really_dst_x = $dst_x;
             $really_dst_y = $dst_y + $fontSize + ($i * 0.25);
         } else {
@@ -447,6 +465,45 @@ class Driver
             $really_dst_y = $dst_y + $fontSize;
         }
         return [$really_dst_x, $really_dst_y];
+    }
+
+    public function run($item, Driver $driver)
+    {
+        switch ($item['type']) {
+            case 'im':
+                $driver->Im(...$item['params']);
+                break;
+            case 'imDst':
+                $driver->ImDst(...$item['params']);
+                break;
+            case 'bg':
+                $driver->Bg(...$item['params']);
+                break;
+            case 'config':
+                $driver->setConfig($item['params']);
+                break;
+            case 'path':
+                $driver->setFilePath($item['params']);
+                break;
+            case 'image':
+                $driver->CopyImage(...$item['params']);
+                break;
+            case 'text':
+                $driver->CopyText(...$item['params']);
+                break;
+            case 'line':
+                $driver->CopyLine(...$item['params']);
+                break;
+            case 'arc':
+                $driver->CopyArc(...$item['params']);
+                break;
+            case 'qrs':
+                $driver->CopyQr(...$item['params']);
+                break;
+            case 'qr':
+                $driver->result = $driver->createQr(...$item['params']);
+                break;
+        }
     }
 
 }

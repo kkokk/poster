@@ -17,7 +17,7 @@ abstract class Facade
     protected static $store = [
         'cache' => \Kkokk\Poster\Cache\Repository::class,
         'poster' => \Kkokk\Poster\Image\PosterManager::class,
-        'captcha' => \Kkokk\Poster\Lang\CaptchaInterface::class,
+        'captcha' => \Kkokk\Poster\Lang\Captcha::class,
     ];
 
     protected static function getInstance()
@@ -30,8 +30,8 @@ abstract class Facade
      * Email: 732853989@qq.com
      * Date: 2023/3/10
      * Time: 14:14
-     * @throws PosterException
      * @return string
+     * @throws PosterException
      */
     protected static function getFacadeModel()
     {

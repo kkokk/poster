@@ -22,11 +22,11 @@ class PosterManager
         $this->factory = new ExtensionFactory;
     }
 
-    public function extension($name  = null)
+    public function extension($name = null)
     {
         $name = $this->parseConnectionName($name);
 
-        if (! isset($this->extensions[$name])) {
+        if (!isset($this->extensions[$name])) {
             $this->extensions[$name] = $this->configure($this->makeExtension($name));
         }
 
@@ -40,7 +40,7 @@ class PosterManager
 
     protected function parseConnectionName($name)
     {
-        if(empty($name)) return $this->supportedExtensions()[0];
+        if (empty($name)) return $this->supportedExtensions()[0];
         return $name;
     }
 
@@ -70,8 +70,8 @@ class PosterManager
     /**
      * 将方法动态传递给默认拓展。
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

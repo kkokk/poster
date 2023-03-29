@@ -12,7 +12,8 @@ require '../vendor/autoload.php';
 
 try {
 
-    $res = Poster::config(['path'=>'poster/imagick.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+    $res = Poster::extension('imagick')
+        ->config(['path'=>'poster/imagick.png','font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
         ->buildIm(638,826,[255,255,255,1],true)
         ->getPoster();
 

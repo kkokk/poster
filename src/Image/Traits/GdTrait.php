@@ -36,9 +36,10 @@ trait GdTrait
         $this->poster_type[$type]($this->im);
     }
 
-    protected function setImage($source){
+    protected function setImage($source)
+    {
 
-        if(strpos($source, 'http') === 0){
+        if (strpos($source, 'http') === 0) {
             throw new PosterException("unable to set the remote source {$source}");
         }
 
@@ -717,5 +718,16 @@ trait GdTrait
             }
         }
         return $im;
+    }
+
+    /**
+     * 字体加粗
+     */
+    protected function fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contents)
+    {
+        for ($i = 0; $i < $weight; $i++) {
+            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
+            imagettftext($this->im, $fontSize, $angle, $really_dst_x, $really_dst_y, $color, $font, $contents);
+        }
     }
 }

@@ -45,8 +45,7 @@ class Extension implements ExtensionInterface
 
     public function Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0)
     {
-        $query = $this->getQueryInstance()->getQrQuery($text, $outfile, $level, $size, $margin, $saveAndPrint);
-        return $this->getDriverInstance($query)->result;
+        return $this->getDriverInstance()->createQr($text, $outfile, $level, $size, $margin, $saveAndPrint);
     }
 
     public function getPoster($query, $path)
@@ -87,10 +86,9 @@ class Extension implements ExtensionInterface
      * @return \Kkokk\Poster\Image\Drivers\Driver
      * @throws PosterException
      */
-    protected function getDriverInstance($query)
+    protected function getDriverInstance($query = [])
     {
-
-        return $this->run($query, function($query) {
+        return $this->run($query, function ($query) {
             return $this->driver->execute($query);
         });
     }
@@ -98,12 +96,9 @@ class Extension implements ExtensionInterface
     protected function run($query, \Closure $callback)
     {
         try {
-
             $result = $callback($query);
-
         } catch (\Exception $e) {
-            echo $e;exit;
-            throw new PosterException($e->getMessage());
+            throw new PosterException($e->getMessage(), 0, $e);
         }
 
         return $result;

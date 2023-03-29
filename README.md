@@ -2,13 +2,13 @@
 
 #### 介绍
 
-**基于gd库、phpqrcode**
+**基于gd、imagick、phpqrcode**
 
 PHP海报生成插件，极速生成方便快捷。
 
 快速生成海报、生成签到日、生成二维码、合成二维码、图片添加水印
 
-增加滑块验证图片生成、旋转验证图片生成、点击验证图片生成、输入验证图片生成
+滑块验证图片生成、旋转验证图片生成、点击验证图片生成、输入验证图片生成
 
 **小提示：**
 
@@ -31,9 +31,7 @@ lang
 
 #### 演示效果
 
-2022-12 
-
-##### **增加了输入验证码验证**
+##### **输入验证码验证**
 
 数字、算术、中文、字母加数字
 
@@ -45,7 +43,7 @@ lang
 
 <img src="tests/1223015613610230151165.gif" alt="输入图片说明" style="zoom: 33%;" />
 
-##### 生成滑块验证图片
+##### 滑块验证图片
 
 <img src="tests/122301561368230151165-1.gif" alt="输入图片说明" style="zoom: 33%;" />
 
@@ -65,39 +63,61 @@ lang
 
 注意：没有特别说明，统一都是px。
 
-文档地址：http://www.520yummy.com/composer/poster/doc.html
+> 文档地址：http://www.520yummy.com/composer/poster/doc.html
+
+##### 通过 PosterManager 调用
 
 ```php
 use Kkokk\Poster\PosterManager; // 使用 PosterManager 调用
-use Kkokk\Poster\Facades\Poster; // 使用 Facades\Poster 调用
-use Kkokk\Poster\Exception\Exception;
+$poster = PosterManager::Poster();
 ```
 
-#### 海报使用说明
+##### 通过 Facades 调用
 
 ```php
-// 使用 PosterManager 调用
-$poster = PosterManager::Poster();
+use Kkokk\Poster\Facades\Poster; // 使用 Facades\Poster 调用
 
-// 使用 Facades\Poster 调用
 $result = Poster::config($params)
     ->buildIm($w,$h,$rgba,$alpha) # 创建画布
     ->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type) # 合成图片
     ->getPoster(); # 获取合成后图片文件地址
-// 技巧 也可以分开使用
-$Poster = Poster::config($params);
-$Poster = $Poster->buildIm($w,$h,$rgba,$alpha); # 创建画布
-$Poster = $Poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type); # 合成图片
-$result = $Poster->getPoster(); # 获取合成后图片文件地址
+```
 
+> 技巧：也可以分开使用
+
+```php
+$Poster = Poster::config($params);
+$Poster->buildIm($w,$h,$rgba,$alpha); # 创建画布
+$Poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type); # 合成图片
+$result = $Poster->getPoster(); # 获取合成后图片文件地址
+```
+
+##### 使用 Gd 拓展
+
+```php
+$poster = PosterManager::Poster(); // 使用 PosterManager 调用
+$Poster = Poster::config($params); // 使用 Facades\Poster 调用
+```
+
+##### 使用 Imagick 拓展
+
+```php
+$poster = PosterManager::Poster()->extension('imagick'); // 使用 PosterManager 调用
+$Poster = Poster::extension('imagick')->config($params); // 使用 Facades\Poster 调用
 ```
 
 ##### 基础配置
 
 ```php
 $params = [
-    'path' => $path, // 设置路径
-    'font_family' => $font_family // 统一设置文字字体，字体绝对路径
+    'path'        => $path,        // 设置路径
+    'font_size'   => $fontSize,    // 统一设置文字大小
+    'font_rgba'   => $rgba,        // 统一设置文字颜色
+    'font_space'  => $angle,       // 统一设置文字间距
+    'font_weight' => $angle,       // 统一设置文字粗细
+    'font_family' => $fontFamily,  // 统一设置文字字体，字体绝对路径
+    'font_angle'  => $angle,       // 统一设置文字旋转角度
+    'font_max_w'  => $maxW,        // 统一设置文字最大换行宽度
 ];
 $poster->config($params);
 ```
@@ -146,6 +166,8 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 | alpha | boolean | 否   | 是否透明，默认false       |
 
 ##### **创建背景、遮罩** 
+
+> 注意：Imagick 方式，背景暂时不能做圆角，渐变色只支持两种
 
 ```php
 // 背景 rgba 参数解释

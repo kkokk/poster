@@ -11,6 +11,7 @@ namespace Kkokk\Poster\Facades;
 use Kkokk\Poster\Image\ExtensionInterface;
 use Kkokk\Poster\Image\PosterManager;
 use Kkokk\Poster\Image\Builder;
+
 /**
  * @method static ExtensionInterface extension($channel = "");
  * @method static Builder config($params = []);
@@ -24,7 +25,8 @@ use Kkokk\Poster\Image\Builder;
  */
 class Poster extends Facade
 {
-    protected static function getFacadeModel(){
+    protected static function getFacadeModel()
+    {
         return 'poster';
     }
 }

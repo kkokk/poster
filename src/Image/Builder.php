@@ -60,7 +60,7 @@ class Builder
         return $this;
     }
 
-    public function buildIm($w, $h, $rgba, $alpha)
+    public function buildIm($w, $h, $rgba = [255, 255, 255, 1], $alpha = false)
     {
         $this->im = [$w, $h, $rgba, $alpha];
         $this->query->setQuery('im', $this->im);
@@ -112,9 +112,9 @@ class Builder
         return $this;
     }
 
-    public function buildText($content, $dst_x = 0, $dst_y = 0, $font = 16, $rgba = [], $max_w = 0, $font_family = '', $weight = 1, $space = 0, $angle = 0)
+    public function buildText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
     {
-        $this->setTexts($content, $dst_x, $dst_y, $font, $rgba, $max_w, $font_family, $weight, $space, $angle);
+        $this->setTexts($content, $dst_x, $dst_y, $fontSize, $rgba, $max_w, $font, $weight, $space, $angle);
         return $this;
     }
 
@@ -123,14 +123,14 @@ class Builder
         foreach ($params as $value) {
             $value['dst_x'] = isset($value['dst_x']) ? $value['dst_x'] : 0;
             $value['dst_y'] = isset($value['dst_y']) ? $value['dst_y'] : 0;
-            $value['font'] = isset($value['font']) ? $value['font'] : 0;
+            $value['fontSize'] = isset($value['font']) ? $value['font'] : 0;
             $value['rgba'] = isset($value['rgba']) ? $value['rgba'] : [];
             $value['max_w'] = isset($value['max_w']) ? $value['max_w'] : 0;
-            $value['font'] = isset($value['font']) ? $value['font'] : '';
+            $value['font'] = isset($value['font_family']) ? $value['font_family'] : '';
             $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
             $value['space'] = isset($value['space']) ? $value['space'] : 0;
             $value['angle'] = isset($value['angle']) ? $value['angle'] : 0;
-            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['font'], $value['rgba'], $value['max_w'], $value['font'], $value['weight'], $value['space'], $value['angle']);
+            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['fontSize'], $value['rgba'], $value['max_w'], $value['font'], $value['weight'], $value['space'], $value['angle']);
         }
         return $this;
     }
@@ -222,7 +222,8 @@ class Builder
         $this->query->setQuery('qrs', $params);
     }
 
-    public function __clone(){
+    public function __clone()
+    {
         $this->query = clone $this->query;
     }
 }

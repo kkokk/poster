@@ -23,38 +23,6 @@ class ImagickDriver extends Driver implements DriverInterface
 
     }
 
-    public function im($w, $h, $rgba, $alpha)
-    {
-        $this->im_w = $w;
-        $this->im_h = $h;
-        $this->im = $this->createIm($w, $h, $rgba, $alpha);
-    }
-
-    public function ImDst($source, $w, $h)
-    {
-        // if (!is_file($source)) {
-        //     throw new PosterException('水印图像不存在');
-        // }
-        $this->source = $source;
-
-        $pic = $this->createImagick($source);
-
-        $bgWidth = $pic->getImageWidth();
-        $bgHeight = $pic->getImageHeight();
-        $this->type = strtolower($pic->getImageFormat());
-
-        if (!empty($w) && !empty($h)) {
-            $this->im_w = $w;
-            $this->im_h = $h;
-            $pic->resizeImage($w, $h, $pic::FILTER_LANCZOS, 1, true);
-        } else {
-            $this->im_w = $bgWidth;
-            $this->im_h = $bgHeight;
-        }
-
-        $this->im = $pic;
-    }
-
     public function getData($path = '')
     {
         if ($path) {
@@ -83,7 +51,39 @@ class ImagickDriver extends Driver implements DriverInterface
         return $this->setImage($this->source);
     }
 
-    public function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
+    public function im($w, $h, $rgba = [255, 255, 255, 1], $alpha = false)
+    {
+        $this->im_w = $w;
+        $this->im_h = $h;
+        $this->im = $this->createIm($w, $h, $rgba, $alpha);
+    }
+
+    public function ImDst($source, $w = 0, $h = 0)
+    {
+        // if (!is_file($source)) {
+        //     throw new PosterException('水印图像不存在');
+        // }
+        $this->source = $source;
+
+        $pic = $this->createImagick($source);
+
+        $bgWidth = $pic->getImageWidth();
+        $bgHeight = $pic->getImageHeight();
+        $this->type = strtolower($pic->getImageFormat());
+
+        if (!empty($w) && !empty($h)) {
+            $this->im_w = $w;
+            $this->im_h = $h;
+            $pic->resizeImage($w, $h, $pic::FILTER_LANCZOS, 1, true);
+        } else {
+            $this->im_w = $bgWidth;
+            $this->im_h = $bgHeight;
+        }
+
+        $this->im = $pic;
+    }
+
+    public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
     {
         // 判断颜色是否渐变
         $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
@@ -132,7 +132,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->destroyImage($pic);
     }
 
-    public function CopyImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
+    public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
@@ -200,31 +200,18 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->destroyImage($pic);
     }
 
-    /**
-     * 合并文字
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/2/13
-     * Time: 15:33
-     * @param $content
-     * @param $dst_x
-     * @param $dst_y
-     * @param $fontSize
-     * @param $rgba
-     * @param int $max_w
-     * @param string $font
-     * @param int $weight
-     * @param int $space
-     * @return void
-     * @throws PosterException
-     */
-    public function CopyText($content, $dst_x, $dst_y, $fontSize, $rgba, $max_w = 0, $font = '', $weight = 1, $space = 0, $angle = 0)
+    public function CopyText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
     {
+        if ($content == '') return true;
+
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
-
-        if ($content == '') return true;
+        $fontSize = $fontSize ?: $this->font_size;
+        $rgba = $rgba ?: $this->font_rgba;
+        $max_w = $max_w ?: $this->font_max_w;
+        $weight = $weight ?: $this->font_weight;
+        $space = $space ?: $this->font_space;
+        $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
             $isAbsolute = $this->isAbsolute($font);
@@ -232,6 +219,8 @@ class ImagickDriver extends Driver implements DriverInterface
         } else {
             $font = $this->font;
         }
+
+        $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
 
         $color = $this->createColorAlpha($rgba);
 
@@ -298,7 +287,50 @@ class ImagickDriver extends Driver implements DriverInterface
         }
     }
 
-    public function CopyQr($text, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
+    public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
+    {
+        $color = $this->createColorAlpha($rgba);
+        $draw = $this->createImagickDraw();
+        $draw->setStrokeColor($color);
+        $draw->setStrokeWidth($weight);
+        switch ($type) {
+            case 'rectangle':
+                $draw->setFillColor($this->createColorAlpha());
+                $draw->rectangle($x1, $y1, $x2, $y2);
+                break;
+            case 'filled_rectangle':
+            case 'filledRectangle':
+                $draw->rectangle($x1, $y1, $x2, $y2);
+                break;
+            default:
+                $draw->line($x1, $y1, $x2, $y2);
+                break;
+        }
+        $this->im->drawImage($draw);
+    }
+
+    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
+    {
+        $color = $this->createColorAlpha($rgba);
+        $draw = $this->createImagickDraw();
+        $draw->setStrokeColor($color);
+        $draw->setStrokeWidth($weight);
+        $wr = $w / 2;
+        $hr = $h / 2;
+        switch ($type) {
+            case 'filled_arc':
+            case 'filledArc':
+                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
+                break;
+            default:
+                $draw->setFillColor($this->createColorAlpha());
+                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
+                break;
+        }
+        $this->im->drawImage($draw);
+    }
+
+    public function CopyQr($text, $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
@@ -343,85 +375,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->destroyImage($pic);
     }
 
-    /**
-     * 划线
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/28
-     * Time: 11:43
-     * @param int $x1
-     * @param int $y1
-     * @param int $x2
-     * @param int $y2
-     * @param array $rgba
-     * @param string $type
-     * @param int $weight
-     * @throws PosterException
-     */
-    public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
-    {
-        $color = $this->createColorAlpha($rgba);
-        $draw = $this->createImagickDraw();
-        $draw->setStrokeColor($color);
-        $draw->setStrokeWidth($weight);
-        switch ($type) {
-            case 'rectangle':
-                $draw->setFillColor($this->createColorAlpha());
-                $draw->rectangle($x1, $y1, $x2, $y2);
-                break;
-            case 'filled_rectangle':
-            case 'filledRectangle':
-                $draw->rectangle($x1, $y1, $x2, $y2);
-                break;
-            default:
-                $draw->line($x1, $y1, $x2, $y2);
-                break;
-        }
-        $this->im->drawImage($draw);
-    }
-
-    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
-    {
-        $color = $this->createColorAlpha($rgba);
-        $draw = $this->createImagickDraw();
-        $draw->setStrokeColor($color);
-        $draw->setStrokeWidth($weight);
-        $wr = $w / 2;
-        $hr = $h / 2;
-        switch ($type) {
-            case 'filled_arc':
-            case 'filledArc':
-                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
-                break;
-            default:
-                $draw->setFillColor($this->createColorAlpha());
-                $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
-                break;
-        }
-        $this->im->drawImage($draw);
-    }
-
-    /**
-     * 字体加粗
-     */
-    protected function fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents)
-    {
-        for ($i = 0; $i < $weight; $i++) {
-
-            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-
-            if ($this->type == 'gif') {
-                foreach ($this->im as $frame) {
-                    $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-                }
-            } else {
-                $this->im->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-            }
-        }
-    }
-
-
-    public function execute($query, $driver = null)
+    public function execute($query = [], Driver $driver = null)
     {
 
         if (empty($driver)) {
@@ -432,45 +386,6 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         return $driver;
-    }
-
-    protected function run($item, Driver $driver)
-    {
-        switch ($item['type']) {
-            case 'im':
-                $driver->Im(...$item['params']);
-                break;
-            case 'imDst':
-                $driver->ImDst(...$item['params']);
-                break;
-            case 'bg':
-                $driver->Bg(...$item['params']);
-                break;
-            case 'config':
-                $driver->setConfig($item['params']);
-                break;
-            case 'path':
-                $driver->setFilePath($item['params']);
-                break;
-            case 'image':
-                $driver->CopyImage(...$item['params']);
-                break;
-            case 'text':
-                $driver->CopyText(...$item['params']);
-                break;
-            case 'line':
-                $driver->CopyLine(...$item['params']);
-                break;
-            case 'arc':
-                $driver->CopyArc(...$item['params']);
-                break;
-            case 'qrs':
-                $driver->CopyQr(...$item['params']);
-                break;
-            case 'qr':
-                $driver->result = $driver->createQr(...$item['params']);
-                break;
-        }
     }
 
     public function destroyImage($Imagick)

@@ -42,9 +42,10 @@ trait ImagickTrait
         echo $this->im->getImageBlob();
     }
 
-    protected function setImage($source){
+    protected function setImage($source)
+    {
 
-        if(strpos($source, 'http') === 0){
+        if (strpos($source, 'http') === 0) {
             throw new PosterException("unable to set the remote source {$source}");
         }
 
@@ -81,7 +82,7 @@ trait ImagickTrait
     {
         $Imagick = new \Imagick();
         if ($src) {
-            if(strpos($src, 'http') === 0){
+            if (strpos($src, 'http') === 0) {
                 $stream = @file_get_contents($src, NULL);
                 if (empty($stream)) throw new PosterException('image resources cannot be empty (' . $src . ')');
                 $Imagick->readImageBlob($stream);
@@ -206,11 +207,28 @@ trait ImagickTrait
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb1");
-        } elseif($rgbaCount > 1) {
+        } elseif ($rgbaCount > 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
             $rgb2 = "rgb(" . $rgbaColor[1][0] . "," . $rgbaColor[1][1] . "," . $rgbaColor[1][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb2");
         }
 
     }
+
+    protected function fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents)
+    {
+        for ($i = 0; $i < $weight; $i++) {
+
+            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
+
+            if ($this->type == 'gif') {
+                foreach ($this->im as $frame) {
+                    $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
+                }
+            } else {
+                $this->im->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
+            }
+        }
+    }
+
 }

@@ -7,19 +7,23 @@
  */
 
 namespace Kkokk\Poster\Facades;
-use Kkokk\Poster\Interfaces\CaptchaInterface;
-use Kkokk\Poster\Lang\CaptchaInterface as CaptchaManager;
+
+use Kkokk\Poster\Captcha\Generators\CaptchaGenerator;
+use Kkokk\Poster\Captcha\CaptchaGeneratorInterface;
+use Kkokk\Poster\Captcha\CaptchaManager;
+
 /**
- * @method static CaptchaManager type(string $channel = null)
- * @method static CaptchaInterface config($params = [])
- * @method static CaptchaInterface check($key , $value , $leeway = 0, $secret = null)
- * @method static CaptchaInterface get($expire = 0)
+ * @method static CaptchaGenerator type(string $channel = null)
+ * @method static CaptchaGenerator config($params = [])
+ * @method static boolean check($key, $value, $leeway = 0, $secret = null)
+ * @method static array get($expire = 0)
  *
  * @see CaptchaManager
  */
 class Captcha extends Facade
 {
-    protected static function getFacadeModel(){
+    protected static function getFacadeModel()
+    {
         return 'captcha';
     }
 }

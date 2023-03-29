@@ -49,7 +49,7 @@ class GdDriver extends Driver implements DriverInterface
     /**
      * 创建指定宽高，颜色，透明的画布
      */
-    public function Im($w, $h, $rgba, $alpha)
+    public function Im($w, $h, $rgba = [255, 255, 255, 1], $alpha = false)
     {
         $this->im_w = $w;
         $this->im_h = $h;
@@ -59,7 +59,7 @@ class GdDriver extends Driver implements DriverInterface
     /**
      * 创建指定图片为画布 宽高，颜色，透明的画布
      */
-    public function ImDst($source, $w, $h)
+    public function ImDst($source, $w = 0, $h = 0)
     {
         // if (!is_file($source)) {
         //     throw new PosterException('水印图像不存在');
@@ -115,7 +115,7 @@ class GdDriver extends Driver implements DriverInterface
      * @param int $src_y
      * @param array $query
      */
-    public function Bg($w, $h, $rgba, $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
+    public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
     {
         // 判断颜色是否渐变
         $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
@@ -171,7 +171,7 @@ class GdDriver extends Driver implements DriverInterface
     /**
      * 创建图片，合并到画布，释放内存
      */
-    public function CopyImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
+    public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
@@ -392,15 +392,18 @@ class GdDriver extends Driver implements DriverInterface
      * @return bool
      * @throws PosterException
      */
-    public function CopyText($content, $dst_x, $dst_y, $fontSize, $rgba, $max_w = 0, $font = '', $weight = 1, $space = 0, $angle = 0)
+    public function CopyText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
     {
+        if ($content == '') return true;
+
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
-
-        $fontSize = ($fontSize * 3) / 4; // px 转化为 pt
-
-        if ($content == '') return true;
+        $fontSize = $fontSize ?: $this->font_size;
+        $rgba = $rgba ?: $this->font_rgba;
+        $max_w = $max_w ?: $this->font_max_w;
+        $weight = $weight ?: $this->font_weight;
+        $space = $space ?: $this->font_space;
+        $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
             $isAbsolute = $this->isAbsolute($font);
@@ -408,6 +411,10 @@ class GdDriver extends Driver implements DriverInterface
         } else {
             $font = $this->font;
         }
+
+        $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
+
+        $fontSize = ($fontSize * 3) / 4; // px 转化为 pt
 
         $color = $this->createColorAlpha($this->im, $rgba);
 
@@ -474,17 +481,6 @@ class GdDriver extends Driver implements DriverInterface
         return true;
     }
 
-    /**
-     * 字体加粗
-     */
-    protected function fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contents)
-    {
-        for ($i = 0; $i < $weight; $i++) {
-            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-            imagettftext($this->im, $fontSize, $angle, $really_dst_x, $really_dst_y, $color, $font, $contents);
-        }
-    }
-
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
@@ -539,7 +535,7 @@ class GdDriver extends Driver implements DriverInterface
      * @param  [type]                   $src_x  [description]
      * @param  [type]                   $src_y  [description]
      */
-    public function CopyQr($text, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
+    public function CopyQr($text, $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
@@ -592,55 +588,15 @@ class GdDriver extends Driver implements DriverInterface
         if (isset($result) && is_resource($result)) $this->destroyImage($result);
     }
 
-    public function execute($query, $driver = null) {
-
-        if(empty($driver)){
+    public function execute($query = [], Driver $driver = null)
+    {
+        if (empty($driver)) {
             $driver = $this;
         }
-        foreach ($query as $item){
+        foreach ($query as $item) {
             $driver->run($item, $driver);
         }
-
         return $driver;
-    }
-
-    protected function run($item, Driver $driver)
-    {
-        switch ($item['type']) {
-            case 'im':
-                $driver->Im(...$item['params']);
-                break;
-            case 'imDst':
-                $driver->ImDst(...$item['params']);
-                break;
-            case 'bg':
-                $driver->Bg(...$item['params']);
-                break;
-            case 'config':
-                $driver->setConfig($item['params']);
-                break;
-            case 'path':
-                $driver->setFilePath($item['params']);
-                break;
-            case 'image':
-                $driver->CopyImage(...$item['params']);
-                break;
-            case 'text':
-                $driver->CopyText(...$item['params']);
-                break;
-            case 'line':
-                $driver->CopyLine(...$item['params']);
-                break;
-            case 'arc':
-                $driver->CopyArc(...$item['params']);
-                break;
-            case 'qrs':
-                $driver->CopyQr(...$item['params']);
-                break;
-            case 'qr':
-                $driver->result = $driver->createQr(...$item['params']);
-                break;
-        }
     }
 
     /**
