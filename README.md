@@ -111,6 +111,7 @@ $Poster = Poster::extension('imagick')->config($params); // 使用 Facades\Poste
 ```php
 $params = [
     'path'        => $path,        // 设置路径
+    'dpi'         => $dpi,         // int[]|int 设置 dpi 只针对 Imagick 有效
     'font_size'   => $fontSize,    // 统一设置文字大小
     'font_rgba'   => $rgba,        // 统一设置文字颜色
     'font_space'  => $angle,       // 统一设置文字间距
