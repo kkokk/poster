@@ -51,8 +51,8 @@ trait RotateTrait
         $r = ($bgWidth / 2) - 2; //圆半径
         for ($x = 0; $x < $bgWidth; $x++) {
             for ($y = 0; $y < $bgHeight; $y++) {
-                $rgbColor = imagecolorat($rotateBg, $x + 2 + $surplusR, $y + 2 + $surplusR);
                 if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
+                    $rgbColor = imagecolorat($rotateBg, $x + 2 + $surplusR, $y + 2 + $surplusR);
                     imagesetpixel($circle, $x + 2, $y + 2, $rgbColor);
                 }
             }
