@@ -110,10 +110,6 @@ class ImagickDriver extends Driver implements DriverInterface
 
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
-        // 裁剪图片
-        $this->cropImage($pic, $src_x, $src_y);
-        // 合并图片
-        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
 
         if (!empty($query)) {
             $that = clone $this;
@@ -122,13 +118,17 @@ class ImagickDriver extends Driver implements DriverInterface
             $that->im_h = $h;
             $that->execute($query, $that);
 
-            // 裁剪图片
-            $this->cropImage($pic, $src_x, $src_y);
             // 合并图片
-            $this->im->compositeImage($that->im, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
-            unset($that);
+            $pic->compositeImage($that->im, ($that->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
+        // 裁剪图片
+        $this->cropImage($pic, $src_x, $src_y);
+
+        // 合并图片
+        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+
+        if($that) unset($that);
         $this->destroyImage($pic);
     }
 
@@ -178,6 +178,8 @@ class ImagickDriver extends Driver implements DriverInterface
                 // 合并原始图片和圆形遮罩图片
                 $pic->compositeImage($mask, $pic::COMPOSITE_DSTIN, 0, 0);
 
+                $this->destroyImage($circle);
+                $this->destroyImage($mask);
                 break;
             default:
                 # code...
@@ -195,8 +197,7 @@ class ImagickDriver extends Driver implements DriverInterface
         // 合并图片
         $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
 
-        $this->destroyImage($circle);
-        $this->destroyImage($mask);
+
         $this->destroyImage($pic);
     }
 
@@ -341,7 +342,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         ob_start(); // 打开一个输出缓冲区
         $this->poster_type['png']($qr); // 将 GD 图像输出到缓冲区
-        $imageData = ob_get_clean(); // 从缓冲区中读取图像数据
+        $imageData = ob_get_contents(); // 从缓冲区中读取图像数据
         ob_end_clean();
 
         $pic = $this->createImagick();
