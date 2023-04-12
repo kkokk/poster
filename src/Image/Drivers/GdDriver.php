@@ -133,15 +133,8 @@ class GdDriver extends Driver implements DriverInterface
         $pic = $this->createIm($w, $h, [], $alpha);
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
 
-        // 如果设置了圆角则画圆角
-        if ($radius) {
-            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
-        }
-
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
-
-        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (!empty($query)) {
             $that = clone $this;
@@ -149,9 +142,16 @@ class GdDriver extends Driver implements DriverInterface
             $that->im_w = $w;
             $that->im_h = $h;
             $that->execute($query, $that);
-            imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+            imagecopy($pic, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
             unset($that);
         }
+
+        // 如果设置了圆角则画圆角
+        if ($radius) {
+            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
+        }
+
+        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
         unset($rgbaCount);
