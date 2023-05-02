@@ -81,7 +81,6 @@ class Driver
     public function setConfig($params = [])
     {
         isset($params['path']) && !empty($params['path']) && $this->setFilePath($params['path']);
-        isset($params['font']) && !empty($params['font']) && $this->font = $params['font'];
         isset($params['font_family']) && !empty($params['font_family']) && $this->font = $params['font_family'];
         isset($params['font_size']) && !empty($params['font_size']) && $this->font_size = $params['font_size'];
         isset($params['font_rgba']) && !empty($params['font_rgba']) && $this->font_rgba = $params['font_rgba'];
@@ -92,6 +91,9 @@ class Driver
 
         if (isset($params['dpi']) && !empty($params['dpi'])) {
             $this->dpi = is_numeric($params['dpi']) ? [$params['dpi'], $params['dpi']] : $params['dpi'];
+        }
+        if(isset($params['font']) && !empty($params['font'])){
+            $this->font = $this->getRealRoute($params['font']);
         }
     }
 
@@ -158,7 +160,7 @@ class Driver
         // 绝对路径 or 相对路径
         $absolute = $this->isAbsolute($pathFileName);
         $this->path = $this->getDocumentRoot();
-        $this->path = $absolute ? '' : ($this->path ? $this->path . '/' : __DIR__ . '/../../../tests/');
+        $this->path = $absolute ? '' : ($this->path ? $this->path : __DIR__ . '/../../../tests/');
     }
 
     /**
@@ -168,7 +170,9 @@ class Driver
      */
     public function getDocumentRoot()
     {
-        return iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
+        $documentRoot = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
+
+        return $documentRoot ? $documentRoot . '/' : '';
     }
 
     /**
@@ -198,6 +202,28 @@ class Driver
         }
 
         return $absolute;
+    }
+
+    /**
+     * 获取真实路径
+     * @Author lang
+     * @Email: 732853989@qq.com
+     * Date: 2023/5/2
+     * Time: 上午9:35
+     * @param $path
+     * @return false|string
+     */
+    public function getRealRoute($path)
+    {
+        $isAbsolute = $this->isAbsolute($path);
+
+        if($this->isCli() && !$isAbsolute) throw new PosterException('For cli environment, please pass the absolute path');
+
+        return !$isAbsolute ? $this->getDocumentRoot() . $path : realpath($path);
+    }
+
+    public function isCli(){
+        return php_sapi_name() === 'cli';
     }
 
     /**
