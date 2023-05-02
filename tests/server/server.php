@@ -12,6 +12,8 @@ use Kkokk\Poster\PosterManager;
 
 require '../../vendor/autoload.php';
 
+
+
 // 验证码
 // $result = Captcha::get();
 // echo <<<EOF
@@ -33,17 +35,18 @@ require '../../vendor/autoload.php';
 // echo $result;
 // exit;
 
-$result = PosterManager::Poster()->extension('imagick')
+$result = Poster::extension('gd')
     ->config([
-        'path' => '../poster/test1.png',
-        'font' => __DIR__ . '/../../src/style/simkai.ttf',
+        'path' => 'poster/test1.png',
+        'font' => 'static/simkai.ttf',
         // 'dpi' => 72
     ])
     ->buildIm(638, 826, [255, 255, 255, 127], false)
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png', 254, 321)
-    ->buildImage('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 253, 326, 0, 0, 131, 131, false, 'circle')
-    ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png', 0, 655)
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
+    // ->buildImage('static/top_bg.png')
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png', 254, 321)
+    // ->buildImage('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 253, 326, 0, 0, 131, 131, false, 'circle')
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png', 0, 655)
     // ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
     ->buildText('明月几时有，把酒问青天', ['center'], 200, 20, [52, 52, 52, 2], 0, '', 1, 40)
     ->buildText('明月几时有，把酒问青天', ['center'], 300, 20, [52, 52, 52, 2], 0, '', 1, 40)
@@ -70,7 +73,4 @@ $result = PosterManager::Poster()->extension('imagick')
     //         // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
     //     })
     ->getPoster();
-
-echo "<pre>";
-print_r($result);
 
