@@ -234,22 +234,25 @@ try {
     //         })
     //     ->getPoster();
 
-    $result = Poster::extension('imagick')
-        ->config(['path'=>'poster/test1.png', 'font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
-        ->buildIm(638,826,[255,255,255,1],true)
-        ->buildImageMany($buildImageManyArr)
-        ->buildTextMany($buildTextManyArr)
-        ->buildText('啊实打实大所大所大所多', 100, 200, 20, [255, 255, 255, 1])
-        ->buildQrMany($buildQrManyArr)
-        ->buildBg(400, 500, ['color' => [[255, 0, 0],
+    $result = Poster::extension('gd')
+        // ->config(['path'=>'poster/test1.png', 'font_family'=> __DIR__ . '/../src/style/simkai.ttf'])
+        // ->buildIm(638,826,[255,255,255,1],true)
+        // ->buildImageMany($buildImageManyArr)
+        // ->buildTextMany($buildTextManyArr)
+        // ->buildText('啊实打实大所大所大所多', 100, 200, 20, [255, 255, 255, 1])
+        // ->buildQrMany($buildQrManyArr)
+        ->buildBg(638, 826, ['color' => [[255, 0, 0],
             [255, 125, 0],
             [255, 255, 0],
             [0, 255, 0],
             [0, 255, 255],
             [0, 0, 255],
-            [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '0'], true, 'center', 'center', 0, 0,
-            function ($im) {
+            [255, 0, 255]], 'alpha' => 50, 'to' => 'left top', 'radius' => '40'], true, 'center', 'center', 0, 0,
+            function ($im) use($buildImageManyArr, $buildTextManyArr, $buildQrManyArr) {
                 $im->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+                $im->buildImageMany($buildImageManyArr);
+                $im->buildTextMany($buildTextManyArr);
+                $im->buildQrMany($buildQrManyArr);
                 // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
                 // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
                 // $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], 'filled_arc', 1);

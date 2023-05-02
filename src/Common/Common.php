@@ -22,7 +22,7 @@ class Common
     public function baseData($image, $type = 'png')
     {
         $baseData = '';
-        if (is_resource($image)) {
+        if (is_resource($image) || is_object($image)) {
             ob_start();
             $this->imType[$type]($image);
             $data = ob_get_contents();

@@ -175,26 +175,22 @@ class GdDriver extends Driver implements DriverInterface
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $path = '';
         if (strpos($src, 'http') === false) {
-            $absolute = $this->isAbsolute($src);
-            if (!$absolute) {
-                $path = $this->path;
-            }
+            $src = $this->getRealRoute($src);
         }
 
-        list($Width, $Height, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($src);
 
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
+        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
         if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($path . $src));
+            $pic = imagecreatefromstring(file_get_contents($src));
         } else {
             $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($path . $src);
+            $pic = @$fun($src);
         }
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
@@ -294,29 +290,25 @@ class GdDriver extends Driver implements DriverInterface
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $path = '';
         if (strpos($src, 'http') === false) {
-            $absolute = $this->isAbsolute($src);
-            if (!$absolute) {
-                $path = $this->path;
-            }
+            $src = $this->getRealRoute($src);
         }
 
-        list($Width, $Height, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($src);
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
+        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
 
         // if ($bgType == 'gif') {
-        //     $pic = imagecreatefromstring(file_get_contents($path . $src));
+        //     $pic = imagecreatefromstring(file_get_contents($src));
         // } else {
         //
         //     $fun = 'imagecreatefrom' . $bgType;
-        //     $pic = @$fun($path . $src);
+        //     $pic = @$fun($src);
         // }
 
         $fun = 'imagecreatefrom' . $bgType;
-        $pic = @$fun($path . $src);
+        $pic = @$fun($src);
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
         $bgHeight = !empty($src_h) ? $src_h : $Height;
@@ -406,8 +398,7 @@ class GdDriver extends Driver implements DriverInterface
         $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
-            $isAbsolute = $this->isAbsolute($font);
-            $font = !$isAbsolute ? $this->getDocumentRoot() . $font : realpath($font);
+            $font = $this->getRealRoute($font);
         } else {
             $font = $this->font;
         }

@@ -136,15 +136,11 @@ class ImagickDriver extends Driver implements DriverInterface
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $path = '';
         if (strpos($src, 'http') === false) {
-            $absolute = $this->isAbsolute($src);
-            if (!$absolute) {
-                $path = $this->path;
-            }
+            $src = $this->getRealRoute($src);
         }
 
-        $pic = $this->createImagick($path . $src);
+        $pic = $this->createImagick($src);
 
         $Width = $pic->getImageWidth();
         $Height = $pic->getImageHeight();
@@ -215,8 +211,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
-            $isAbsolute = $this->isAbsolute($font);
-            $font = !$isAbsolute ? $this->getDocumentRoot() . $font : realpath($font);
+            $font = $this->getRealRoute($font);
         } else {
             $font = $this->font;
         }
