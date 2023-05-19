@@ -142,8 +142,6 @@ class GdDriver extends Driver implements DriverInterface
             $that->im_w = $w;
             $that->im_h = $h;
             $that->execute($query, $that);
-            imagecopy($pic, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-            unset($that);
         }
 
         // 如果设置了圆角则画圆角

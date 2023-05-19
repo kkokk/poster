@@ -118,8 +118,8 @@ class ImagickDriver extends Driver implements DriverInterface
             $that->im_h = $h;
             $that->execute($query, $that);
 
-            // 合并图片
-            $pic->compositeImage($that->im, ($that->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            // 合并图片, 合并图片移到下方，这里不需要再合并
+            // $pic->compositeImage($that->im, ($that->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
         // 裁剪图片
