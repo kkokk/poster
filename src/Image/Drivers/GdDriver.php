@@ -133,15 +133,8 @@ class GdDriver extends Driver implements DriverInterface
         $pic = $this->createIm($w, $h, [], $alpha);
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
 
-        // 如果设置了圆角则画圆角
-        if ($radius) {
-            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
-        }
-
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
-
-        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (!empty($query)) {
             $that = clone $this;
@@ -149,9 +142,14 @@ class GdDriver extends Driver implements DriverInterface
             $that->im_w = $w;
             $that->im_h = $h;
             $that->execute($query, $that);
-            imagecopy($this->im, $that->im, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
-            unset($that);
         }
+
+        // 如果设置了圆角则画圆角
+        if ($radius) {
+            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
+        }
+
+        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
         unset($rgbaCount);
@@ -175,26 +173,22 @@ class GdDriver extends Driver implements DriverInterface
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $path = '';
         if (strpos($src, 'http') === false) {
-            $absolute = $this->isAbsolute($src);
-            if (!$absolute) {
-                $path = $this->path;
-            }
+            $src = $this->getRealRoute($src);
         }
 
-        list($Width, $Height, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($src);
 
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
+        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
         if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($path . $src));
+            $pic = imagecreatefromstring(file_get_contents($src));
         } else {
             $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($path . $src);
+            $pic = @$fun($src);
         }
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
@@ -294,29 +288,25 @@ class GdDriver extends Driver implements DriverInterface
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $path = '';
         if (strpos($src, 'http') === false) {
-            $absolute = $this->isAbsolute($src);
-            if (!$absolute) {
-                $path = $this->path;
-            }
+            $src = $this->getRealRoute($src);
         }
 
-        list($Width, $Height, $bgType) = @getimagesize($path . $src);
+        list($Width, $Height, $bgType) = @getimagesize($src);
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $path . $src . ')');
+        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
 
         // if ($bgType == 'gif') {
-        //     $pic = imagecreatefromstring(file_get_contents($path . $src));
+        //     $pic = imagecreatefromstring(file_get_contents($src));
         // } else {
         //
         //     $fun = 'imagecreatefrom' . $bgType;
-        //     $pic = @$fun($path . $src);
+        //     $pic = @$fun($src);
         // }
 
         $fun = 'imagecreatefrom' . $bgType;
-        $pic = @$fun($path . $src);
+        $pic = @$fun($src);
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
         $bgHeight = !empty($src_h) ? $src_h : $Height;
@@ -406,8 +396,7 @@ class GdDriver extends Driver implements DriverInterface
         $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
-            $isAbsolute = $this->isAbsolute($font);
-            $font = !$isAbsolute ? $this->getDocumentRoot() . $font : realpath($font);
+            $font = $this->getRealRoute($font);
         } else {
             $font = $this->font;
         }
