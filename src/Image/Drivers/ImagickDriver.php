@@ -90,6 +90,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
         $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
         $radius = isset($rgba['radius']) ? $rgba['radius'] : 0;
+        $contentAlpha = isset($rgba['content_alpha']) ? $rgba['content_alpha'] : false;
         $rgbaCount = count($rgbaColor);
 
         // im不存在则创建
@@ -99,14 +100,12 @@ class ImagickDriver extends Driver implements DriverInterface
         // 渐变处理->直接处理im
         // 计算颜色方向
         $pic = $this->createIm($w, $h, [], $alpha);
-
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
 
-        $pic->setImageAlpha(round((128 - $alphas) / 127, 2)); // 透明度
-
-        // if ($radius) {
-        //     // 暂不支持圆角处理
-        // }
+        // 设置透明度，内容不透明
+        if($alpha && !$contentAlpha) {
+            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+        }
 
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
@@ -120,6 +119,16 @@ class ImagickDriver extends Driver implements DriverInterface
 
             // 合并图片, 合并图片移到下方，这里不需要再合并
             // $pic->compositeImage($that->im, ($that->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        }
+
+        // 设置透明度，内容也透明
+        if($alpha && $contentAlpha) {
+            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+        }
+
+        if ($radius) {
+            // 圆角处理
+            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
         }
 
         // 裁剪图片
