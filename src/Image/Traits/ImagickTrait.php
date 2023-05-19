@@ -182,28 +182,57 @@ trait ImagickTrait
      */
     public function calcColorDirection(\Imagick $source, $rgbaColor, $rgbaCount, $to, $w, $h)
     {
-        // if(!empty($rgbaColor)){
-        //     for ($i = 0; $i < $rgbaCount - 1; $i++) {
-        //         if(isset($rgbaColor[$i + 1]))
-        //         {
-        //             $rgbBox[] = [
-        //                 "rgb(" . $rgbaColor[$i][0] . "," . $rgbaColor[$i][1] . "," . $rgbaColor[$i][2] . ")",
-        //                 "rgb(" . $rgbaColor[$i + 1][0] . "," . $rgbaColor[$i + 1][1] . "," . $rgbaColor[$i + 1][2] . ")"
-        //             ];
-        //         } else {
-        //             $rgbBox[] = ["rgb(" . $rgbaColor[$i][0] . "," . $rgbaColor[$i][1] . "," . $rgbaColor[$i][2] . ")"];
-        //         }
-        //
-        //     }
-        //
-        //     foreach ($rgbBox as $box){
-        //         if(count($box) == 1) {
-        //             $source->newPseudoImage($w, $h, "gradient:$box[0]");
-        //         } else {
-        //             $source->newPseudoImage($w, $h, "gradient:$box[0]-$box[1]");
-        //         }
-        //     }
-        // }
+
+        switch ($to) {
+            case '':
+            case 'bottom':
+                break;
+            case 'top':
+                $rgbaColor = array_reverse($rgbaColor);
+                break;
+            case 'left':
+                break;
+            case 'right':
+                break;
+            case 'right bottom':
+            case 'bottom right':
+                break;
+            case 'right top':
+            case 'top right':
+                break;
+            case 'left bottom':
+            case 'bottom left':
+                break;
+            case 'left top':
+            case 'top left':
+                break;
+            default:
+                // code...
+                break;
+        }
+
+        if($rgbaCount<3) {
+            $this->linearGradient($source, $rgbaColor, $rgbaCount, $w, $h);
+        } else {
+
+            $picKey = 0;
+            $chunk = floor($h / ($rgbaCount-1));
+            foreach ($rgbaColor as $k => $v) {
+
+                if($k == $rgbaCount - 1) break;
+
+                $picsC = $this->createIm($w, $chunk, [], true);
+
+                $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k+1]], $rgbaCount, $w, $chunk);
+
+                $source->compositeImage($picsC, ($this->im)::COMPOSITE_DEFAULT, 0, $k * $chunk);
+
+                $picKey ++;
+            }
+        }
+    }
+
+    public function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h) {
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb1");
@@ -212,7 +241,6 @@ trait ImagickTrait
             $rgb2 = "rgb(" . $rgbaColor[1][0] . "," . $rgbaColor[1][1] . "," . $rgbaColor[1][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb2");
         }
-
     }
 
     protected function fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents)
@@ -229,6 +257,67 @@ trait ImagickTrait
                 $this->im->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
             }
         }
+    }
+
+    /**
+     * 画圆角
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/5/19
+     * Time: 15:34
+     * @param \Imagick $pic
+     * @param $w double 宽
+     * @param $h double 高
+     * @param $radius int 圆角
+     * @return mixed
+     * @throws PosterException
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     */
+    protected function setPixelRadius($pic, $w, $h, $radius)
+    {
+        // 圆角处理
+        $len = $w > $h ? $h / 2 : $w / 2;
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius, $len);
+        // 四个角一样
+        $mask = $this->createImagick();
+        $mask->newImage($w, $h, $this->createColorAlpha([255, 255, 255, 127]));
+        $draw = $this->createImagickDraw();
+        $draw->setFillColor($this->createColorAlpha([255, 255, 255, 1]));
+
+        if($leftTopRadius == $rightTopRadius && $leftTopRadius == $leftBottomRadius && $leftTopRadius == $rightBottomRadius) {
+            // 搞一个长方形
+            $draw->roundRectangle(0, 0, $w, $h, $leftTopRadius, $leftTopRadius);
+        } else {
+            // 中间两个长方形填满
+            $draw->rectangle(max($leftTopRadius, $leftBottomRadius)*2, 0, $w - max($rightTopRadius, $rightBottomRadius)*2, $h);
+            $draw->rectangle(0, max($leftTopRadius, $rightTopRadius)*2, $w, $h - max($leftBottomRadius, $rightBottomRadius)*2);
+
+            // 左上角为 圆角
+            $draw->rectangle(0, $leftTopRadius, max($leftTopRadius, $leftBottomRadius)*2, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->rectangle($leftTopRadius, 0, max($leftTopRadius, $leftBottomRadius)*2, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->ellipse($leftTopRadius, $leftTopRadius, $leftTopRadius, $leftTopRadius, 0, 360);
+
+            // 右上角为 圆角
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius)*2, 0, $w - $rightTopRadius, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius)*2, $rightTopRadius, $w, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->ellipse($w - $rightTopRadius, $rightTopRadius, $rightTopRadius, $rightTopRadius, 0, 360);
+
+            // 右下角为 圆角
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius)*2, $h - max($rightBottomRadius, $leftBottomRadius)*2, $w, $h - $rightBottomRadius);
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius)*2, $h - max($rightBottomRadius, $leftBottomRadius)*2, $w - $rightBottomRadius, $h);
+            $draw->ellipse($w - $rightBottomRadius, $h - $rightBottomRadius, $rightBottomRadius, $rightBottomRadius, 0, 360);
+
+            // 左下角为 圆角
+            $draw->rectangle(0, $h - max($rightBottomRadius, $leftBottomRadius)*2, max($leftTopRadius, $leftBottomRadius)*2, $h - $leftBottomRadius);
+            $draw->rectangle($leftBottomRadius, $h - max($rightBottomRadius, $leftBottomRadius)*2, max($leftTopRadius, $leftBottomRadius)*2, $h);
+            $draw->ellipse($leftBottomRadius, $h - $leftBottomRadius, $leftBottomRadius, $leftBottomRadius, 0, 360);
+        }
+
+        $mask->drawImage($draw);
+        $pic->compositeImage($mask, ($this->im)::COMPOSITE_DSTIN, 0, 0);
+
+        return $pic;
     }
 
 }

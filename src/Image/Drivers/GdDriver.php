@@ -122,6 +122,7 @@ class GdDriver extends Driver implements DriverInterface
         $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
         $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
         $radius = isset($rgba['radius']) ? $rgba['radius'] : 0;
+        $contentAlpha = isset($rgba['content_alpha']) ? $rgba['content_alpha'] : false;
         $rgbaCount = count($rgbaColor);
 
         // im不存在则创建
@@ -131,7 +132,12 @@ class GdDriver extends Driver implements DriverInterface
         // 渐变处理->直接处理im
         // 计算颜色方向
         $pic = $this->createIm($w, $h, [], $alpha);
-        $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h);
+        $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
+
+        // 设置透明度，内容不透明
+        if($alpha && !$contentAlpha) {
+            $pic = $this->setImageAlpha($pic, $w, $h, $alphas);
+        }
 
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
@@ -144,6 +150,11 @@ class GdDriver extends Driver implements DriverInterface
             $that->execute($query, $that);
         }
 
+        // 设置透明度内容也透明
+        if($alpha && $contentAlpha) {
+            $pic = $this->setImageAlpha($pic, $w, $h, $alphas);
+        }
+
         // 如果设置了圆角则画圆角
         if ($radius) {
             $pic = $this->setPixelRadius($pic, $w, $h, $radius);
@@ -152,6 +163,7 @@ class GdDriver extends Driver implements DriverInterface
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
+        if (isset($mask) && is_resource($mask)) $this->destroyImage($mask);
         unset($rgbaCount);
         unset($rgbaColor);
         unset($alphas);

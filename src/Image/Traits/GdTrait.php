@@ -201,13 +201,12 @@ trait GdTrait
      * @param $im
      * @param $rgbaColor
      * @param $rgbaCount
-     * @param $alphas
      * @param $to
      * @param $w
      * @param $h
      * @return mixed
      */
-    public function calcColorDirection($im, $rgbaColor, $rgbaCount, $alphas, $to, $w, $h)
+    public function calcColorDirection($im, $rgbaColor, $rgbaCount, $to, $w, $h)
     {
         $to = preg_replace('~\s+~', ' ', trim($to, ' '));
 
@@ -216,50 +215,50 @@ trait GdTrait
             case 'bottom':
                 $toi = $h;
                 $toj = $w;
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             case 'top':
                 $toi = $h;
                 $toj = $w;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             case 'left':
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
                 break;
             case 'right':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 'j', 'i');
+                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
                 break;
             case 'right bottom':
             case 'bottom right':
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             case 'right top':
             case 'top right':
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, 0, $toj);
                 break;
             case 'left bottom':
             case 'bottom left':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, 0, $toj);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, 0, $toj);
                 break;
             case 'left top':
             case 'top left':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas);
+                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             default:
                 // code...
@@ -276,17 +275,16 @@ trait GdTrait
      * Date: 2022/10/20
      * Time: 上午12:15
      * @param $im
-     * @param $alphas
      * @param $rgbaColor
      * @param $rgbaCount
      * @param $length
      * @param $i
      * @return false|int
      */
-    public function getColor($im, $alphas, $rgbaColor, $rgbaCount, $length, $i)
+    public function getColor($im, $rgbaColor, $rgbaCount, $length, $i)
     {
         $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
-        $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
+        $color = imagecolorallocate($im, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
         return $color;
     }
 
@@ -318,18 +316,17 @@ trait GdTrait
      * @param $toj double 高或宽
      * @param $rgbaColor array 渐变色值
      * @param $rgbaCount int 渐变色数量
-     * @param $alphas int 透明度 1 - 127
      * @param int $radius int 圆角
      * @param string $ii string x,y 变量取值替换
      * @param string $jj string x,y 变量取值替换
      * @return mixed|resource
      */
-    protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $ii = 'i', $jj = 'j')
+    protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $ii = 'i', $jj = 'j')
     {
 
         for ($i = $toi; $i >= 0; $i--) {
             // 获取颜色
-            $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $toi, $i);
+            $color = $this->getColor($im, $rgbaColor, $rgbaCount, $toi, $i);
             // imagefilledrectangle($this->im, 0, $i, $w, 0, $color); // 填充颜色
             // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
@@ -406,73 +403,6 @@ trait GdTrait
     }
 
     /**
-     * 根据传值类型获取四个角的半径
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2022/11/12
-     * Time: 15:39
-     * @param $radius string|array|integer '20 10' [20, 10] 10
-     * @param $len
-     * @return false[]|float[]
-     */
-    protected function getRadiusType($radius, $len)
-    {
-        if (is_string($radius)) {
-            // 把字符串格式转数组
-            $radius = preg_replace('~\s+~', ' ', trim($radius, ' '));
-            $radius = explode(' ', $radius);
-        } elseif (is_numeric($radius)) {
-            // 整形转数组
-            $radius = [$radius, $radius, $radius, $radius];
-        } else {
-            if (!is_array($radius)) throw new PosterException('圆角参数类型错误');
-        }
-        // [20] 四个角
-        // [20,30] 第一个值 左上 右下 第二个值 右上 左下
-        // [20,30,20] 第一个值 左上 第二个值 右上 左下 第三个值 右下
-        // [20,30,20,10]  左上 右上 右下  左下
-        $radiusCount = count($radius);
-        if ($radiusCount == 1) {
-            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightTopRadius = $this->getMaxRadius($len, $radius[0]);
-            $leftBottomRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
-        } elseif ($radiusCount == 2) {
-            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightBottomRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
-            $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
-        } elseif ($radiusCount == 3) {
-            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
-            $leftBottomRadius = $this->getMaxRadius($len, $radius[1]);
-            $rightBottomRadius = $this->getMaxRadius($len, $radius[2]);
-        } else {
-            $leftTopRadius = $this->getMaxRadius($len, $radius[0]);
-            $rightTopRadius = $this->getMaxRadius($len, $radius[1]);
-            $leftBottomRadius = $this->getMaxRadius($len, $radius[2]);
-            $rightBottomRadius = $this->getMaxRadius($len, $radius[3]);
-        }
-
-        return [$leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius];
-    }
-
-    /**
-     * 获取最大圆角半径
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2022/11/12
-     * Time: 15:14
-     * @param $len
-     * @param $radius
-     * @return false|float
-     */
-    protected function getMaxRadius($len, $radius)
-    {
-        return $radius < $len ? floor($radius) : floor($len);
-    }
-
-    /**
      * 渐变处理方法 对角 分两段循环
      * @Author lang
      * @Email: 732853989@qq.com
@@ -483,12 +413,11 @@ trait GdTrait
      * @param $toj
      * @param $rgbaColor
      * @param $rgbaCount
-     * @param $alphas
      * @param int $x
      * @param int $y
      * @return mixed
      */
-    protected function linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0)
+    protected function linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $x = 0, $y = 0)
     {
 
         $toLen = $toi >= $toj ? $toi : $toj;
@@ -502,7 +431,7 @@ trait GdTrait
             for ($i = 0; $i < $toLen + 1; $i++) {
                 //设$i为y轴坐标
                 $f = 0;
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $i; $j++) {
                     if ($j <= $toi && ($i - $j) <= $toj) {
                         if (!$f) {
@@ -516,7 +445,7 @@ trait GdTrait
             }
             //加入右半段
             for ($i = $x + 1; $i <= $toi; $i++) {
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $y; $j++) {
                     if (($i + $j) <= $toi && ($y - $j) <= $toj) {
                         imagesetpixel($im, $i + $j, $y - $j, $color);
@@ -528,7 +457,7 @@ trait GdTrait
             for ($i = 0; $i < $toLen + 1; $i++) {
                 //设$i为y轴坐标
                 $f = false;
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $i; $j++) {
                     if ($j <= $toi && ($i - $j) <= $toj) {
                         if (!$f) {
@@ -543,7 +472,7 @@ trait GdTrait
 
             //加入后半段
             for ($i = $x + 1; $i <= $toi; $i++) {
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $y; $j++) {
                     if (($i + $j) <= $toi && ($y - $j) <= $toj) {
                         imagesetpixel($im, $i + $j, $j, $color);
@@ -566,12 +495,11 @@ trait GdTrait
      * @param $toj
      * @param $rgbaColor
      * @param $rgbaCount
-     * @param $alphas
      * @param int $x
      * @param int $y
      * @return mixed
      */
-    protected function linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $alphas, $x = 0, $y = 0)
+    protected function linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, $x = 0, $y = 0)
     {
         $total = $toi + $toj + 1;    // 对角线最大循环次数
         $isRectangle = $toi != $toj; // 判断是否是长方形
@@ -589,13 +517,13 @@ trait GdTrait
 
         if ($isRectangle) { // 长方形
             for ($i = 0; $i < $total; $i++) {
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointRectangle($im, $i, $centerNum, $total, $color, $toiTag, $tojTag, $x, $y);
             }
         } else {
             // 正方形
             for ($i = 0; $i < $total; $i++) {
-                $color = $this->getColor($im, $alphas, $rgbaColor, $rgbaCount, $total, $ii--);
+                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointSquare($im, $i, $centerNum, $color, $x, $y);
             }
         }
@@ -729,5 +657,22 @@ trait GdTrait
             list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
             imagettftext($this->im, $fontSize, $angle, $really_dst_x, $really_dst_y, $color, $font, $contents);
         }
+    }
+
+    /** 设置背景透明 */
+    public function setImageAlpha($pic, $w, $h, $alphas) {
+
+        $mask = $this->createIm($w, $h, [], $alphas > 1);
+
+        for ($x = 0; $x <= $w; $x++) {
+            for ($y = 0; $y <= $h; $y++) {
+                $rgbColor = imagecolorat($pic, $x, $y);
+                $thisColor = imagecolorsforindex($pic, $rgbColor);
+                $color = $this->createColorAlpha($pic, [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);
+                imagesetpixel($mask, $x, $y, $color);
+            }
+        }
+
+        return $mask;
     }
 }

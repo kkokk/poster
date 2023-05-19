@@ -168,7 +168,7 @@ $poster->buildImDst($src,$w,$h,$rgba,$alpha); # 创建指定图片为画布
 
 ##### **创建背景、遮罩** 
 
-> 注意：Imagick 方式，背景暂时不能做圆角，渐变色只支持两种
+> 注意：Imagick 方式，背景目前支持做圆角，渐变色可以支持多种，方向只支持上下
 
 ```php
 // 背景 rgba 参数解释
@@ -633,13 +633,67 @@ $res = PosterManager::Captcha()->type($type)->check($key, $value);
 	}
 ```
 
-##### 海报类静态调用
+##### 海报类门面调用
+
 ```php
 use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
 # 合成图片
 try {
-    $addImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
+    $result = Poster::extension('gd')
+    ->config([
+        'path' => __DIR__ . '/../poster/test1.png',
+        // 'font' => 'static/simkai.ttf',
+        // 'dpi' => 72
+    ])
+    ->buildIm(638, 826, [255, 255, 255, 127], false)
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
+    // ->buildImage('static/top_bg.png')
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png', 254, 321)
+    // ->buildImage('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 253, 326, 0, 0, 131, 131, false, 'circle')
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png', 0, 655)
+    // ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
+    ->buildText('明月几时有，把酒问青天', ['center'], 200, 20, [52, 52, 52, 2], 0, '', 1, 40)
+    ->buildText('明月几时有，把酒问青天', ['center'], 300, 20, [52, 52, 52, 2], 0, '', 1, 40)
+    ->buildText('苏轼', 'center', 477, 16, [51, 51, 51, 1])
+    ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。', 'center', 515, 14, [153, 153, 153, 1])
+    ->buildText('长按识别', 497, 720, 15, [153, 153, 153, 1])
+    ->buildText('查看TA的更多作品', 437, 757, 15, [153, 153, 153, 1])
+    ->buildQr('http://www.baidu.com', 37, 692, 0, 0, 122, 122)
+    ->buildBg(400, 500, ['color' => [
+        [255, 0, 0],
+        [255, 125, 0],
+        [255, 255, 0],
+        [0, 255, 0],
+        [0, 255, 255],
+        [0, 0, 255],
+        [255, 0, 255]
+    ], 'alpha' => 80, 'to' => 'top', 'radius' => '20 30 40 80'], true, 'center', 'center', 0, 0,
+        function ($im) {
+            // $im->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png');
+            $im->buildLine(10, 100, 100, 200, [0, 0, 0, 1], '', 10);
+            // $im->buildLine(10, 30, 100, 100, [0, 0, 0, 1], 'rectangle', 10);
+            // $im->buildLine(120, 10, 220, 100, [0, 0, 0, 1], 'filled_rectangle', 10);
+            $im->buildArc(200, 200, 50, 50, 0, 360, [0, 0, 0, 1], '', 1);
+            $im->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center', ['custom', 'center', 0, 100, 0], 20, [0, 0, 0, 50], 0, '', 1, 0);
+            // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
+        })
+    ->getPoster();
+} catch (Exception $e){
+	echo $e->getMessage();
+}
+```
+
+
+
+##### 海报类静态调用
+
+```php
+use Kkokk\Poster\PosterManager;
+use Kkokk\Poster\Exception\Exception;
+# 合成图片
+try {
+    $addImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
     $result = PosterManager::Poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
         ->buildIm(638,826,[255,255,255,127],false)
         ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
@@ -712,7 +766,7 @@ try {
         )->getPoster();
     
     # 给图片添加水印
-    $setImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
+    $setImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
     $result = PosterManager::Poster() //给指定图片添加水印，这里为空就好
         ->buildImDst(__DIR__.'/test.jpeg')
         ->buildImage($setImage,'-20%','-20%',0,0,0,0,false)
@@ -731,7 +785,7 @@ use Kkokk\Poster\PosterManager;
 use Kkokk\Poster\Exception\Exception;
 # 合成图片
 try {
-    $addImage = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg";
+    $addImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
 	$PosterManager = new PosterManager('poster/poster_user'); //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
 	$result = $PosterManager->buildIm(638,826,255,255,255,1]27,false)
 	->buildIm(638,826,[255,255,255,127],false)
@@ -752,7 +806,7 @@ try {
 	->getPoster();
 
 	# 给图片添加水印
-    $setImage = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2854425629,4097927492&fm=26&gp=0.jpg';
+    $setImage = 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png';
 	$PosterManager = new PosterManager(); //给指定图片添加水印，这里为空就好
 	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
 	->buildImage($setImage,'center','-20%',0,0,0,0,true)
