@@ -73,6 +73,9 @@ class CaptchaGenerator
         } catch (PosterException $e) {
             // 未查询到缓存器，则返回密码，自行保存
             return false;
+        } catch (\Exception $e) {
+            // 报错，则返回密码，自行保存
+            return false;
         }
         return true;
     }

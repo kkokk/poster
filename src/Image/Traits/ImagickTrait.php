@@ -35,7 +35,11 @@ trait ImagickTrait
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $type;
             }
-            $this->im->writeImage($this->path . $this->pathname . '/' . $this->filename);
+            if($type == 'gif') {
+                $this->im->writeImages($this->path . $this->pathname . '/' . $this->filename, true);
+            } else {
+                $this->im->writeImage($this->path . $this->pathname . '/' . $this->filename);
+            }
             return ['url' => $this->pathname . '/' . $this->filename];
         }
         header('Content-Type:Image/' . $type);
@@ -50,6 +54,7 @@ trait ImagickTrait
         }
 
         if (!empty($source)) {
+            if($this->type =='gif') return $this->im->writeImages($source, true);
             return $this->im->writeImage($source);
         }
 
@@ -97,11 +102,11 @@ trait ImagickTrait
     /**
      * 创建画布
      */
-    public function createIm($w, $h, $rgba, $alpha = false)
+    public function createIm($w, $h, $rgba, $alpha = false, $type = null)
     {
         $color = $alpha ? $this->createColorAlpha($rgba) : $this->createColor($rgba);
         $image = $this->createImagick();
-        $image->newImage($w, $h, $color, $this->type);//设置画布的信息以及画布的格式
+        $image->newImage($w, $h, $color, $type ?: $this->type);//设置画布的信息以及画布的格式
         return $image;
     }
 
@@ -252,6 +257,7 @@ trait ImagickTrait
             if ($this->type == 'gif') {
                 foreach ($this->im as $frame) {
                     $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
+                    // $this->im->nextImage();
                 }
             } else {
                 $this->im->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);

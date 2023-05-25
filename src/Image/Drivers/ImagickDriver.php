@@ -135,7 +135,14 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->cropImage($pic, $src_x, $src_y);
 
         // 合并图片
-        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        if($this->type == 'gif') {
+            // 每帧长宽不一致问题, 水印会不一致
+            foreach ($this->im as $frame) {
+                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            }
+        } else {
+            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        }
 
         if($that) unset($that);
         $this->destroyImage($pic);
@@ -200,7 +207,14 @@ class ImagickDriver extends Driver implements DriverInterface
         // 裁剪图片
         $this->cropImage($pic, $src_x, $src_y);
         // 合并图片
-        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        if($this->type == 'gif') {
+            // 每帧长宽不一致问题, 水印会不一致
+            foreach ($this->im as $frame) {
+                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            }
+        } else {
+            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        }
 
 
         $this->destroyImage($pic);
@@ -311,7 +325,15 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->line($x1, $y1, $x2, $y2);
                 break;
         }
-        $this->im->drawImage($draw);
+
+        if($this->type == 'gif') {
+            // 每帧长宽不一致问题, 水印会不一致
+            foreach ($this->im as $frame) {
+                $frame->drawImage($draw);
+            }
+        } else {
+            $this->im->drawImage($draw);
+        }
     }
 
     public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
@@ -332,7 +354,14 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
         }
-        $this->im->drawImage($draw);
+        if($this->type == 'gif') {
+            // 每帧长宽不一致问题, 水印会不一致
+            foreach ($this->im as $frame) {
+                $frame->drawImage($draw);
+            }
+        } else {
+            $this->im->drawImage($draw);
+        }
     }
 
     public function CopyQr($text, $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
@@ -374,7 +403,14 @@ class ImagickDriver extends Driver implements DriverInterface
         // 裁剪图片
         $this->cropImage($pic, $src_x, $src_y);
         // 合并图片
-        $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        if($this->type == 'gif') {
+            // 每帧长宽不一致问题, 水印会不一致
+            foreach ($this->im as $frame) {
+                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            }
+        } else {
+            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+        }
 
         !is_resource($qr) || imagedestroy($qr);
         $this->destroyImage($pic);
