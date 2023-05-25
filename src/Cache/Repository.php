@@ -21,8 +21,10 @@ class Repository
             $connector = LaravelCache::class;
         } elseif (class_exists(ThinkCache6::class)) {
             $connector = ThinkCache6::class;
+            $method = str_replace('put', 'set', $method);
         } elseif (class_exists(ThinkCache5::class)) {
             $connector = ThinkCache5::class;
+            $method = str_replace('put', 'set', $method);
         } else {
             throw new PosterException('no cacheDriver');
         }
