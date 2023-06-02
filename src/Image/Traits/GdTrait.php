@@ -659,8 +659,37 @@ trait GdTrait
         }
     }
 
+    /**
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/6/2
+     * Time: 14:26
+     */
+    protected function fontWeightArr($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contentsArr)
+    {
+
+        $dst_x_old = $dst_x;
+        foreach ($contentsArr as $v) {
+
+            $contents = $v['value'];
+
+            if ($contents == "\n") {
+                $dst_x = $dst_x_old;
+                $dst_y += 1.75 * $fontSize;
+                continue;
+            }
+
+            $customColor = !empty($v['color']) ? $v['color'] : $color;
+
+            $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $customColor, $font, $contents);
+
+            $dst_x += $v['w'];
+        }
+    }
+
     /** 设置背景透明 */
-    public function setImageAlpha($pic, $w, $h, $alphas) {
+    public function setImageAlpha($pic, $w, $h, $alphas)
+    {
 
         $mask = $this->createIm($w, $h, [], $alphas > 1);
 

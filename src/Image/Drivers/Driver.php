@@ -599,4 +599,128 @@ class Driver
         return $radius < $len ? floor($radius) : floor($len);
     }
 
+    public function domHtml($content)
+    {
+        $dom = new \DOMDocument();
+
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $content);
+
+        $xpath = new \DOMXPath($dom);
+
+        // 获取所有的 h1 标签
+        $spanTags = $xpath->query('//span');
+        $textNodes = $xpath->query("//text()");
+
+        // 遍历 h1 标签并输出内容
+        foreach ($spanTags as $tag) {
+            // echo $tag->nodeValue; // 输出标签内的文本内容
+            $style = $tag->getAttribute('style'); // 获取 style 属性值
+
+            $styles = explode(';', $style);
+
+            foreach ($styles as $style) {
+                $styleParts = explode(':', $style);
+                $property = trim($styleParts[0]);
+                $value = trim($styleParts[1]);
+
+                if ($property === 'color') {
+                    echo $value; // 输出 color 值
+                }
+            }
+            echo $style;
+            echo $tag->nodeValue;
+        }
+
+        // 输出选中节点的文本内容
+        foreach ($textNodes as $node) {
+            echo $node->nodeValue;
+        }
+        print_r($textNodes);
+        exit;
+    }
+
+    public function getStyleAttr($style, $type = 'color')
+    {
+        $attr = '';
+
+        $styles = explode(';', $style);
+
+        foreach ($styles as $style) {
+            $styleParts = explode(':', $style);
+            $property = trim($styleParts[0]);
+            $value = trim($styleParts[1]);
+
+            if ($property === $type) {
+                $attr = $value; // 输出属性值
+            }
+        }
+
+        return $attr;
+    }
+
+    /**
+     * 获取单个字属性
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/6/2
+     * Time: 15:38
+     * @param string $content
+     * @param string $color
+     * @param int $w
+     * @return array
+     */
+    public function getLetterArr($content = "\n", $color = '', $w = 0)
+    {
+        return [
+            'color' => $color,
+            'w' => $w,
+            'value' => $content
+        ];
+    }
+
+    /**
+     * 获取内容
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/6/2
+     * Time: 15:37
+     * @param $letter
+     * @param $content
+     * @param string $color
+     */
+    public function getNodeValue(&$letter, $content, $color = '')
+    {
+        $contents = $this->getBrNodeValue($content);
+        foreach ($contents as $k => $v) {
+            if (!empty($v)) {
+                if (isset($contents[$k - 1])) {
+                    $letter[] = $this->getLetterArr();
+                }
+
+                for ($i = 0; $i < mb_strlen($v); $i++) {
+                    $letter[] = $this->getLetterArr(mb_substr($v, $i, 1), $color);
+                }
+            } else {
+                if ($k != 0) $letter[] = $this->getLetterArr();
+            }
+
+        }
+    }
+
+    /**
+     * 匹配换行符
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2023/6/2
+     * Time: 15:37
+     * @param $content
+     * @return array|false|string[]
+     */
+    public function getBrNodeValue($content)
+    {
+        $pattern = '/<br>|<br\/>/i';
+        // 分割字符串
+        return preg_split($pattern, $content, -1, 2);
+    }
+
 }

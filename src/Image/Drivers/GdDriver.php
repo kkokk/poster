@@ -421,65 +421,154 @@ class GdDriver extends Driver implements DriverInterface
 
         mb_internal_encoding('UTF-8'); // 设置编码
 
-        // 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度
-        $contents = '';
-        $letter = [];
-
-        // 将字符串拆分成一个个单字 保存到数组 letter 中
-        for ($i = 0; $i < mb_strlen($content); $i++) {
-            $letter[] = mb_substr($content, $i, 1);
-        }
-
         $max_ws = $this->im_w;
         if (isset($max_w) && !empty($max_w)) {
             $max_ws = $max_w;
         }
 
+        // 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度
+        $contents = '';
+        $contentsArr = [];
+        $letter = [];
         $line = 1;
         $calcSpaceRes = 0;
-        foreach ($letter as $l) {
-            $textStr = $contents . ' ' . $l;
-            $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
-            $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
-            // 判断拼接后的字符串是否超过预设的宽度
-            if (($textWidth > $max_ws) && ($contents !== '')) {
-                $contents .= "\n";
-                $line++;
+
+        // 主动设置是否解析html标签
+        if(is_array($content)) {
+
+            if(!isset($content['type'])) throw new PosterException('type is required');
+            if(!isset($content['content'])) throw new PosterException('content is required');
+
+            $type = $content['type'];
+            $content = $content['content'];
+
+            // 确认包含才处理
+            if ($type == 'html' && preg_match('/<[^>]*>/', $content)) {
+
+                // 正则匹配 span 属性
+                $pattern = '/<span style="(.*?)">(.*?)<\/span>/i';
+
+                // 分割字符串
+                $matches = preg_split($pattern, $content, -1,PREG_SPLIT_DELIM_CAPTURE);
+
+                $common = new Common();
+
+                for($i = 0; $i < count($matches); $i+=3)
+                {
+                    if(!empty($matches[$i])) {
+                        $this->getNodeValue($letter, $matches[$i], $color);
+                    }
+
+                    if(isset($matches[$i+1])){
+                        $style = $matches[$i+1];
+                        $colorValue = $this->getStyleAttr($style);
+                        $colorCustom = $this->createColorAlpha($this->im, $common->getNodeStyleColor($colorValue));
+                        $this->getNodeValue($letter, $matches[$i+2], $colorCustom);
+                    }
+                }
+
+            } else {
+                $this->getNodeValue($letter, $content, $color);
             }
-            $contents .= $l;
-            $line === 1 && $calcSpaceRes += $calcSpace;
-        }
 
-        $calcFont = [
-            'text_width' => $textWidth,
-            'text_height' => abs($fontBox[1] - $fontBox[7]),
-        ];
-        $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+            $textWidthArr = [];
+            foreach ($letter as $l) {
+                $textStr = $contents . ' ' . $l['value'];
+                $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
+                $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
 
-        $dst_y = $this->calcTextDstY($dst_y, $calcFont);
-
-        # 自定义间距
-        if ($space > 0) {
-
-            $dst_x_old = $dst_x;
-            for ($j = 0; $j < mb_strlen($contents); $j++) {
-
-                $spaceStr = mb_substr($contents, $j, 1);
-                if ($spaceStr == "\n") {
-                    $dst_x = $dst_x_old;
-                    $dst_y += 1.75 * $fontSize;
+                if($l['value'] == "\n") {
+                    $contents = "";
+                    $contentsArr[] = $this->getLetterArr();
+                    $line++;
                     continue;
                 }
-                $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $spaceStr);
-                $dst_x += $space;
+
+                if(!isset($textWidthArr[$line])) $textWidthArr[$line] =  - $space / 2;
+                if (($textWidth > $max_ws || $textWidthArr[$line] > $max_ws) && ($contents !== '')) {
+                    // 判断拼接后的字符串是否超过预设的宽度
+                    $contents = "";
+                    $contentsArr[] = $this->getLetterArr();
+                    $line++;
+                }
+                $contents .= $l['value'];
+
+                $fontBox1 = imagettfbbox($fontSize, $angle, $font, $l['value']);
+                $l['w'] = abs($fontBox1[2]) + $calcSpace;
+                $textWidthArr[$line] += $l['w'];
+                $contentsArr[] = $l;
+
+                $line === 1 && $calcSpaceRes += $calcSpace;
             }
 
+            $calcFont = [
+                'text_width' => max(array_values($textWidthArr)), // 取最宽行宽
+                'text_height' => abs($fontBox[1] - $fontBox[7]),
+            ];
+            $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+
+            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+            # 自定义间距
+            $this->fontWeightArr($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contentsArr);
+
+            return true;
 
         } else {
-            $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contents);
-        }
+            // 将字符串拆分成一个个单字 保存到数组 letter 中
+            for ($i = 0; $i < mb_strlen($content); $i++) {
+                $letter[] = mb_substr($content, $i, 1);
+            }
 
-        return true;
+            $textWidthArr = [];
+            $contentStr = '';
+            foreach ($letter as $l) {
+                $textStr = $contentStr . ' ' . $l;
+                $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
+                $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
+                $textWidthArr[$line] = $textWidth;
+                // 判断拼接后的字符串是否超过预设的宽度
+
+                if (($textWidth > $max_ws) && ($contents !== '')) {
+                    $contents .= "\n";
+                    $contentStr = "";
+                    $line++;
+                }
+                $contents .= $l;
+                $contentStr .= $l;
+                $line === 1 && $calcSpaceRes += $calcSpace;
+            }
+
+            $calcFont = [
+                'text_width' => max(array_values($textWidthArr)) - $space * 1.25,
+                'text_height' => abs($fontBox[1] - $fontBox[7]),
+            ];
+            $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+
+            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+
+            # 自定义间距
+            if ($space > 0) {
+
+                $dst_x_old = $dst_x;
+                for ($j = 0; $j < mb_strlen($contents); $j++) {
+
+                    $spaceStr = mb_substr($contents, $j, 1);
+                    if ($spaceStr == "\n") {
+                        $dst_x = $dst_x_old;
+                        $dst_y += 1.75 * $fontSize;
+                        continue;
+                    }
+                    $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $spaceStr);
+                    $dst_x += $space;
+                }
+
+
+            } else {
+                $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contents);
+            }
+
+            return true;
+        }
     }
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)

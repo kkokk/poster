@@ -8,6 +8,8 @@
 
 namespace Kkokk\Poster\Common;
 
+use Kkokk\Poster\Exception\PosterException;
+
 class Common
 {
     protected $imType = [
@@ -72,5 +74,44 @@ class Common
     {
         // (p2.x - p1.x) * (p.y - p1.y) -(p.x - p1.x) * (p2.y - p1.y);
         return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
+    }
+
+    public function getNodeStyleColor($color)
+    {
+        if(strpos($color, 'rgb') !== false) {
+            return $this->styleToRgba($color);
+        } elseif(strpos($color, '#') !== false) {
+            return $this->hexToRgba($color);
+        } else {
+            throw new PosterException('only support rgb or hexadecimal');
+        }
+    }
+
+    public function hexToRgba($hexColor)
+    {
+        $rgb = [];
+        $color = str_replace('#', '', $hexColor);
+        if (strlen($color) > 3) {
+            $rgb = [
+                hexdec(substr($color, 0, 2)),
+                hexdec(substr($color, 2, 2)),
+                hexdec(substr($color, 4, 2)),
+                1,
+            ];
+        }
+
+        return $rgb;
+    }
+
+    public function styleRgbToRgba($rgbColor)
+    {
+        preg_match('/rgb\((.*?)\)/', $rgbColor, $color);
+        print_r($color);exit;
+    }
+
+    public function styleRgbaToRgba($rgbaColor)
+    {
+        preg_match('/rgba\((.*?)\)/', $rgbaColor, $color);
+        print_r($color);exit;
     }
 }
