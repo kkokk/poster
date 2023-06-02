@@ -265,6 +265,31 @@ trait ImagickTrait
         }
     }
 
+    public function fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contentsArr, $color)
+    {
+        $dst_x_old = $dst_x;
+        foreach ($contentsArr as $v) {
+
+            $contents = $v['value'];
+
+            if ($contents == "\n") {
+                $dst_x = $dst_x_old;
+                $dst_y += 1.75 * $fontSize;
+                continue;
+            }
+
+            if(!empty($v['color'])){
+                $draw->setFillColor($v['color']);
+            } else {
+                $draw->setFillColor($color);
+            }
+
+            $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents);
+
+            $dst_x += $v['w'];
+        }
+    }
+
     /**
      * 画圆角
      * Author: lang

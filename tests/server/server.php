@@ -12,7 +12,20 @@ use Kkokk\Poster\PosterManager;
 
 require '../../vendor/autoload.php';
 
+$startAt = microtime(true);
+echo $startAt . PHP_EOL;
 
+$msg1 = ['type' => 'html', 'content' => '我是<br><span style="color:#fF8716;">某某</span>，<br/>我在<span style="color:#fF8716;">贵阳</span><br>我为家乡助力<br>我是<br>第<span style="color:#fF8716;">336</span>位岑巩好物代言人，海报生成图片验证极速生成方便快捷快速生成海报'];
+// $msg1 = '位岑巩好物代言人位岑巩好物代言人位岑巩好物代言人';
+// $msg1 = ['type' => 'html', 'content' => '位岑巩好物代言人位岑巩好物1<br><br>代言人位岑巩好物代言人'];
+
+Poster::extension('imagick')
+    ->config([
+        'path' => __DIR__ . '/../poster/text1.png'
+    ])
+    ->buildIm(638, 826, [255, 255, 255, 127], false)
+    ->buildText($msg1, ['center'], 200, 20, [52, 52, 52, 1], 300, '', 10, 40)
+    ->getPoster();
 
 // 验证码
 // $result = Captcha::get();
@@ -34,15 +47,6 @@ require '../../vendor/autoload.php';
 //     ->stream();
 // echo $result;
 // exit;
-
-$gif = __DIR__ . '/../poster/1223015613610230151165.gif';
-
-
-Poster::extension('imagick')->buildImDst($gif)
-    // ->buildLine(100, 100, 300, 200, [255, 255, 0, 1], '', 10)
-    // ->buildImage('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 253, 126, 0, 0, 131, 131, false, 'circle')
-    ->buildText('明月几时有，把酒问青天', ['center'], 20, 20, [52, 52, 52, 2], 0, '', 1, 40)
-    ->setPoster();
 
 
 // $result = Poster::extension('gd')
@@ -85,3 +89,10 @@ Poster::extension('imagick')->buildImDst($gif)
 //         })
 //     ->getPoster();
 
+echo (memory_get_usage() / 1024 / 1024) . 'M' . PHP_EOL;
+echo (memory_get_peak_usage() / 1024 / 1024) . 'M' . PHP_EOL;
+print_r(getrusage()) . PHP_EOL;
+
+$endAt = microtime(true);
+echo $endAt . PHP_EOL;
+echo $endAt - $startAt . PHP_EOL;
