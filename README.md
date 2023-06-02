@@ -332,6 +332,12 @@ $poster->buildArc($cx, $cy, $w, $h, $s, $e, $rgba, $type, $style, $weight);
 ##### 合成文字
 
 ```php
+// 可以用span标签的style color属性改变文字颜色，可用br标签换行
+$content = [
+    'type' => 'html',
+    'content' => '我是<br><span style="color:#fF8716;">某某</span>，<br/>我在<span style="color:#fF8716;">贵阳</span><br>我为家乡助力<br>我用<span style="color:#fF8716;">poster</span>生成海报图片'
+];
+
 $poster->buildText($content,$dst_x,$dst_y,$font,$rgba,$max_w,$font_family,$weight,$space); # 合成文字
 
 // 新增文字宽度定位
