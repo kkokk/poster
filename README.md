@@ -2,7 +2,7 @@
 
 #### 介绍
 
-**基于gd、imagick、phpqrcode**
+**基于 gd、imagick、phpqrcode**
 
 PHP海报生成插件，极速生成方便快捷。
 
@@ -24,7 +24,11 @@ lang
 
 群号 590660254 [点击链接加入群聊【海报图片验证交流群】](https://jq.qq.com/?_wv=1027&k=k374FhrR)
 
-#### 安装或更新教程
+#### 使用文档
+
+> 文档地址：http://langlanglang.gitee.io/poster-doc/
+
+#### 安装或更新
 
 1.  composer require kkokk/poster
 2.  composer update kkokk/poster
@@ -62,8 +66,6 @@ lang
 #### **引用海报类**
 
 注意：没有特别说明，统一都是px。
-
-> 文档地址：http://www.520yummy.com/composer/poster/doc.html
 
 ##### 通过 PosterManager 调用
 
