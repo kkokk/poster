@@ -302,7 +302,7 @@ class ImagickDriver extends Driver implements DriverInterface
             $textWidthArr = [];
             foreach ($letter as $l) {
 
-                $textStr = $contents . ' ' . $l['value'];
+                $textStr = $contents . $l['value'];
                 $fontBox = $this->im->queryFontMetrics($draw, $textStr);
                 $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
 
@@ -350,7 +350,7 @@ class ImagickDriver extends Driver implements DriverInterface
             }
 
             foreach ($letter as $l) {
-                $textStr = $contents . ' ' . $l;
+                $textStr = $contents . $l;
                 $fontBox = $this->im->queryFontMetrics($draw, $textStr);
                 $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
                 // 判断拼接后的字符串是否超过预设的宽度

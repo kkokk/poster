@@ -473,7 +473,7 @@ class GdDriver extends Driver implements DriverInterface
 
             $textWidthArr = [];
             foreach ($letter as $l) {
-                $textStr = $contents . ' ' . $l['value'];
+                $textStr = $contents . $l['value'];
                 $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
                 $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
 
@@ -522,7 +522,7 @@ class GdDriver extends Driver implements DriverInterface
             $textWidthArr = [];
             $contentStr = '';
             foreach ($letter as $l) {
-                $textStr = $contentStr . ' ' . $l;
+                $textStr = $contentStr . $l;
                 $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
                 $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
                 $textWidthArr[$line] = $textWidth;
