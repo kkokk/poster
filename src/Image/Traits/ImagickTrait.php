@@ -221,7 +221,7 @@ trait ImagickTrait
         } else {
 
             $picKey = 0;
-            $chunk = floor($h / ($rgbaCount-1));
+            $chunk = ceil($h / ($rgbaCount-1));
             foreach ($rgbaColor as $k => $v) {
 
                 if($k == $rgbaCount - 1) break;
