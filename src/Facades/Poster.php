@@ -13,7 +13,7 @@ use Kkokk\Poster\Image\PosterManager;
 use Kkokk\Poster\Image\Builder;
 
 /**
- * @method static ExtensionInterface extension($channel = "");
+ * @method static ExtensionInterface extension($name = "");
  * @method static Builder config($params = []);
  * @method static Builder buildIm($w, $h, $rgba = [], $alpha = false);
  * @method static Builder buildImDst($src, $w = 0, $h = 0);

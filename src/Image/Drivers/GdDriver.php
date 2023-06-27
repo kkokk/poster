@@ -536,12 +536,13 @@ class GdDriver extends Driver implements DriverInterface
                 $contents .= $l;
                 $contentStr .= $l;
                 $line === 1 && $calcSpaceRes += $calcSpace;
+
+                $calcFont = [
+                    'text_width' => max(array_values($textWidthArr)),
+                    'text_height' => abs($fontBox[1] - $fontBox[7]),
+                ];
             }
 
-            $calcFont = [
-                'text_width' => max(array_values($textWidthArr)) - $space * 1.25,
-                'text_height' => abs($fontBox[1] - $fontBox[7]),
-            ];
             $dst_x = $this->calcTextDstX($dst_x, $calcFont);
 
             $dst_y = $this->calcTextDstY($dst_y, $calcFont);

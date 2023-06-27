@@ -13,8 +13,14 @@ use Kkokk\Poster\Exception\PosterException;
 class Extension implements ExtensionInterface
 {
 
+    /**
+     * @var \Kkokk\Poster\Image\Drivers\DriverInterface $driver
+     */
     protected $driver;
 
+    /**
+     * @var string
+     */
     protected $path;
 
     function __construct($driver, $path)
