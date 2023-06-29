@@ -692,7 +692,7 @@ class Driver
     {
         $contents = $this->getBrNodeValue($content);
         foreach ($contents as $k => $v) {
-            if (!empty($v)) {
+            if ($v != '') {
                 if (isset($contents[$k - 1])) {
                     $letter[] = $this->getLetterArr();
                 }
