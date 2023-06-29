@@ -15,18 +15,18 @@ require '../../vendor/autoload.php';
 $startAt = microtime(true);
 echo $startAt . PHP_EOL;
 
-// $msg1 = ['type' => 'html', 'content' => '我是<br><span style="color:#fF8716;">某某</span>，<br/>我在<span style="color:#fF8716;">贵阳</span><br>我为家乡助力<br>我是<br>第<span style="color:#fF8716;">336</span>位岑巩好物代言人，海报生成图片验证极速生成方便快捷快速生成海报'];
+$msg1 = ['type' => 'html', 'content' => '我是<br><span style="color:#fF8716;">某某</span>，<br/>我在<span style="color:#fF8716;">贵阳</span><br>我为家乡助力<br>我是<br>第<span style="color:#fF8716;font-size: 20px;">0</span>位岑巩好物代言人，海报生成图片验证极速生成方便快捷快速生成海报'];
 // $msg1 = '我是某某，我在贵阳，我为家乡助力，我是第336位岑巩好物代言人，海报生成图片验证极速生成方便快捷快速生成海报';
 // $msg2 = ['type' => 'html', 'content' => '我是某某，我在贵阳，我为家乡助力，我是第336位岑巩好物代言人，海报生成图片验证极速生成方便快捷快速生成海报'];
 
-// Poster::extension('imagick')
-//     ->config([
-//         'path' => __DIR__ . '/../poster/text1.png'
-//     ])
-//     ->buildIm(638, 826, [255, 255, 255, 127], false)
-//     ->buildText($msg1, ['center'], 200, 20, [52, 52, 52, 1], 300, '', 1, 0)
-//     ->getPoster();
-
+Poster::extension('gd')
+    ->config([
+        'path' => __DIR__ . '/../poster/text1.png'
+    ])
+    ->buildIm(638, 826, [255, 255, 255, 127], false)
+    ->buildText($msg1, ['center'], 200, 20, [52, 52, 52, 1], 300, '', 1, 0)
+    ->getPoster();
+exit;
 // Poster::extension('imagick')
 //     ->config([
 //         'path' => __DIR__ . '/../poster/text2.png'
