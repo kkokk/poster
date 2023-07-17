@@ -135,7 +135,7 @@ class GdDriver extends Driver implements DriverInterface
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
 
         // 设置透明度，内容不透明
-        if($alpha && !$contentAlpha) {
+        if ($alpha && !$contentAlpha) {
             $pic = $this->setImageAlpha($pic, $w, $h, $alphas);
         }
 
@@ -151,7 +151,7 @@ class GdDriver extends Driver implements DriverInterface
         }
 
         // 设置透明度内容也透明
-        if($alpha && $contentAlpha) {
+        if ($alpha && $contentAlpha) {
             $pic = $this->setImageAlpha($pic, $w, $h, $alphas);
         }
 
@@ -434,10 +434,10 @@ class GdDriver extends Driver implements DriverInterface
         $calcSpaceRes = 0;
 
         // 主动设置是否解析html标签
-        if(is_array($content)) {
+        if (is_array($content)) {
 
-            if(!isset($content['type'])) throw new PosterException('type is required');
-            if(!isset($content['content'])) throw new PosterException('content is required');
+            if (!isset($content['type'])) throw new PosterException('type is required');
+            if (!isset($content['content'])) throw new PosterException('content is required');
 
             $type = $content['type'];
             $content = $content['content'];
@@ -449,21 +449,20 @@ class GdDriver extends Driver implements DriverInterface
                 $pattern = '/<span style="(.*?)">(.*?)<\/span>/i';
 
                 // 分割字符串
-                $matches = preg_split($pattern, $content, -1,PREG_SPLIT_DELIM_CAPTURE);
+                $matches = preg_split($pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
                 $common = new Common();
 
-                for($i = 0; $i < count($matches); $i+=3)
-                {
-                    if(!empty($matches[$i])) {
+                for ($i = 0; $i < count($matches); $i += 3) {
+                    if (!empty($matches[$i])) {
                         $this->getNodeValue($letter, $matches[$i], $color);
                     }
 
-                    if(isset($matches[$i+1])){
-                        $style = $matches[$i+1];
+                    if (isset($matches[$i + 1])) {
+                        $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
                         $colorCustom = $this->createColorAlpha($this->im, $common->getNodeStyleColor($colorValue));
-                        $this->getNodeValue($letter, $matches[$i+2], $colorCustom);
+                        $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
 
@@ -471,30 +470,44 @@ class GdDriver extends Driver implements DriverInterface
                 $this->getNodeValue($letter, $content, $color);
             }
 
+            $normalSize = imagettfbbox($fontSize, 0, $font, '好');
+            $punctuationSize = imagettfbbox($fontSize, 0, $font, '，');
+            // 计算标点符号的水平偏移量
+            $horizontalOffset = abs($punctuationSize[2] - $normalSize[2]) / 2;
+
             $textWidthArr = [];
             foreach ($letter as $l) {
                 $textStr = $contents . $l['value'];
                 $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
-                $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
+                $textWidth = abs($fontBox[2]) + $calcSpaceRes + 2;
+                if (preg_match('/[\x{3002}\x{ff0c}\x{ff1f}\x{ff01}\x{ff1a}\x{ff1b}]/u', $l['value'])) {
+                    $textWidth += $horizontalOffset;
+                }
 
-                if($l['value'] == "\n") {
+                if ($l['value'] == "\n") {
                     $contents = "";
                     $contentsArr[] = $this->getLetterArr();
                     $line++;
                     continue;
                 }
 
-                if(!isset($textWidthArr[$line])) $textWidthArr[$line] =  - $space / 2;
+                if (!isset($textWidthArr[$line])) {
+                    $textWidthArr[$line] = -$space / 2;
+                }
                 if (($textWidth > $max_ws || $textWidthArr[$line] > $max_ws) && ($contents !== '')) {
                     // 判断拼接后的字符串是否超过预设的宽度
                     $contents = "";
                     $contentsArr[] = $this->getLetterArr();
                     $line++;
+                    $textWidthArr[$line] = -$space / 2;
                 }
                 $contents .= $l['value'];
 
                 $fontBox1 = imagettfbbox($fontSize, $angle, $font, $l['value']);
-                $l['w'] = abs($fontBox1[2]) + $calcSpace;
+                $l['w'] = abs($fontBox1[2]) + $calcSpace + 2;
+                if (preg_match('/[\x{3002}\x{ff0c}\x{ff1f}\x{ff01}\x{ff1a}\x{ff1b}]/u', $l['value'])) {
+                    $l['w'] += $horizontalOffset;
+                }
                 $textWidthArr[$line] += $l['w'];
                 $contentsArr[] = $l;
 
@@ -524,7 +537,7 @@ class GdDriver extends Driver implements DriverInterface
             foreach ($letter as $l) {
                 $textStr = $contentStr . $l;
                 $fontBox = imagettfbbox($fontSize, $angle, $font, $textStr);
-                $textWidth = abs($fontBox[2] - $fontBox[0]) + $calcSpaceRes;
+                $textWidth = abs($fontBox[2]) + $calcSpaceRes;
                 $textWidthArr[$line] = $textWidth;
                 // 判断拼接后的字符串是否超过预设的宽度
 

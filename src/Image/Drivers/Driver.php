@@ -92,7 +92,7 @@ class Driver
         if (isset($params['dpi']) && !empty($params['dpi'])) {
             $this->dpi = is_numeric($params['dpi']) ? [$params['dpi'], $params['dpi']] : $params['dpi'];
         }
-        if(isset($params['font']) && !empty($params['font'])){
+        if (isset($params['font']) && !empty($params['font'])) {
             $this->font = $this->getRealRoute($params['font']);
         }
     }
@@ -217,12 +217,13 @@ class Driver
     {
         $isAbsolute = $this->isAbsolute($path);
 
-        if($this->isCli() && !$isAbsolute) throw new PosterException('For cli environment, please pass the absolute path');
+        if ($this->isCli() && !$isAbsolute) throw new PosterException('For cli environment, please pass the absolute path');
 
         return !$isAbsolute ? $this->getDocumentRoot() . $path : realpath($path);
     }
 
-    public function isCli(){
+    public function isCli()
+    {
         return php_sapi_name() === 'cli';
     }
 
@@ -648,7 +649,11 @@ class Driver
         foreach ($styles as $style) {
             $styleParts = explode(':', $style);
             $property = trim($styleParts[0]);
-            $value = trim($styleParts[1]);
+            if (isset($styleParts[1])) {
+                $value = trim($styleParts[1]);
+            } else {
+                $value = '';
+            }
 
             if ($property === $type) {
                 $attr = $value; // 输出属性值

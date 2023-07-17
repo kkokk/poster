@@ -42,9 +42,10 @@ class CaptchaGenerator
         return $this->Common->baseData($im, $type);
     }
 
-    public function imOutput($im, $dir = '', $type = 'png', $quality = 75)
+    public function imOutput($im, $type = 'png', $quality = 75, $filename = 'im')
     {
-        $yes = 0; // 控制是否生成图片，测试时方便查看
+        $yes = 1; // 控制是否生成图片，测试时方便查看
+        $dir = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
         return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
     }
 

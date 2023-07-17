@@ -85,7 +85,7 @@ trait SliderTrait
             }
         }
 
-        imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+        $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
             $w / 2, 0,
@@ -107,7 +107,7 @@ trait SliderTrait
                 $x + $w, $y + $h,
                 $x, $y + $h,
             ];
-            imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+            $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
         }
 
@@ -273,7 +273,7 @@ trait SliderTrait
             }
         }
 
-        imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+        $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
             $w / 2, 0,
@@ -299,7 +299,7 @@ trait SliderTrait
                 $x + $w / 4, $y + $h,
                 $x, $y + $h / 2,
             ];
-            imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+            $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
         }
 
@@ -385,7 +385,7 @@ trait SliderTrait
             }
         }
 
-        imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+        $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
             $w / 4, 0,
@@ -413,7 +413,7 @@ trait SliderTrait
                 $x + $w / 4, $y + $h,
                 $x, $y + $h / 2,
             ];
-            imagefilledpolygon($this->im, $points, count($points) / 2, $bgColor);
+            $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
         }
 
@@ -424,6 +424,24 @@ trait SliderTrait
             'x' => $x1,
             'y' => $y1,
         ];
+    }
+
+    /**
+     * php 8.1 废弃参数 $points_count
+     * User: lang
+     * Date: 2023/7/17
+     * Time: 10:45
+     * @param $im
+     * @param $points
+     * @param $points_count
+     * @param $color
+     * @return void
+     */
+    protected function drawImageFilledPolygon($im, $points, $points_count, $color){
+        if(PHP_VERSION < 8.1)
+            imagefilledpolygon($im, $points, $points_count, $color);
+        else
+            imagefilledpolygon($im, $points, $color);
     }
 
     protected function getImBg()

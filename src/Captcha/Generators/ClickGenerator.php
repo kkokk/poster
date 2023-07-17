@@ -102,9 +102,9 @@ class ClickGenerator extends CaptchaGenerator implements CaptchaGeneratorInterfa
 
         $this->imOutput(
             $this->im,
-            __DIR__ . '/../../tests/poster/click.' . $this->configs['im_type'],
             $this->configs['im_type'],
-            $this->configs['quality']
+            $this->configs['quality'],
+            'click'
         );
 
         $baseData = $this->baseData($this->im, $this->configs['im_type']);
