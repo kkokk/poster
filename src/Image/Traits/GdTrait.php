@@ -669,6 +669,8 @@ trait GdTrait
     {
 
         $dst_x_old = $dst_x;
+        // $max = max(array_column($contentsArr, 'w')); // 取最大宽度
+
         foreach ($contentsArr as $v) {
 
             $contents = $v['value'];
@@ -683,6 +685,7 @@ trait GdTrait
 
             $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $customColor, $font, $contents);
 
+            // $dst_x += $max;
             $dst_x += $v['w'];
         }
     }

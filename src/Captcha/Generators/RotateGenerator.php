@@ -59,9 +59,9 @@ class RotateGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
 
         $this->imOutput(
             $this->im,
-            __DIR__ . '/../../tests/poster/rotate.' . $this->configs['im_type'],
             $this->configs['im_type'],
-            $this->configs['quality']
+            $this->configs['quality'],
+            'rotate'
         );
 
         $baseData = $this->baseData($this->im, $this->configs['im_type']);
