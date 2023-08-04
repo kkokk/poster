@@ -103,7 +103,7 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:41
-     * @param string $src
+     * @param string|array $src
      * @param int $dst_x
      * @param int $dst_y
      * @param int $src_x
