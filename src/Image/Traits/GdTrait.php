@@ -15,9 +15,13 @@ trait GdTrait
 
     /**
      * 返回图片流或者图片
-     * @Author lang
-     * @Date   2020-08-14T14:29:57+0800
-     * @return void|array
+     * User: lang
+     * Date: 2023/8/4
+     * Time: 17:53
+     * @param $type
+     * @param $outfile
+     * @return false|string|string[]|void
+     * @throws PosterException
      */
     protected function returnImage($type, $outfile = true)
     {
@@ -32,6 +36,12 @@ trait GdTrait
 
             return ['url' => $this->pathname . '/' . $this->filename];
         }
+        if(PHP_SAPI === 'cli') {
+            ob_start();
+            $this->poster_type[$type]($this->im);
+            return ob_get_clean();
+        }
+
         header('Content-Type:Image/' . $this->type);
         $this->poster_type[$type]($this->im);
     }

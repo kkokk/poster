@@ -42,8 +42,15 @@ trait ImagickTrait
             }
             return ['url' => $this->pathname . '/' . $this->filename];
         }
+
+        $imageBlob = $this->im->getImageBlob();
+
+        if(PHP_SAPI === 'cli') {
+            return $imageBlob;
+        }
+
         header('Content-Type:Image/' . $type);
-        echo $this->im->getImageBlob();
+        echo $imageBlob;
     }
 
     protected function setImage($source)
