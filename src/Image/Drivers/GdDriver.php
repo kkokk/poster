@@ -17,9 +17,11 @@ class GdDriver extends Driver implements DriverInterface
 {
     use GdTrait;
 
+    private $common;
+
     function __construct()
     {
-
+        $this->common = new Common();
     }
 
     public function getData($path = '')
@@ -37,8 +39,7 @@ class GdDriver extends Driver implements DriverInterface
 
     public function getBaseData()
     {
-        $common = new Common();
-        return $common->baseData($this->im, $this->type);
+        return $this->common->baseData($this->im, $this->type);
     }
 
     public function setData()
@@ -178,12 +179,44 @@ class GdDriver extends Driver implements DriverInterface
         unset($src_y);
     }
 
+    public function getRotatedPoints($x, $y, $angle)
+    {
+        $theta = deg2rad($angle);
+        $cs = cos($theta);
+        $sn = sin($theta);
+        $newX = $x * $cs - $y * $sn;
+        $newY = $x * $sn + $y * $cs;
+        return array($newX, $newY);
+    }
+
+    public function matrix_multiply($matrix1, $matrix2)
+    {
+        $result = array();
+        for ($i = 0; $i < 3; $i++) {
+            for ($j = 0; $j < 3; $j++) {
+                $sum = 0;
+                for ($k = 0; $k < 3; $k++) {
+                    $sum += $matrix1[$i][$k] * $matrix2[$k][$j];
+                }
+                $result[$i][$j] = $sum;
+            }
+        }
+        return $result;
+    }
+
     /**
      * 创建图片，合并到画布，释放内存
      */
     public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
     {
+        $angle = 0;
         if (empty($this->im)) throw new PosterException('im resources not be found');
+
+        if (is_array($src)) {
+            $angle = isset($src['angle']) ? $src['angle'] : 0;
+            $src = isset($src['src']) ? $src['src'] : '';
+            if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+        }
 
         if (strpos($src, 'http') === false) {
             $src = $this->getRealRoute($src);
@@ -260,12 +293,31 @@ class GdDriver extends Driver implements DriverInterface
                 # code...
                 break;
         }
-
         # 处理目标 x 轴
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
         $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
+
+        # 处理旋转
+        if ($angle > 0) {
+            $pic = imagerotate($pic, $angle, $this->createColorAlpha($this->im));
+            //获取旋转后的宽高
+            $newWidth = imagesx($pic);
+            $newHeight = imagesy($pic);
+            if (empty($src_w)) {
+                $bgWidth = $newWidth;
+            } else {
+                if ($newWidth != $newHeight) $bgWidth = $newWidth;
+                $src_x = ceil(($newWidth - $bgWidth) / 2);
+            }
+            if (empty($src_h)) {
+                $bgHeight = $newHeight;
+            } else {
+                if ($newWidth != $newHeight) $bgHeight = $newHeight;
+                $src_y = ceil(($newHeight - $bgHeight) / 2);
+            }
+        }
 
         //整合海报
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
@@ -451,8 +503,6 @@ class GdDriver extends Driver implements DriverInterface
                 // 分割字符串
                 $matches = preg_split($pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-                $common = new Common();
-
                 for ($i = 0; $i < count($matches); $i += 3) {
                     if (!empty($matches[$i])) {
                         $this->getNodeValue($letter, $matches[$i], $color);
@@ -461,7 +511,7 @@ class GdDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColorAlpha($this->im, $common->getNodeStyleColor($colorValue));
+                        $colorCustom = $this->createColorAlpha($this->im, $this->common->getNodeStyleColor($colorValue));
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }

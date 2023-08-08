@@ -78,11 +78,20 @@ $result = Poster::extension('gd')
         // 'font' => 'static/simkai.ttf',
         // 'dpi' => 72
     ])
-    ->buildIm(638, 826, [41, 43, 48, 127], false)
+    // ->buildIm(638, 826, [41, 43, 48, 127], false)
+    ->buildIm(638, 826, [0, 255, 255, 127], false)
     // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
     // ->buildImage('static/top_bg.png')
     // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png', 254, 321)
-    ->buildImage(['src' => 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 'angle' => 45], 253, 326, 0, 0, 131, 131, false, 'circle')
+    ->buildImage([
+        // 'src' => __DIR__ . '/../poster/1689560381.png',
+        'src' => 'https://img.zmtc.com/2019/1220/20191220080912614.jpg',
+        'angle' => 210
+    ], 0, src_w:360, src_h:640)
+    ->buildImage([
+        'src' => 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png',
+        'angle' => 80
+    ], 253, 326, 0, 0, 131, 131, false, 'circle')
     // ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png', 0, 655)
     // ->buildImage('https://test.acyapi.51acy.com/wechat/qrcode/poster_241.jpg',37,692,0,0,122,122)
     // ->buildText('明月几时有，把酒问青天', ['center'], 200, 20, [52, 52, 52, 2], 0, '', 1, 40)
