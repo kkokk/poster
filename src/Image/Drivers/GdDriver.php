@@ -301,7 +301,7 @@ class GdDriver extends Driver implements DriverInterface
 
         # 处理旋转
         if ($angle > 0) {
-            $pic = imagerotate($pic, $angle, $this->createColorAlpha($this->im));
+            $pic = imagerotate($pic, abs($angle % 360 - 360), $this->createColorAlpha($this->im));
             //获取旋转后的宽高
             $newWidth = imagesx($pic);
             $newHeight = imagesy($pic);

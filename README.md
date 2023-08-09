@@ -217,22 +217,28 @@ $poster->buildBg(400,526,[
 ##### **合成图片**
 
 ```php
+/**
+ * 合成图片
+ * @param string|array $src  图片地址，旋转角度
+ */
 $poster->buildImage($src,$dst_x,$dst_y,$src_x,$src_y,$src_w,$src_h,$alpha,$type); # 合成图片
 ```
 
+> 注意：旋转角度是顺时针
+
 参数说明
 
-| 变量  | 类型           | 必填 | 注释                                                         |
-| ----- | -------------- | ---- | ------------------------------------------------------------ |
-| src   | string         | 是   | 路径，支持网络图片（带http或https）                          |
-| dst_x | number\|string | 否   | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
-| dst_y | number\|string | 否   | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负 |
-| src_x | number         | 否   | 图片x轴，默认0                                               |
-| src_y | number         | 否   | 图片y轴，默认0                                               |
-| src_w | number         | 否   | 图片自定义宽，默认原宽                                       |
-| src_h | number         | 否   | 图片自定义高，默认原高                                       |
-| alpha | boolean        | 否   | 是否透明，true：是                                           |
-| type  | string         | 否   | 图片变形类型，正常形状：'normal'，圆形：'circle' ，默认normal |
+| 变量  | 类型             | 必填 | 注释                                                                                       |
+| ----- |----------------|----|------------------------------------------------------------------------------------------|
+| src   | string\|array  | 是   | ['src'=> $src, 'angle'=> $angle] <br> $src: 路径，支持网络图片（带http或https）<br>$angle: 旋转角度，顺时针旋转 |
+| dst_x | number\|string | 否  | 画布位置x 特殊值 center 居中，居中并向左偏移 ['center',-5]， 居中并向右偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负    |
+| dst_y | number\|string | 否  | 画布位置y 特殊值 center 居中，居中并向上偏移 ['center',-5]， 居中并向下偏移 ['center',5]； 支持百分比20% 支持自定义  支持正负    |
+| src_x | number         | 否  | 图片x轴，默认0                                                                                 |
+| src_y | number         | 否  | 图片y轴，默认0                                                                                 |
+| src_w | number         | 否  | 图片自定义宽，默认原宽                                                                              |
+| src_h | number         | 否  | 图片自定义高，默认原高                                                                              |
+| alpha | boolean        | 否  | 是否透明，true：是                                                                              |
+| type  | string         | 否  | 图片变形类型，正常形状：'normal'，圆形：'circle' ，默认normal                                               |
 
 ##### **批量合成图片**
 
