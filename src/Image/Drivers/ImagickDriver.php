@@ -150,7 +150,14 @@ class ImagickDriver extends Driver implements DriverInterface
 
     public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
     {
+        $angle = 0;
         if (empty($this->im)) throw new PosterException('im resources not be found');
+
+        if (is_array($src)) {
+            $angle = isset($src['angle']) ? $src['angle'] : 0;
+            $src = isset($src['src']) ? $src['src'] : '';
+            if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+        }
 
         if (strpos($src, 'http') === false) {
             $src = $this->getRealRoute($src);
@@ -206,6 +213,14 @@ class ImagickDriver extends Driver implements DriverInterface
 
         // 裁剪图片
         $this->cropImage($pic, $src_x, $src_y);
+
+
+        # 处理旋转
+        if ($angle > 0) {
+            $pic->rotateimage($this->createColorAlpha(), $angle);
+        }
+
+
         // 合并图片
         if($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
