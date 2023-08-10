@@ -44,7 +44,7 @@ class CaptchaGenerator
 
     public function imOutput($im, $type = 'png', $quality = 75, $filename = 'im')
     {
-        $yes = 1; // 控制是否生成图片，测试时方便查看
+        $yes = 0; // 控制是否生成图片，测试时方便查看
         $dir = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
         return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
     }
