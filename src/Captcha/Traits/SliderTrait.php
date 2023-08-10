@@ -446,6 +446,6 @@ trait SliderTrait
 
     protected function getImBg()
     {
-        return __DIR__ . '/../../style/slider_bg/layer0' . mt_rand(1, 3) . '.jpg';
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'slider_bg' . DIRECTORY_SEPARATOR . 'layer0' . mt_rand(1, 3) . '.jpg';
     }
 }

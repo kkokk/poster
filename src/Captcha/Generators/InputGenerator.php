@@ -22,7 +22,7 @@ class InputGenerator extends CaptchaGenerator implements CaptchaGeneratorInterfa
         'im_type' => 'png', // png 默认 jpg quality 质量
         'quality' => 80,    // jpg quality 质量
         'type' => 'number', // type = number 数字 alpha_num 字母和数字 math 计算 text 文字
-        'font_family' => __DIR__ . '/../../style/simkai.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件
+        'font_family' => __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件
         'font_size' => 32, // 字体大小
         'font_count' => 4,  // 字体长度
         'line_count' => 5,  // 干扰线数量

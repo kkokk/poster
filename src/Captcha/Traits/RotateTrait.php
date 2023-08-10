@@ -65,6 +65,6 @@ trait RotateTrait
 
     protected function getImBg()
     {
-        return __DIR__ . '/../../style/rotate_bg/rotate0' . mt_rand(1, 5) . '.jpg';
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'rotate_bg' . DIRECTORY_SEPARATOR . 'rotate0' . mt_rand(1, 5) . '.jpg';
     }
 }

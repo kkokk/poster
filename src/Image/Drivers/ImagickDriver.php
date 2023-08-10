@@ -45,6 +45,11 @@ class ImagickDriver extends Driver implements DriverInterface
         return $common->baseData($this->im->getImageBlob(), $this->type);
     }
 
+    public function getIm()
+    {
+        return $this->im;
+    }
+
     public function setData()
     {
         $this->setDPI();
@@ -159,10 +164,6 @@ class ImagickDriver extends Driver implements DriverInterface
             if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
         }
 
-        if (strpos($src, 'http') === false) {
-            $src = $this->getRealRoute($src);
-        }
-
         $pic = $this->createImagick($src);
 
         $Width = $pic->getImageWidth();
@@ -175,12 +176,14 @@ class ImagickDriver extends Driver implements DriverInterface
             case 'normal':
                 # 自定义宽高的时候
                 if (!empty($src_w) && !empty($src_h)) {
-                    $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true);
+                    // $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true); // 等比缩放
+                    $pic->scaleImage($bgWidth, $bgHeight);
                 }
                 break;
             case 'circle':
                 if (!empty($src_w) && !empty($src_h)) {
-                    $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true);
+                    // $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true); // 等比缩放
+                    $pic->scaleImage($bgWidth, $bgHeight);
                 }
                 // 创建一个圆形遮罩图片
 

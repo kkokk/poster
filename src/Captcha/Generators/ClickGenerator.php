@@ -25,7 +25,7 @@ class ClickGenerator extends CaptchaGenerator implements CaptchaGeneratorInterfa
         'bg_width' => 256,
         'bg_height' => 256,
         'type' => 'text', // text 汉字 number 数字 alpha_num 字母和数字
-        'font_family' => __DIR__ . '/../../style/zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
+        'font_family' => __DIR__ . DIRECTORY_SEPARATOR .'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'zhankukuheiti.ttf', // 感谢站酷提供免费商用站酷库黑体、可自定义炫酷字体文件（绝对路径）
         'contents' => '',   // 自定义文字
         'font_size' => 42,  // 字体大小
         'font_count' => 0,  // 字体大小

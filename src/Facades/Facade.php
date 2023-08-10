@@ -18,6 +18,7 @@ abstract class Facade
         'cache' => \Kkokk\Poster\Cache\Repository::class,
         'poster' => \Kkokk\Poster\Image\PosterManager::class,
         'captcha' => \Kkokk\Poster\Lang\Captcha::class,
+        'html' => \Kkokk\Poster\Html\HtmlManager::class,
     ];
 
     protected static function getInstance()

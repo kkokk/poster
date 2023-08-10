@@ -9,6 +9,7 @@
 namespace Kkokk\Poster\Image\Traits;
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Html\Drivers\DriverInterface;
 
 trait GdTrait
 {
@@ -32,9 +33,9 @@ trait GdTrait
                 $this->filename = $this->filename . '.' . $this->type;
             }
 
-            $this->poster_type[$type]($this->im, $this->path . $this->pathname . '/' . $this->filename);
+            $this->poster_type[$type]($this->im, $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
 
-            return ['url' => $this->pathname . '/' . $this->filename];
+            return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
         if(PHP_SAPI === 'cli') {
             ob_start();
@@ -58,6 +59,43 @@ trait GdTrait
         }
 
         throw new PosterException("source not found {$source}");
+    }
+
+    public function createImage($src = '')
+    {
+        if($src instanceof DriverInterface) {
+            return $this->returnImageInfoByBlob($src->getImageBlob());
+        } elseif(strpos($src, 'http') === 0 || file_exists($src)) {
+            return $this->returnImageInfoBySrc($src);
+        } else {
+            return $this->returnImageInfoByBlob($src);
+        }
+    }
+
+    public function returnImageInfoByBlob($blob)
+    {
+        list($width, $height) = @getimagesizefromstring($blob);
+        $pic = imagecreatefromstring($blob);
+        return [$pic, $width, $height];
+    }
+
+    public function returnImageInfoBySrc($src)
+    {
+        list($width, $height, $bgType) = @getimagesize($src);
+
+        $bgType = image_type_to_extension($bgType, false);
+
+        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+
+        $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
+        if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
+            $pic = imagecreatefromstring(file_get_contents($src));
+        } else {
+            $fun = 'imagecreatefrom' . $bgType;
+            $pic = @$fun($src);
+        }
+
+        return [$pic, $width, $height];
     }
 
     /**

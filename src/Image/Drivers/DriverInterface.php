@@ -52,6 +52,15 @@ interface DriverInterface
     public function setData();
 
     /**
+     * 获取 Im 实例
+     * User: lang
+     * Date: 2023/8/10
+     * Time: 16:16
+     * @return mixed
+     */
+    public function getIm();
+
+    /**
      * 创建画布
      * Author: lang
      * Email: 732853989@qq.com

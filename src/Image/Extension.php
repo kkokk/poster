@@ -74,6 +74,11 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->getBaseData();
     }
 
+    public function getIm($query)
+    {
+        return $this->getDriverInstance($query)->getIm();
+    }
+
     public function query()
     {
         return new Builder(

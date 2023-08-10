@@ -129,4 +129,14 @@ interface ExtensionInterface
      * @return string
      */
     public function baseData($query);
+
+    /**
+     * 获取 im 对象
+     * User: lang
+     * Date: 2023/8/10
+     * Time: 16:00
+     * @param $query
+     * @return mixed
+     */
+    public function getIm($query);
 }

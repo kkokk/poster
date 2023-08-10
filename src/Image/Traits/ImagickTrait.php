@@ -10,6 +10,7 @@ namespace Kkokk\Poster\Image\Traits;
 
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Html\Drivers\DriverInterface;
 
 trait ImagickTrait
 {
@@ -35,17 +36,17 @@ trait ImagickTrait
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $type;
             }
-            if($type == 'gif') {
-                $this->im->writeImages($this->path . $this->pathname . '/' . $this->filename, true);
+            if ($type == 'gif') {
+                $this->im->writeImages($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename, true);
             } else {
-                $this->im->writeImage($this->path . $this->pathname . '/' . $this->filename);
+                $this->im->writeImage($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
             }
-            return ['url' => $this->pathname . '/' . $this->filename];
+            return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
 
         $imageBlob = $this->im->getImageBlob();
 
-        if(PHP_SAPI === 'cli') {
+        if (PHP_SAPI === 'cli') {
             return $imageBlob;
         }
 
@@ -61,7 +62,7 @@ trait ImagickTrait
         }
 
         if (!empty($source)) {
-            if($this->type =='gif') return $this->im->writeImages($source, true);
+            if ($this->type == 'gif') return $this->im->writeImages($source, true);
             return $this->im->writeImage($source);
         }
 
@@ -94,12 +95,16 @@ trait ImagickTrait
     {
         $Imagick = new \Imagick();
         if ($src) {
-            if (strpos($src, 'http') === 0) {
+            if ($src instanceof DriverInterface) {
+                $Imagick->readImageBlob($src->getImageBlob());
+            } elseif (strpos($src, 'http') === 0 ) {
                 $stream = @file_get_contents($src, NULL);
                 if (empty($stream)) throw new PosterException('image resources cannot be empty (' . $src . ')');
                 $Imagick->readImageBlob($stream);
+            } elseif(file_exists($src)) {
+                $Imagick->readImage($this->getRealRoute($src));
             } else {
-                $Imagick->readImage($src);
+                $Imagick->readImageBlob($src);
             }
 
         }
@@ -223,28 +228,29 @@ trait ImagickTrait
                 break;
         }
 
-        if($rgbaCount<3) {
+        if ($rgbaCount < 3) {
             $this->linearGradient($source, $rgbaColor, $rgbaCount, $w, $h);
         } else {
 
             $picKey = 0;
-            $chunk = ceil($h / ($rgbaCount-1));
+            $chunk = ceil($h / ($rgbaCount - 1));
             foreach ($rgbaColor as $k => $v) {
 
-                if($k == $rgbaCount - 1) break;
+                if ($k == $rgbaCount - 1) break;
 
                 $picsC = $this->createIm($w, $chunk, [], true);
 
-                $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k+1]], $rgbaCount, $w, $chunk);
+                $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
 
                 $source->compositeImage($picsC, ($this->im)::COMPOSITE_DEFAULT, 0, $k * $chunk);
 
-                $picKey ++;
+                $picKey++;
             }
         }
     }
 
-    public function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h) {
+    public function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
+    {
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb1");
@@ -285,7 +291,7 @@ trait ImagickTrait
                 continue;
             }
 
-            if(!empty($v['color'])){
+            if (!empty($v['color'])) {
                 $draw->setFillColor($v['color']);
             } else {
                 $draw->setFillColor($color);
@@ -323,32 +329,32 @@ trait ImagickTrait
         $draw = $this->createImagickDraw();
         $draw->setFillColor($this->createColorAlpha([255, 255, 255, 1]));
 
-        if($leftTopRadius == $rightTopRadius && $leftTopRadius == $leftBottomRadius && $leftTopRadius == $rightBottomRadius) {
+        if ($leftTopRadius == $rightTopRadius && $leftTopRadius == $leftBottomRadius && $leftTopRadius == $rightBottomRadius) {
             // 搞一个长方形
             $draw->roundRectangle(0, 0, $w, $h, $leftTopRadius, $leftTopRadius);
         } else {
             // 中间两个长方形填满
-            $draw->rectangle(max($leftTopRadius, $leftBottomRadius)*2, 0, $w - max($rightTopRadius, $rightBottomRadius)*2, $h);
-            $draw->rectangle(0, max($leftTopRadius, $rightTopRadius)*2, $w, $h - max($leftBottomRadius, $rightBottomRadius)*2);
+            $draw->rectangle(max($leftTopRadius, $leftBottomRadius) * 2, 0, $w - max($rightTopRadius, $rightBottomRadius) * 2, $h);
+            $draw->rectangle(0, max($leftTopRadius, $rightTopRadius) * 2, $w, $h - max($leftBottomRadius, $rightBottomRadius) * 2);
 
             // 左上角为 圆角
-            $draw->rectangle(0, $leftTopRadius, max($leftTopRadius, $leftBottomRadius)*2, max($leftTopRadius, $rightTopRadius)*2);
-            $draw->rectangle($leftTopRadius, 0, max($leftTopRadius, $leftBottomRadius)*2, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->rectangle(0, $leftTopRadius, max($leftTopRadius, $leftBottomRadius) * 2, max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle($leftTopRadius, 0, max($leftTopRadius, $leftBottomRadius) * 2, max($leftTopRadius, $rightTopRadius) * 2);
             $draw->ellipse($leftTopRadius, $leftTopRadius, $leftTopRadius, $leftTopRadius, 0, 360);
 
             // 右上角为 圆角
-            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius)*2, 0, $w - $rightTopRadius, max($leftTopRadius, $rightTopRadius)*2);
-            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius)*2, $rightTopRadius, $w, max($leftTopRadius, $rightTopRadius)*2);
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, 0, $w - $rightTopRadius, max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, $rightTopRadius, $w, max($leftTopRadius, $rightTopRadius) * 2);
             $draw->ellipse($w - $rightTopRadius, $rightTopRadius, $rightTopRadius, $rightTopRadius, 0, 360);
 
             // 右下角为 圆角
-            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius)*2, $h - max($rightBottomRadius, $leftBottomRadius)*2, $w, $h - $rightBottomRadius);
-            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius)*2, $h - max($rightBottomRadius, $leftBottomRadius)*2, $w - $rightBottomRadius, $h);
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2, $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w, $h - $rightBottomRadius);
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2, $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w - $rightBottomRadius, $h);
             $draw->ellipse($w - $rightBottomRadius, $h - $rightBottomRadius, $rightBottomRadius, $rightBottomRadius, 0, 360);
 
             // 左下角为 圆角
-            $draw->rectangle(0, $h - max($rightBottomRadius, $leftBottomRadius)*2, max($leftTopRadius, $leftBottomRadius)*2, $h - $leftBottomRadius);
-            $draw->rectangle($leftBottomRadius, $h - max($rightBottomRadius, $leftBottomRadius)*2, max($leftTopRadius, $leftBottomRadius)*2, $h);
+            $draw->rectangle(0, $h - max($rightBottomRadius, $leftBottomRadius) * 2, max($leftTopRadius, $leftBottomRadius) * 2, $h - $leftBottomRadius);
+            $draw->rectangle($leftBottomRadius, $h - max($rightBottomRadius, $leftBottomRadius) * 2, max($leftTopRadius, $leftBottomRadius) * 2, $h);
             $draw->ellipse($leftBottomRadius, $h - $leftBottomRadius, $leftBottomRadius, $leftBottomRadius, 0, 360);
         }
 
