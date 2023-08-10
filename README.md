@@ -2,7 +2,9 @@
 
 #### 介绍
 
-**基于 gd、imagick、phpqrcode**
+**得益于 gd、imagick、phpqrcode、wkhtmltopdf**
+
+**主要为了封装一个生成图片便捷的插件，非常感谢使用到的所有工具背后开发者的贡献**
 
 PHP海报生成插件，极速生成方便快捷。
 
@@ -63,7 +65,7 @@ lang
 
 ​	生成签到日历海报、邀请海报
 
-#### **引用海报类**
+#### **生成海报**
 
 注意：没有特别说明，统一都是px。
 
@@ -461,7 +463,185 @@ $qr = PosterManager::Poster()->Qr('http://www.520yummy.com','poster/1.png'); # �
 
 返回说明：outfile 为空，输出二维码图片，不生成文件；否则返回图片路径。
 
-#### 验证码使用说明
+#### HTML转图片、PDF
+
+> 需要安装 wkhtmltopdf 工具，下载地址 https://wkhtmltopdf.org/downloads.html
+>
+> 注意：css 以 -webkit 标准执行
+
+##### **调用Html类**
+
+```php
+use Kkokk\Poster\Facades\Html;
+```
+
+##### **加载html**
+
+```php
+$html = <<<eol
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>你好</title>
+    <style>
+      html, body{
+        margin: 0;
+        padding: 0;
+      }
+      .app {
+        width: 338px;
+        height: 426px;
+        background: -webkit-linear-gradient(top left,red, orange, yellow, green, blue, purple);
+        border-radius: 40px;
+      }
+      h1{
+        margin: 0;
+        text-align: center;
+      }
+    </style>
+</head>
+<body>
+  <div class="app">
+    <h1>你好，世界</h1>
+  </div>
+</body>
+</html>
+eol;
+/**
+ * @param string $html html文件路径、链接、html字符串 
+ */
+$html = Html::load($html);
+```
+
+##### **输出类型**
+
+```php
+/**
+ * @param string $type 默认png，值范围为常规图片类型，PDF
+ */
+$html->type($type);
+```
+
+##### **工具原生命令**
+
+```php
+/**
+ * @param string $command 工具原生命令 如 --version
+ */
+$html->command($command);
+```
+
+##### **设置尺寸**
+
+```php
+/**
+ * @param int $width 指定宽度
+ * @param int $height 指定高度
+ */
+$html->size($width, $height);
+```
+
+##### **剪裁**
+
+```php
+/**
+ * @param int $crop_w 剪裁宽度
+ * @param int $crop_h 剪裁高度
+ * @param int $crop_x 从x点开始剪裁
+ * @param int $crop_y 从y点开始剪裁
+ */
+$html->crop($crop_w, $crop_h, $crop_x, $crop_y);
+```
+
+##### **设置背景透明**
+
+```php
+$html->transparent();
+```
+
+##### **设置图片质量**
+
+```php
+/**
+ * @param int $quality 0-100
+ */
+$html->quality($quality)
+```
+
+##### **设置输出地址**
+
+```php
+/**
+ * @param string $path 指定保存文件路径，包含文件名
+ * @param string $type 默认png 这里和type方法一致
+ */
+$html->output($path, $type);
+```
+
+##### **渲染**
+
+```php
+/**
+ * @return Html Html对象
+ */
+$htmlObj = $html->render();
+```
+
+##### **获取二进制流**
+
+```php
+$blob = $htmlObj->getImageBlob();
+```
+
+##### **获取保存文件**
+
+```php
+$file = $htmlObj->output;
+```
+
+##### **完整示例**
+
+```php
+use Kkokk\Poster\Facades\Html;
+
+$htmlObj = Html::load($html)->transparent()->size(338, 426)->render();
+
+// 流文件
+$blob = $htmlObj->getImageBlob();
+// 文件地址
+$file = $htmlObj->output;
+
+```
+
+##### 和生成海报的合成图片配合使用
+
+```php
+use Kkokk\Poster\Facades\Poster;
+use Kkokk\Poster\Facades\Html;
+
+// $html 用上面的代码这里省略...
+Poster::extension('gd')
+    ->buildIm(638, 826, [41, 43, 48, 127], false)
+    ->buildImage([
+        'src' => Html::load($html)->transparent()->size(338, 426)->render()->getImageBlob(),
+        'angle' => 0
+    ], 'center', 'center')
+    ->buildImage([
+        'src' => 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png',
+        'angle' => 80
+    ], 253, 326, 0, 0, 131, 131, false, 'circle')
+    ->buildText('苏轼', 'center', 477, 16, [255, 255, 255, 1])
+    ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。', 'center', 515, 14, [255, 255, 255, 1])
+    ->stream();
+
+// 以上将把 wkhtmltopdf 生成的图片合成到海报中，并输出为流文件
+```
+
+#### 生成验证码图片
 
 ##### 滑块图片验证
 
