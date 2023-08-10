@@ -47,6 +47,10 @@ class GdDriver extends Driver implements DriverInterface
         return $this->setImage($this->source);
     }
 
+    public function getIm()
+    {
+        return $this->im;
+    }
     /**
      * 创建指定宽高，颜色，透明的画布
      */
@@ -218,23 +222,7 @@ class GdDriver extends Driver implements DriverInterface
             if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
         }
 
-        if (strpos($src, 'http') === false) {
-            $src = $this->getRealRoute($src);
-        }
-
-        list($Width, $Height, $bgType) = @getimagesize($src);
-
-        $bgType = image_type_to_extension($bgType, false);
-
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
-
-        $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
-        if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
-            $pic = imagecreatefromstring(file_get_contents($src));
-        } else {
-            $fun = 'imagecreatefrom' . $bgType;
-            $pic = @$fun($src);
-        }
+        list($pic, $Width, $Height) = $this->createImage($src);
 
         $bgWidth = !empty($src_w) ? $src_w : $Width;
         $bgHeight = !empty($src_h) ? $src_h : $Height;

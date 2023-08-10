@@ -7,7 +7,7 @@
  */
 
 namespace Kkokk\Poster\Image\Drivers;
-require_once(__DIR__ . '/../../PHPQrcode/phpqrcode.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
 
 use Kkokk\Poster\Exception\PosterException;
 
@@ -32,7 +32,7 @@ class Driver
     protected $path;
 
     /** @var string 设置字体 */
-    protected $font = __DIR__ . '/../../style/simkai.ttf';
+    protected $font = __DIR__ . DIRECTORY_SEPARATOR .'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
     /** @var string 字体系列 例如 Microsoft YaHei */
     protected $font_family = '';
     /** @var int 字体大小 */
@@ -110,12 +110,12 @@ class Driver
     {
         $path = is_array($path) ? $path : [$path];
         $pathFileName = isset($path[0]) ? $path[0] : '';
-        $pathFileName = str_replace(['\\', '/'], '/', $pathFileName);
+        $pathFileName = str_replace(['\\', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
 
         $fileName = $pathFileName ?: time();
-        if (strripos($pathFileName, '/') !== false) {
+        if (strripos($pathFileName, DIRECTORY_SEPARATOR) !== false) {
             $this->setPathName($pathFileName);
-            $fileName = substr($pathFileName, strripos($pathFileName, '/') + 1);
+            $fileName = substr($pathFileName, strripos($pathFileName, DIRECTORY_SEPARATOR) + 1);
         }
         $this->setFileName($fileName);
         $this->setPath($pathFileName);
@@ -146,7 +146,7 @@ class Driver
      */
     public function setPathName($pathFileName)
     {
-        $this->pathname = substr($pathFileName, 0, strripos($pathFileName, '/'));
+        $this->pathname = substr($pathFileName, 0, strripos($pathFileName, DIRECTORY_SEPARATOR));
     }
 
     /**
@@ -160,7 +160,7 @@ class Driver
         // 绝对路径 or 相对路径
         $absolute = $this->isAbsolute($pathFileName);
         $this->path = $this->getDocumentRoot();
-        $this->path = $absolute ? '' : ($this->path ? $this->path : __DIR__ . '/../../../tests/');
+        $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '.. ' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -172,7 +172,7 @@ class Driver
     {
         $documentRoot = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
 
-        return $documentRoot ? $documentRoot . '/' : '';
+        return $documentRoot ? $documentRoot . DIRECTORY_SEPARATOR : '';
     }
 
     /**
@@ -189,14 +189,14 @@ class Driver
         // 区分WIN系统绝对路径、暂时只区分linux win mac
         switch (PHP_OS) {
             case 'Darwin':
-                $absolute = stripos($pathFileName, '/') === 0 ?: false;
+                $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
                 break;
             case 'linux':
             default:
                 if (stripos(PHP_OS, 'WIN') !== false) {
                     $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
                 } else {
-                    $absolute = stripos($pathFileName, '/') === 0 ?: false;
+                    $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
                 }
                 break;
         }

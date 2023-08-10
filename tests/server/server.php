@@ -51,7 +51,7 @@ $startAt = microtime(true);
 //     ->buildText($msg2, ['center'], 200, 20, [52, 52, 52, 1], 300, '', 1, 0)
 //     ->getPoster();
 // 验证码
-// $result = Captcha::get();
+// $result = Captcha::type('click')->get();
 // echo <<<EOF
 //     <img src="{$result['img']}" >
 // EOF;

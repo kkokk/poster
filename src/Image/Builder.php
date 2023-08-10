@@ -204,6 +204,12 @@ class Builder
         return $this->extension->baseData($query);
     }
 
+    public function getIm()
+    {
+        $query = $this->query->getQuery();
+        return $this->extension->getIm($query);
+    }
+
     protected function setImages(...$params)
     {
         $this->images[] = $params;
