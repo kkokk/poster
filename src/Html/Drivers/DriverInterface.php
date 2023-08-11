@@ -12,4 +12,6 @@ interface DriverInterface
     public function render($query);
 
     public function getImageBlob();
+
+    public function getFilePath();
 }

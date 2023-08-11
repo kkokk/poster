@@ -167,6 +167,11 @@ class WkDriver extends Driver implements DriverInterface
         return file_get_contents($this->output);
     }
 
+    public function getFilePath()
+    {
+        return $this->output;
+    }
+
     function __destruct()
     {
         $this->tmp && @unlink($this->output);

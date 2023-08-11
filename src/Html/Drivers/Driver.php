@@ -19,5 +19,5 @@ class Driver
      * 输出地址
      * @var string
      */
-    public $output;
+    protected $output;
 }
