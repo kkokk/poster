@@ -62,6 +62,9 @@ class CaptchaGenerator
         } catch (PosterException $e) {
             // 如果未定义缓存器则返回false, 需要传递自行保存的密码进行比对
             return false;
+        } catch (\Exception $e) {
+            // 报错，则返回false, 需要传递自行保存的密码进行比对
+            return false;
         }
         return $contents;
     }
