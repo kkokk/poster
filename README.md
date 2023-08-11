@@ -600,7 +600,7 @@ $blob = $htmlObj->getImageBlob();
 ##### **获取保存文件**
 
 ```php
-$file = $htmlObj->output;
+$file = $htmlObj->getFilePath();
 ```
 
 ##### **完整示例**
@@ -613,7 +613,7 @@ $htmlObj = Html::load($html)->transparent()->size(338, 426)->render();
 // 流文件
 $blob = $htmlObj->getImageBlob();
 // 文件地址
-$file = $htmlObj->output;
+$file = $htmlObj->getFilePath();
 
 ```
 
