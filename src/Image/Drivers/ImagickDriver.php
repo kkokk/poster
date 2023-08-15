@@ -466,11 +466,11 @@ class ImagickDriver extends Driver implements DriverInterface
         }
     }
 
-    public function CopyQr($text, $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
+    public function CopyQr($text, $level = 'L', $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $qr = \QRcode::re_png($text, $size, $margin);
+        $qr = \QRcode::re_png($text, $level, $size, $margin);
 
         $bgWidth = imagesx($qr);
         $bgHeight = imagesy($qr);

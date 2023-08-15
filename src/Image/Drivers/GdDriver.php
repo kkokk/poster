@@ -51,6 +51,7 @@ class GdDriver extends Driver implements DriverInterface
     {
         return $this->im;
     }
+
     /**
      * 创建指定宽高，颜色，透明的画布
      */
@@ -677,11 +678,11 @@ class GdDriver extends Driver implements DriverInterface
      * @param  [type]                   $src_x  [description]
      * @param  [type]                   $src_y  [description]
      */
-    public function CopyQr($text, $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
+    public function CopyQr($text, $level = 'L', $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $result = \QRcode::re_png($text, $size, $margin);
+        $result = \QRcode::re_png($text, $level, $size, $margin);
         if ($src_w > 0) {
 
             $bgWidth = $src_w;
