@@ -135,9 +135,9 @@ class Builder
         return $this;
     }
 
-    public function buildQr($text, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $size = 4, $margin = 1)
+    public function buildQr($text, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $size = 4, $margin = 1, $level = 'L')
     {
-        $this->setQrs($text, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
+        $this->setQrs($text, $level, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
         return $this;
     }
 
@@ -152,7 +152,8 @@ class Builder
             $value['src_h'] = isset($value['src_h']) ? $value['src_h'] : 0;
             $value['size'] = isset($value['size']) ? $value['size'] : 4;
             $value['margin'] = isset($value['margin']) ? $value['margin'] : 1;
-            $this->setQrs($value['text'], $value['size'], $value['margin'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h']);
+            $value['level'] = isset($value['level']) ? $value['level'] : 'L';
+            $this->setQrs($value['text'], $value['level'], $value['size'], $value['margin'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h']);
         }
         return $this;
     }
