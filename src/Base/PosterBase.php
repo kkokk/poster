@@ -1651,11 +1651,11 @@ class PosterBase
      * @param  [type]                   $src_x  [description]
      * @param  [type]                   $src_y  [description]
      */
-    protected function CopyQr($text, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
+    protected function CopyQr($text, $level, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h)
     {
         if (empty($this->im)) throw new PosterException('im resources not be found');
 
-        $result = \QRcode::re_png($text, $size, $margin);
+        $result = \QRcode::re_png($text, $level, $size, $margin);
         if ($src_w > 0) {
 
             $bgWidth = $src_w;

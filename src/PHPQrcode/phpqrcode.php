@@ -3103,10 +3103,10 @@
         }
 
         //----------------------------------------------------------------------
-        public static function re_png($text, $outfile = false, $level = QR_ECLEVEL_L, $size = 3, $margin = 4, $saveAndPrint=false) 
+        public static function re_png($text, $level = QR_ECLEVEL_L, $size = 3, $margin = 4)
         {
             $enc = QRencode::factory($level, $size, $margin);
-            return $enc->re_encodePNG($text, $outfile, $saveAndPrint=false);
+            return $enc->re_encodePNG($text);
         }
 
         //----------------------------------------------------------------------
@@ -3323,7 +3323,7 @@
             }
         }
 
-        public function re_encodePNG($intext, $outfile = false,$saveAndPrint=false) 
+        public function re_encodePNG($intext, $outfile = false)
         {
             try {
             
@@ -3337,7 +3337,7 @@
                 
                 $maxSize = (int)(QR_PNG_MAXIMUM_SIZE / (count($tab)+2*$this->margin));
                 
-                return QRimage::re_png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveAndPrint);
+                return QRimage::re_png($tab, min(max(1, $this->size), $maxSize), $this->margin);
             
             } catch (Exception $e) {
             

@@ -48,7 +48,7 @@ interface MyPoster
 
     public function buildTextMany($arr = []);
 
-    public function buildQr($text, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $size = 4, $margin = 1);
+    public function buildQr($text, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $size = 4, $margin = 1, $level = 'L');
 
     public function buildQrMany($arr = []);
 
