@@ -83,9 +83,9 @@ trait GdTrait
     {
         list($width, $height, $bgType) = @getimagesize($src);
 
-        $bgType = image_type_to_extension($bgType, false);
-
         if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+
+        $bgType = image_type_to_extension($bgType, false);
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
         if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
