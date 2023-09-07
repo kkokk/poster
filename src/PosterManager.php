@@ -61,17 +61,17 @@ class PosterManager
 
     private static function buildConnector()
     {
-        if (!isset(self::$connector)) {
+        if (!isset(self::$connector[self::$className])) {
 
             if (!class_exists(self::$className)) {
                 throw new SystemException("the class name does not exist . class : " . self::$className);
             }
             if (empty(self::$options)) {
-                self::$connector = new self::$className(self::$options);
+                self::$connector[self::$className] = new self::$className(self::$options);
             } else {
-                self::$connector = new self::$className(...self::$options);
+                self::$connector[self::$className] = new self::$className(...self::$options);
             }
         }
-        return self::$connector;
+        return self::$connector[self::$className];
     }
 }
