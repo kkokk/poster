@@ -109,7 +109,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         // 设置透明度，内容不透明
         if($alpha && !$contentAlpha) {
-            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $this->setImageAlpha($pic, $alphas);
         }
 
         $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
@@ -128,7 +128,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         // 设置透明度，内容也透明
         if($alpha && $contentAlpha) {
-            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $this->setImageAlpha($pic, $alphas);
         }
 
         if ($radius) {
