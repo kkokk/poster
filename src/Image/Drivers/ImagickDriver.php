@@ -357,7 +357,7 @@ class ImagickDriver extends Driver implements DriverInterface
             $dst_y = $this->calcTextDstY($dst_y, $calcFont);
 
             # 自定义间距
-            $this->fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contentsArr, $color);
+            $this->fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $contentsArr, $color);
 
             return true;
 
@@ -398,12 +398,12 @@ class ImagickDriver extends Driver implements DriverInterface
                         $dst_y += 1.75 * $fontSize;
                         continue;
                     }
-                    $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $spaceStr);
+                    $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $spaceStr);
                     $dst_x += $space;
                 }
 
             } else {
-                $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents);
+                $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $contents);
             }
         }
     }
