@@ -224,7 +224,7 @@ trait GdTrait
             $index1 = 0;
             $index2 = 1;
             $di = 0;
-            for ($j = $rgbaCount + 1; $j > 0; $j--) {
+            for ($j = $rgbaCount; $j > 0; $j--) {
 
                 if ($i >= ceil((($j - 1) * $d)) && $i <= ceil($j * $d)) {
                     $index1 = $j - 1;
@@ -233,7 +233,6 @@ trait GdTrait
                     break;
                 }
             }
-
             $colorRgb = $this->calcColor($d, $di, $rgbaColor[$index1], $rgbaColor[$index2]);
         }
 
@@ -744,8 +743,8 @@ trait GdTrait
 
         $mask = $this->createIm($w, $h, [], $alphas > 1);
 
-        for ($x = 0; $x <= $w; $x++) {
-            for ($y = 0; $y <= $h; $y++) {
+        for ($x = 0; $x < $w; $x++) {
+            for ($y = 0; $y < $h; $y++) {
                 $rgbColor = imagecolorat($pic, $x, $y);
                 $thisColor = imagecolorsforindex($pic, $rgbColor);
                 $color = $this->createColorAlpha($pic, [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);

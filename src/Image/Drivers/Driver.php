@@ -370,14 +370,15 @@ class Driver
         $imWidth = ($x1 !== null && $x2 !== null) ?
             ($x2 - $x1)
             : $this->im_w;
-        if ($dst_x === 'center') {
-            $dst_x = ceil(($imWidth - $fontBoxWidth) / 2);
+       if ($dst_x === 'center') {
+            // 如果文字宽度大于 画布宽度 则为0
+            $dst_x = ceil(max(0, ($imWidth - $fontBoxWidth)) / 2);
         } elseif (is_array($dst_x)) {
             $dst_x[1] = isset($dst_x[1]) ? $dst_x[1] : 0;
             $x1 = $x1 !== null ? $x1 : 0;
             switch ($dst_x[0]) {
                 case 'center':
-                    $dst_x = ceil(($imWidth - $fontBoxWidth) / 2) + $x1 + $dst_x[1];
+                    $dst_x = ceil(max(0, ($imWidth - $fontBoxWidth)) / 2) + $x1 + $dst_x[1];
                     break;
                 case 'left': // 左对齐 且 左右偏移
                     $dst_x = $x1 + $dst_x[1];
@@ -428,13 +429,13 @@ class Driver
             ($y2 - $y1)
             : $this->im_h;
         if ($dst_y === 'center') {
-            $dst_y = ceil(($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight);
+            $dst_y = ceil(max(0, ($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight));
         } elseif (is_array($dst_y)) {
             $dst_y[1] = isset($dst_y[1]) ? $dst_y[1] : 0;
             $y1 = $y1 !== null ? $y1 : 0;
             switch ($dst_y[0]) {
                 case 'center':
-                    $dst_y = ceil(($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight) + $y1 + $dst_y[1];
+                    $dst_y = ceil(max(0, ($imHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight)) + $y1 + $dst_y[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
                     $dst_y = $y1 + $dst_y[1];

@@ -364,4 +364,21 @@ trait ImagickTrait
         return $pic;
     }
 
+    /**
+     * 设置透明度
+     * User: lang
+     * Date: 2023/9/22
+     * Time: 11:00
+     * @param $pic
+     * @param $alphas
+     * @return void
+     */
+    protected function setImageAlpha($pic, $alphas)
+    {
+        if(method_exists($pic,'setImageOpacity')) {
+            $pic->setImageOpacity(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+        } elseif (method_exists($pic,'setImageAlpha')) {
+            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+        }
+    }
 }
