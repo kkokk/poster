@@ -187,7 +187,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 }
 
                 $pic->setImageFormat( "png" );
-                $pic->setimagematte(true); // 激活遮罩通道
+                $pic->setImageMatte(true); // 激活遮罩通道
 
                 // 创建一个圆形遮罩图片
 
