@@ -79,6 +79,24 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->getIm();
     }
 
+    public function getImInfo($query){
+        return $this->getDriverInstance($query)->getImInfo();
+    }
+
+    public function blob($query)
+    {
+        return $this->getDriverInstance($query)->blob();
+    }
+
+    public function tmp($query)
+    {
+        return $this->getDriverInstance($query)->tmp();
+    }
+
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0) {
+        return $this->query()->crop($x, $y, $width, $height);
+    }
+
     public function query()
     {
         return new Builder(

@@ -52,6 +52,16 @@ class GdDriver extends Driver implements DriverInterface
         return $this->im;
     }
 
+    public function blob()
+    {
+        return $this->getBlob($this->type, $this->im);
+    }
+
+    public function tmp()
+    {
+        return $this->getTmp($this->type, $this->im);
+    }
+
     /**
      * 创建指定宽高，颜色，透明的画布
      */
@@ -67,25 +77,8 @@ class GdDriver extends Driver implements DriverInterface
      */
     public function ImDst($source, $w = 0, $h = 0)
     {
-        // if (!is_file($source)) {
-        //     throw new PosterException('水印图像不存在');
-        // }
         $this->source = $source;
-        //获取水印图像信息
-        $info = @getimagesize($source);
-
-        if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
-            throw new PosterException('wrong source');
-        }
-
-        list($bgWidth, $bgHeight, $bgType) = $info;
-
-        $this->type = image_type_to_extension($bgType, false);
-        if (empty($this->type)) throw new PosterException('image resources cannot be empty (' . $source . ')');
-
-        //创建水印图像资源
-        $fun = 'imagecreatefrom' . $this->type;
-        $cut = @$fun($source);
+        list($cut, $bgWidth, $bgHeight) = $this->createImage($source);
 
         //设定水印图像的混色模式
         imagealphablending($cut, true);
@@ -111,14 +104,14 @@ class GdDriver extends Driver implements DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/25
      * Time: 17:55
-     * @param int $w 宽
-     * @param int $h 高
-     * @param array $rgba 背景颜色
+     * @param int   $w     宽
+     * @param int   $h     高
+     * @param array $rgba  背景颜色
      * @param false $alpha 是否透明
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $src_x
-     * @param int $src_y
+     * @param int   $dst_x
+     * @param int   $dst_y
+     * @param int   $src_x
+     * @param int   $src_y
      * @param array $query
      */
     public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
@@ -168,8 +161,12 @@ class GdDriver extends Driver implements DriverInterface
 
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
-        if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
-        if (isset($mask) && is_resource($mask)) $this->destroyImage($mask);
+        if (isset($pic) && is_resource($pic)) {
+            $this->destroyImage($pic);
+        }
+        if (isset($mask) && is_resource($mask)) {
+            $this->destroyImage($mask);
+        }
         unset($rgbaCount);
         unset($rgbaColor);
         unset($alphas);
@@ -212,15 +209,28 @@ class GdDriver extends Driver implements DriverInterface
     /**
      * 创建图片，合并到画布，释放内存
      */
-    public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
-    {
+    public function CopyImage(
+        $src,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0,
+        $alpha = false,
+        $type = 'normal'
+    ) {
         $angle = 0;
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         if (is_array($src)) {
             $angle = isset($src['angle']) ? $src['angle'] : 0;
             $src = isset($src['src']) ? $src['src'] : '';
-            if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+            if (empty($src)) {
+                throw new PosterException('image resources cannot be empty (' . $src . ')');
+            }
         }
 
         list($pic, $Width, $Height) = $this->createImage($src);
@@ -297,13 +307,17 @@ class GdDriver extends Driver implements DriverInterface
             if (empty($src_w)) {
                 $bgWidth = $newWidth;
             } else {
-                if ($newWidth != $newHeight) $bgWidth = $newWidth;
+                if ($newWidth != $newHeight) {
+                    $bgWidth = $newWidth;
+                }
                 $src_x = ceil(($newWidth - $bgWidth) / 2);
             }
             if (empty($src_h)) {
                 $bgHeight = $newHeight;
             } else {
-                if ($newWidth != $newHeight) $bgHeight = $newHeight;
+                if ($newWidth != $newHeight) {
+                    $bgHeight = $newHeight;
+                }
                 $src_y = ceil(($newHeight - $bgHeight) / 2);
             }
         }
@@ -311,9 +325,15 @@ class GdDriver extends Driver implements DriverInterface
         //整合海报
         imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
 
-        if (isset($pic) && is_resource($pic)) $this->destroyImage($pic);
-        if (isset($circle) && is_resource($circle)) $this->destroyImage($circle);
-        if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
+        if (isset($pic) && is_resource($pic)) {
+            $this->destroyImage($pic);
+        }
+        if (isset($circle) && is_resource($circle)) {
+            $this->destroyImage($circle);
+        }
+        if (isset($circle_new) && is_resource($circle_new)) {
+            $this->destroyImage($circle_new);
+        }
         unset($path);
         unset($bgWidth);
         unset($bgHeight);
@@ -326,20 +346,31 @@ class GdDriver extends Driver implements DriverInterface
      * Email: 732853989@qq.com
      * Date: 2022/12/12
      * Time: 9:52
-     * @param $src
-     * @param $dst_x
-     * @param $dst_y
-     * @param $src_x
-     * @param $src_y
-     * @param $src_w
-     * @param $src_h
-     * @param false $alpha
+     * @param        $src
+     * @param        $dst_x
+     * @param        $dst_y
+     * @param        $src_x
+     * @param        $src_y
+     * @param        $src_w
+     * @param        $src_h
+     * @param false  $alpha
      * @param string $type
      * @throws PosterException
      */
-    public function CopyMergeImage($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha = false, $type = 'normal')
-    {
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+    public function CopyMergeImage(
+        $src,
+        $dst_x,
+        $dst_y,
+        $src_x,
+        $src_y,
+        $src_w,
+        $src_h,
+        $alpha = false,
+        $type = 'normal'
+    ) {
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         if (strpos($src, 'http') === false) {
             $src = $this->getRealRoute($src);
@@ -348,7 +379,9 @@ class GdDriver extends Driver implements DriverInterface
         list($Width, $Height, $bgType) = @getimagesize($src);
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+        if (empty($bgType)) {
+            throw new PosterException('image resources cannot be empty (' . $src . ')');
+        }
 
         // if ($bgType == 'gif') {
         //     $pic = imagecreatefromstring(file_get_contents($src));
@@ -413,8 +446,12 @@ class GdDriver extends Driver implements DriverInterface
         //整合水印
         imagecopymerge($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight, 100);
 
-        if (isset($circle) && is_resource($circle)) $this->destroyImage($circle);
-        if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
+        if (isset($circle) && is_resource($circle)) {
+            $this->destroyImage($circle);
+        }
+        if (isset($circle_new) && is_resource($circle_new)) {
+            $this->destroyImage($circle_new);
+        }
     }
 
     /**
@@ -423,23 +460,37 @@ class GdDriver extends Driver implements DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/2/13
      * Time: 15:33
-     * @param $content
-     * @param $dst_x
-     * @param $dst_y
-     * @param $fontSize
-     * @param $rgba
-     * @param int $max_w
+     * @param        $content
+     * @param        $dst_x
+     * @param        $dst_y
+     * @param        $fontSize
+     * @param        $rgba
+     * @param int    $max_w
      * @param string $font
-     * @param int $weight
-     * @param int $space
+     * @param int    $weight
+     * @param int    $space
      * @return bool
      * @throws PosterException
      */
-    public function CopyText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
-    {
-        if ($content == '') return true;
+    public function CopyText(
+        $content,
+        $dst_x = 0,
+        $dst_y = 0,
+        $fontSize = null,
+        $rgba = null,
+        $max_w = null,
+        $font = null,
+        $weight = null,
+        $space = null,
+        $angle = null
+    ) {
+        if ($content == '') {
+            return true;
+        }
 
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         $fontSize = $fontSize ?: $this->font_size;
         $rgba = $rgba ?: $this->font_rgba;
@@ -477,8 +528,12 @@ class GdDriver extends Driver implements DriverInterface
         // 主动设置是否解析html标签
         if (is_array($content)) {
 
-            if (!isset($content['type'])) throw new PosterException('type is required');
-            if (!isset($content['content'])) throw new PosterException('content is required');
+            if (!isset($content['type'])) {
+                throw new PosterException('type is required');
+            }
+            if (!isset($content['content'])) {
+                throw new PosterException('content is required');
+            }
 
             $type = $content['type'];
             $content = $content['content'];
@@ -500,7 +555,8 @@ class GdDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColorAlpha($this->im, $this->common->getNodeStyleColor($colorValue));
+                        $colorCustom = $this->createColorAlpha($this->im,
+                            $this->common->getNodeStyleColor($colorValue));
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
@@ -554,7 +610,7 @@ class GdDriver extends Driver implements DriverInterface
             }
 
             $calcFont = [
-                'text_width' => max(array_values($textWidthArr)), // 取最宽行宽
+                'text_width'  => max(array_values($textWidthArr)), // 取最宽行宽
                 'text_height' => abs($fontBox[1] - $fontBox[7]),
             ];
             $dst_x = $this->calcTextDstX($dst_x, $calcFont);
@@ -590,7 +646,7 @@ class GdDriver extends Driver implements DriverInterface
                 $line === 1 && $calcSpaceRes += $calcSpace;
 
                 $calcFont = [
-                    'text_width' => max(array_values($textWidthArr)),
+                    'text_width'  => max(array_values($textWidthArr)),
                     'text_height' => abs($fontBox[1] - $fontBox[7]),
                 ];
             }
@@ -644,8 +700,18 @@ class GdDriver extends Driver implements DriverInterface
         }
     }
 
-    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
-    {
+    public function CopyArc(
+        $cx = 0,
+        $cy = 0,
+        $w = 0,
+        $h = 0,
+        $s = 0,
+        $e = 0,
+        $rgba = [],
+        $type = '',
+        $style = '',
+        $weight = 1
+    ) {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
         $color = $this->createColorAlpha($this->im, $rgba);
 
@@ -678,9 +744,21 @@ class GdDriver extends Driver implements DriverInterface
      * @param  [type]                   $src_x  [description]
      * @param  [type]                   $src_y  [description]
      */
-    public function CopyQr($text, $level = 'L', $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
-    {
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+    public function CopyQr(
+        $text,
+        $level = 'L',
+        $size = 4,
+        $margin = 1,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0
+    ) {
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         $result = \QRcode::re_png($text, $level, $size, $margin);
         if ($src_w > 0) {
@@ -727,8 +805,29 @@ class GdDriver extends Driver implements DriverInterface
 
         //整合海报
         imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
-        if (isset($circle_new) && is_resource($circle_new)) $this->destroyImage($circle_new);
-        if (isset($result) && is_resource($result)) $this->destroyImage($result);
+        if (isset($circle_new) && is_resource($circle_new)) {
+            $this->destroyImage($circle_new);
+        }
+        if (isset($result) && is_resource($result)) {
+            $this->destroyImage($result);
+        }
+    }
+
+    /**
+     * 裁剪
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 11:22
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     */
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0)
+    {
+        $this->im = imagecrop($this->im, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
+        $this->im_w = $width;
+        $this->im_h = $height;
     }
 
     public function execute($query = [], Driver $driver = null)

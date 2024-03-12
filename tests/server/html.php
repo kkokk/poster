@@ -10,6 +10,12 @@ use Kkokk\Poster\Facades\Poster;
 
 require '../../vendor/autoload.php';
 
+Poster::buildIm(300, 300, [0,0,0,127])
+    ->buildQr('https://www.baidu.com',0, 0, 0, 0, 300, 300)
+    ->buildImage('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png', 'center', 'center', 0, 0, 50, 50)
+    ->stream();
+exit;
+
 
 $html = <<<eol
 <!doctype html>

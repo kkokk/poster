@@ -13,8 +13,8 @@ use Kkokk\Poster\Exception\PosterException;
  * User: lang
  * 注意 使用的是 -webkit 语法
  * @package Kkokk\Poster\Html\Drivers
- * @class WkDriver
- * @author 73285 2023-08-10
+ * @class   WkDriver
+ * @author  73285 2023-08-10
  */
 class WkDriver extends Driver implements DriverInterface
 {
@@ -47,15 +47,28 @@ class WkDriver extends Driver implements DriverInterface
 
     public function size($width = 0, $height = 0)
     {
-        if($width && $height) $this->size = "--width " . $width . " --height " . $height;
+        if ($width) {
+            $this->size .= "--width " . $width;
+        }
+        if ($height) {
+            $this->size .= " --height " . $height;
+        }
     }
 
     public function crop($crop_w = 0, $crop_h = 0, $crop_x = 0, $crop_y = 0)
     {
-        if($crop_w) $this->crop .= " --crop-w " . $crop_w;
-        if($crop_h) $this->crop .= " --crop-h " . $crop_h;
-        if($crop_x) $this->crop .= " --crop-x " . $crop_x;
-        if($crop_y) $this->crop .= " --crop-y " . $crop_y;
+        if ($crop_w) {
+            $this->crop .= " --crop-w " . $crop_w;
+        }
+        if ($crop_h) {
+            $this->crop .= " --crop-h " . $crop_h;
+        }
+        if ($crop_x) {
+            $this->crop .= " --crop-x " . $crop_x;
+        }
+        if ($crop_y) {
+            $this->crop .= " --crop-y " . $crop_y;
+        }
     }
 
     public function quality($quality)
@@ -68,13 +81,17 @@ class WkDriver extends Driver implements DriverInterface
     public function setType($type)
     {
         $this->type = strtolower($type);
-        if($this->type == 'pdf') $this->driver = 'wkhtmltopdf';
+        if ($this->type == 'pdf') {
+            $this->driver = 'wkhtmltopdf';
+        }
     }
 
     public function output($path, $type = '')
     {
         $this->output = $path;
-        if($type) $this->setType($type);
+        if ($type) {
+            $this->setType($type);
+        }
     }
 
     public function setTransparent($transparent = true)
@@ -92,12 +109,12 @@ class WkDriver extends Driver implements DriverInterface
      */
     public function setCommand($command)
     {
-        $this->command = $command;
+        $this->command .= ' ' . $command;
     }
 
     private function tmp()
     {
-        $this->output = dirname(dirname(dirname(__FILE__)))  . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . uniqid('html') . '.png';
+        $this->output = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . uniqid('html') . '.png';
         $this->tmp = true;
     }
 
@@ -136,26 +153,32 @@ class WkDriver extends Driver implements DriverInterface
         }
 
         $check = exec($this->driver . ' --version');
-        if(empty($check)) throw new PosterException('Please install ' . $this->driver);
+        if (empty($check)) {
+            throw new PosterException('Please install ' . $this->driver);
+        }
 
 
-        if(preg_match('/<[^>]*>/', $this->html))
-        {
-            $this->tmpHtmlPath = dirname(dirname(dirname(__FILE__)))  . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . uniqid('html') . '.html';
+        if (preg_match('/<[^>]*>/', $this->html)) {
+            $this->tmpHtmlPath = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . uniqid('html') . '.html';
             file_put_contents($this->tmpHtmlPath, $this->html);
             $this->html = $this->tmpHtmlPath;
         }
 
-        if($this->type == 'pdf') {
+        if ($this->type == 'pdf') {
 
-            if(empty($this->output)) throw new PosterException('Save path cannot be empty');
+            if (empty($this->output)) {
+                throw new PosterException('Save path cannot be empty');
+            }
             $this->quality = '';
 
         } else {
-            if(empty($this->output)) $this->tmp();
+            if (empty($this->output)) {
+                $this->tmp();
+            }
         }
 
-        $command = sprintf("%s %s %s %s %s %s %s %s", $this->driver, $this->command, $this->transparent, $this->size, $this->crop, $this->quality, $this->html, $this->output);
+        $command = sprintf("%s %s %s %s %s %s %s %s", $this->driver, $this->command, $this->transparent, $this->size,
+            $this->crop, $this->quality, $this->html, $this->output);
 
         exec($command);
 

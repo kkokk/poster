@@ -66,9 +66,9 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:30
-     * @param int $w
-     * @param int $h
-     * @param array $rgba
+     * @param int     $w
+     * @param int     $h
+     * @param array   $rgba
      * @param boolean $alpha
      * @return void
      */
@@ -81,8 +81,8 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:31
      * @param string $source
-     * @param int $w
-     * @param int $h
+     * @param int    $w
+     * @param int    $h
      * @return void
      */
     public function ImDst($source, $w = 0, $h = 0);
@@ -93,14 +93,14 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:40
-     * @param int $w
-     * @param int $h
+     * @param int   $w
+     * @param int   $h
      * @param array $rgba
      * @param false $alpha
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $src_x
-     * @param int $src_y
+     * @param int   $dst_x
+     * @param int   $dst_y
+     * @param int   $src_x
+     * @param int   $src_y
      * @param array $query
      * @return void
      */
@@ -113,17 +113,27 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:41
      * @param string|array $src
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $src_x
-     * @param int $src_y
-     * @param int $src_w
-     * @param int $src_h
-     * @param false $alpha
-     * @param string $type
+     * @param int          $dst_x
+     * @param int          $dst_y
+     * @param int          $src_x
+     * @param int          $src_y
+     * @param int          $src_w
+     * @param int          $src_h
+     * @param false        $alpha
+     * @param string       $type
      * @return void
      */
-    public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal');
+    public function CopyImage(
+        $src,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0,
+        $alpha = false,
+        $type = 'normal'
+    );
 
     /**
      * 复制文字
@@ -132,18 +142,29 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:41
      * @param string $content
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $fontSize
-     * @param array $rgba
-     * @param int $max_w
+     * @param int    $dst_x
+     * @param int    $dst_y
+     * @param int    $fontSize
+     * @param array  $rgba
+     * @param int    $max_w
      * @param string $font
-     * @param int $weight
-     * @param int $space
-     * @param int $angle
+     * @param int    $weight
+     * @param int    $space
+     * @param int    $angle
      * @return void
      */
-    public function CopyText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null);
+    public function CopyText(
+        $content,
+        $dst_x = 0,
+        $dst_y = 0,
+        $fontSize = null,
+        $rgba = null,
+        $max_w = null,
+        $font = null,
+        $weight = null,
+        $space = null,
+        $angle = null
+    );
 
     /**
      * 复制线
@@ -151,13 +172,13 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:44
-     * @param int $x1
-     * @param int $y1
-     * @param int $x2
-     * @param int $y2
-     * @param array $rgba
+     * @param int    $x1
+     * @param int    $y1
+     * @param int    $x2
+     * @param int    $y2
+     * @param array  $rgba
      * @param string $type
-     * @param int $weight
+     * @param int    $weight
      * @return void
      */
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1);
@@ -168,19 +189,30 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:45
-     * @param int $cx
-     * @param int $cy
-     * @param int $w
-     * @param int $h
-     * @param int $s
-     * @param int $e
-     * @param array $rgba
+     * @param int    $cx
+     * @param int    $cy
+     * @param int    $w
+     * @param int    $h
+     * @param int    $s
+     * @param int    $e
+     * @param array  $rgba
      * @param string $type
      * @param string $style
-     * @param int $weight
+     * @param int    $weight
      * @return void
      */
-    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1);
+    public function CopyArc(
+        $cx = 0,
+        $cy = 0,
+        $w = 0,
+        $h = 0,
+        $s = 0,
+        $e = 0,
+        $rgba = [],
+        $type = '',
+        $style = '',
+        $weight = 1
+    );
 
     /**
      * 复制二维码
@@ -189,17 +221,28 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:47
      * @param string $text
-     * @param int $size
-     * @param int $margin
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $src_x
-     * @param int $src_y
-     * @param int $src_w
-     * @param int $src_h
+     * @param int    $size
+     * @param int    $margin
+     * @param int    $dst_x
+     * @param int    $dst_y
+     * @param int    $src_x
+     * @param int    $src_y
+     * @param int    $src_w
+     * @param int    $src_h
      * @return mixed
      */
-    public function CopyQr($text, $level = 'L', $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0);
+    public function CopyQr(
+        $text,
+        $level = 'L',
+        $size = 4,
+        $margin = 1,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0
+    );
 
     /**
      * 执行画图
@@ -207,9 +250,39 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:48
-     * @param array $query
+     * @param array       $query
      * @param Driver|null $driver
      * @return Driver
      */
-    public function execute($query = [],Driver $driver = null);
+    public function execute($query = [], Driver $driver = null);
+
+    /**
+     * 裁剪
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 11:22
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     */
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0);
+
+    /**
+     * 获取流
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 15:11
+     * @return mixed
+     */
+    public function blob();
+
+    /**
+     * 保存到临时文件并返回路径
+     * User: lang
+     * Date: 2024/3/12
+     * Time: 15:28
+     * @return mixed
+     */
+    public function tmp();
 }
