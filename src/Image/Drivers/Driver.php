@@ -7,6 +7,7 @@
  */
 
 namespace Kkokk\Poster\Image\Drivers;
+
 require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
 
 use Kkokk\Poster\Exception\PosterException;
@@ -32,7 +33,7 @@ class Driver
     protected $path;
 
     /** @var string 设置字体 */
-    protected $font = __DIR__ . DIRECTORY_SEPARATOR .'..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
+    protected $font = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
     /** @var string 字体系列 例如 Microsoft YaHei */
     protected $font_family = '';
     /** @var int 字体大小 */
@@ -59,10 +60,10 @@ class Driver
 
     /** @var string[] 图片类型 */
     protected $poster_type = [
-        'gif' => 'imagegif',
+        'gif'  => 'imagegif',
         'jpeg' => 'imagejpeg',
-        'jpg' => 'imagejpeg',
-        'png' => 'imagepng',
+        'jpg'  => 'imagejpeg',
+        'png'  => 'imagepng',
         'wbmp' => 'imagewbmp'
     ];
 
@@ -72,7 +73,7 @@ class Driver
     /**
      * 设置基本配置
      * @Author lang
-     * @Email: 732853989@qq.com
+     * @Email  : 732853989@qq.com
      * Date: 2023/2/12
      * Time: 下午10:09
      * @param array $params
@@ -207,7 +208,7 @@ class Driver
     /**
      * 获取真实路径
      * @Author lang
-     * @Email: 732853989@qq.com
+     * @Email  : 732853989@qq.com
      * Date: 2023/5/2
      * Time: 上午9:35
      * @param $path
@@ -217,7 +218,9 @@ class Driver
     {
         $isAbsolute = $this->isAbsolute($path);
 
-        if ($this->isCli() && !$isAbsolute) throw new PosterException('For cli environment, please pass the absolute path');
+        if ($this->isCli() && !$isAbsolute) {
+            throw new PosterException('For cli environment, please pass the absolute path');
+        }
 
         return !$isAbsolute ? $this->getDocumentRoot() . $path : realpath($path);
     }
@@ -358,19 +361,19 @@ class Driver
      * Email: 732853989@qq.com
      * Date: 2023/2/13
      * Time: 14:15
-     * @param $dst_x
-     * @param $fontBox
+     * @param      $dst_x
+     * @param      $fontBox
      * @param null $x1
      * @param null $x2
      * @return false|float|int|mixed
      */
-    protected function calcTextDstX($dst_x, $calcFont, $x1 = NULL, $x2 = NULL)
+    protected function calcTextDstX($dst_x, $calcFont, $x1 = null, $x2 = null)
     {
         $fontBoxWidth = $calcFont['text_width'];
         $imWidth = ($x1 !== null && $x2 !== null) ?
             ($x2 - $x1)
             : $this->im_w;
-       if ($dst_x === 'center') {
+        if ($dst_x === 'center') {
             // 如果文字宽度大于 画布宽度 则为0
             $dst_x = ceil(max(0, ($imWidth - $fontBoxWidth)) / 2);
         } elseif (is_array($dst_x)) {
@@ -416,13 +419,13 @@ class Driver
      * Email: 732853989@qq.com
      * Date: 2023/2/13
      * Time: 14:14
-     * @param $dst_y
-     * @param $fontBox
+     * @param      $dst_y
+     * @param      $fontBox
      * @param null $y1
      * @param null $y2
      * @return false|float|int|mixed
      */
-    protected function calcTextDstY($dst_y, $calcFont, $y1 = NULL, $y2 = NULL)
+    protected function calcTextDstY($dst_y, $calcFont, $y1 = null, $y2 = null)
     {
         $fontBoxHeight = $calcFont['text_height']; // 文字加换行数的高度
         $imHeight = ($y1 !== null && $y2 !== null) ?
@@ -473,11 +476,11 @@ class Driver
      * Email: 732853989@qq.com
      * Date: 2023/3/27
      * Time: 16:46
-     * @param int $i 当前循环次数
-     * @param int $weight 循环次数
+     * @param int $i        当前循环次数
+     * @param int $weight   循环次数
      * @param int $fontSize 字体大小
-     * @param int $dst_x x 位置
-     * @param int $dst_y y 位置
+     * @param int $dst_x    x 位置
+     * @param int $dst_y    y 位置
      * @return array|float[]
      */
     protected function calcWeight($i, $weight, $fontSize, $dst_x, $dst_y)
@@ -531,6 +534,9 @@ class Driver
             case 'qr':
                 $driver->result = $driver->createQr(...$item['params']);
                 break;
+            case 'crop':
+                $driver->crop(...$item['params']);
+                break;
         }
     }
 
@@ -554,7 +560,9 @@ class Driver
             // 整形转数组
             $radius = [$radius, $radius, $radius, $radius];
         } else {
-            if (!is_array($radius)) throw new PosterException('圆角参数类型错误');
+            if (!is_array($radius)) {
+                throw new PosterException('圆角参数类型错误');
+            }
         }
         // [20] 四个角
         // [20,30] 第一个值 左上 右下 第二个值 右上 左下
@@ -599,6 +607,22 @@ class Driver
     protected function getMaxRadius($len, $radius)
     {
         return $radius < $len ? floor($radius) : floor($len);
+    }
+
+    /**
+     * 获取图片信息
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 11:08
+     * @return mixed
+     */
+    public function getImInfo()
+    {
+        return [
+            'type'   => $this->type,
+            'width'  => $this->im_w,
+            'height' => $this->im_h,
+        ];
     }
 
     public function domHtml($content)
@@ -672,14 +696,14 @@ class Driver
      * Time: 15:38
      * @param string $content
      * @param string $color
-     * @param int $w
+     * @param int    $w
      * @return array
      */
     public function getLetterArr($content = "\n", $color = '', $w = 0)
     {
         return [
             'color' => $color,
-            'w' => $w,
+            'w'     => $w,
             'value' => $content
         ];
     }
@@ -690,8 +714,8 @@ class Driver
      * Email: 732853989@qq.com
      * Date: 2023/6/2
      * Time: 15:37
-     * @param $letter
-     * @param $content
+     * @param        $letter
+     * @param        $content
      * @param string $color
      */
     public function getNodeValue(&$letter, $content, $color = '')
@@ -707,7 +731,9 @@ class Driver
                     $letter[] = $this->getLetterArr(mb_substr($v, $i, 1), $color);
                 }
             } else {
-                if ($k != 0) $letter[] = $this->getLetterArr();
+                if ($k != 0) {
+                    $letter[] = $this->getLetterArr();
+                }
             }
 
         }

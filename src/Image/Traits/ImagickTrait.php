@@ -54,6 +54,22 @@ trait ImagickTrait
         echo $imageBlob;
     }
 
+    protected function getBlob($im)
+    {
+        return $im->getImageBlob();
+    }
+
+    protected function getTmp($type, $im)
+    {
+        $output = tempnam(sys_get_temp_dir(), uniqid('imagickImage'));
+        if ($type == 'gif') {
+            $im->writeImages($output, true);
+        } else {
+            $im->writeImage($output);
+        }
+        return $output;
+    }
+
     protected function setImage($source)
     {
 

@@ -50,6 +50,17 @@ class ImagickDriver extends Driver implements DriverInterface
         return $this->im;
     }
 
+    public function blob()
+    {
+        $this->setDPI();
+        return $this->getBlob($this->im);
+    }
+
+    public function tmp()
+    {
+        return $this->getTmp($this->type, $this->im);
+    }
+
     public function setData()
     {
         $this->setDPI();
@@ -65,9 +76,6 @@ class ImagickDriver extends Driver implements DriverInterface
 
     public function ImDst($source, $w = 0, $h = 0)
     {
-        // if (!is_file($source)) {
-        //     throw new PosterException('水印图像不存在');
-        // }
         $this->source = $source;
 
         $pic = $this->createImagick($source);
@@ -108,7 +116,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
 
         // 设置透明度，内容不透明
-        if($alpha && !$contentAlpha) {
+        if ($alpha && !$contentAlpha) {
             $this->setImageAlpha($pic, $alphas);
         }
 
@@ -127,7 +135,7 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         // 设置透明度，内容也透明
-        if($alpha && $contentAlpha) {
+        if ($alpha && $contentAlpha) {
             $this->setImageAlpha($pic, $alphas);
         }
 
@@ -140,7 +148,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->cropImage($pic, $src_x, $src_y);
 
         // 合并图片
-        if($this->type == 'gif') {
+        if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->im as $frame) {
                 $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
@@ -149,19 +157,34 @@ class ImagickDriver extends Driver implements DriverInterface
             $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
-        if($that) unset($that);
+        if ($that) {
+            unset($that);
+        }
         $this->destroyImage($pic);
     }
 
-    public function CopyImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
-    {
+    public function CopyImage(
+        $src,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0,
+        $alpha = false,
+        $type = 'normal'
+    ) {
         $angle = 0;
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         if (is_array($src)) {
             $angle = isset($src['angle']) ? $src['angle'] : 0;
             $src = isset($src['src']) ? $src['src'] : '';
-            if (empty($src)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+            if (empty($src)) {
+                throw new PosterException('image resources cannot be empty (' . $src . ')');
+            }
         }
 
         $pic = $this->createImagick($src);
@@ -186,7 +209,7 @@ class ImagickDriver extends Driver implements DriverInterface
                     $pic->scaleImage($bgWidth, $bgHeight);
                 }
 
-                $pic->setImageFormat( "png" );
+                $pic->setImageFormat("png");
                 $pic->setImageMatte(true); // 激活遮罩通道
 
                 // 创建一个圆形遮罩图片
@@ -229,7 +252,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
 
         // 合并图片
-        if($this->type == 'gif') {
+        if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->im as $frame) {
                 $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
@@ -242,11 +265,25 @@ class ImagickDriver extends Driver implements DriverInterface
         $this->destroyImage($pic);
     }
 
-    public function CopyText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
-    {
-        if ($content == '') return true;
+    public function CopyText(
+        $content,
+        $dst_x = 0,
+        $dst_y = 0,
+        $fontSize = null,
+        $rgba = null,
+        $max_w = null,
+        $font = null,
+        $weight = null,
+        $space = null,
+        $angle = null
+    ) {
+        if ($content == '') {
+            return true;
+        }
 
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         $fontSize = $fontSize ?: $this->font_size;
         $rgba = $rgba ?: $this->font_rgba;
@@ -284,10 +321,14 @@ class ImagickDriver extends Driver implements DriverInterface
         $fontSize = ($fontSize * 3) / 4; // 使和gd一致
 
         // 主动设置是否解析html标签
-        if(is_array($content)) {
+        if (is_array($content)) {
 
-            if(!isset($content['type'])) throw new PosterException('type is required');
-            if(!isset($content['content'])) throw new PosterException('content is required');
+            if (!isset($content['type'])) {
+                throw new PosterException('type is required');
+            }
+            if (!isset($content['content'])) {
+                throw new PosterException('content is required');
+            }
 
             $type = $content['type'];
             $content = $content['content'];
@@ -299,21 +340,20 @@ class ImagickDriver extends Driver implements DriverInterface
                 $pattern = '/<span style="(.*?)">(.*?)<\/span>/i';
 
                 // 分割字符串
-                $matches = preg_split($pattern, $content, -1,PREG_SPLIT_DELIM_CAPTURE);
+                $matches = preg_split($pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
                 $common = new Common();
 
-                for($i = 0; $i < count($matches); $i+=3)
-                {
-                    if(!empty($matches[$i])) {
+                for ($i = 0; $i < count($matches); $i += 3) {
+                    if (!empty($matches[$i])) {
                         $this->getNodeValue($letter, $matches[$i], $color);
                     }
 
-                    if(isset($matches[$i+1])){
-                        $style = $matches[$i+1];
+                    if (isset($matches[$i + 1])) {
+                        $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
                         $colorCustom = $this->createColorAlpha($common->getNodeStyleColor($colorValue));
-                        $this->getNodeValue($letter, $matches[$i+2], $colorCustom);
+                        $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
 
@@ -328,14 +368,16 @@ class ImagickDriver extends Driver implements DriverInterface
                 $fontBox = $this->im->queryFontMetrics($draw, $textStr);
                 $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
 
-                if($l['value'] == "\n") {
+                if ($l['value'] == "\n") {
                     $contents = "";
                     $contentsArr[] = $this->getLetterArr();
                     $line++;
                     continue;
                 }
 
-                if(!isset($textWidthArr[$line])) $textWidthArr[$line] =  - $space / 2;
+                if (!isset($textWidthArr[$line])) {
+                    $textWidthArr[$line] = -$space / 2;
+                }
                 // 判断拼接后的字符串是否超过预设的宽度
                 if (($textWidth > $max_ws || $textWidthArr[$line] > $max_ws) && ($contents !== '')) {
                     $contents .= "\n";
@@ -353,7 +395,7 @@ class ImagickDriver extends Driver implements DriverInterface
             }
 
             $calcFont = [
-                'text_width' => max(array_values($textWidthArr)), // 取最宽行宽
+                'text_width'  => max(array_values($textWidthArr)), // 取最宽行宽
                 'text_height' => abs($fontBox[1] - $fontBox[7]),
             ];
             $dst_x = $this->calcTextDstX($dst_x, $calcFont);
@@ -385,7 +427,7 @@ class ImagickDriver extends Driver implements DriverInterface
             }
 
             $calcFont = [
-                'text_width' => $textWidth,
+                'text_width'  => $textWidth,
                 'text_height' => abs($fontBox['textHeight'] + $fontBox['descender']),
             ];
             $dst_x = $this->calcTextDstX($dst_x, $calcFont) - $fontBox['descender']; // 调整和 gd 的误差值
@@ -432,7 +474,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 break;
         }
 
-        if($this->type == 'gif') {
+        if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->im as $frame) {
                 $frame->drawImage($draw);
@@ -442,8 +484,18 @@ class ImagickDriver extends Driver implements DriverInterface
         }
     }
 
-    public function CopyArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
-    {
+    public function CopyArc(
+        $cx = 0,
+        $cy = 0,
+        $w = 0,
+        $h = 0,
+        $s = 0,
+        $e = 0,
+        $rgba = [],
+        $type = '',
+        $style = '',
+        $weight = 1
+    ) {
         $color = $this->createColorAlpha($rgba);
         $draw = $this->createImagickDraw();
         $draw->setStrokeColor($color);
@@ -460,7 +512,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
         }
-        if($this->type == 'gif') {
+        if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->im as $frame) {
                 $frame->drawImage($draw);
@@ -470,16 +522,28 @@ class ImagickDriver extends Driver implements DriverInterface
         }
     }
 
-    public function CopyQr($text, $level = 'L', $size = 4, $margin = 1, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0)
-    {
-        if (empty($this->im)) throw new PosterException('im resources not be found');
+    public function CopyQr(
+        $text,
+        $level = 'L',
+        $size = 4,
+        $margin = 1,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0
+    ) {
+        if (empty($this->im)) {
+            throw new PosterException('im resources not be found');
+        }
 
         $qr = \QRcode::re_png($text, $level, $size, $margin);
 
         $bgWidth = imagesx($qr);
         $bgHeight = imagesy($qr);
 
-        ob_start(); // 打开一个输出缓冲区
+        ob_start();                     // 打开一个输出缓冲区
         $this->poster_type['png']($qr); // 将 GD 图像输出到缓冲区
         $imageData = ob_get_contents(); // 从缓冲区中读取图像数据
         ob_end_clean();
@@ -509,7 +573,7 @@ class ImagickDriver extends Driver implements DriverInterface
         // 裁剪图片
         $this->cropImage($pic, $src_x, $src_y);
         // 合并图片
-        if($this->type == 'gif') {
+        if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->im as $frame) {
                 $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
@@ -520,6 +584,23 @@ class ImagickDriver extends Driver implements DriverInterface
 
         !is_resource($qr) || imagedestroy($qr);
         $this->destroyImage($pic);
+    }
+
+    /**
+     * 裁剪
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 11:22
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     */
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0)
+    {
+        $this->im->cropImage($width, $height, $x, $y);
+        $this->im_w = $width;
+        $this->im_h = $height;
     }
 
     public function execute($query = [], Driver $driver = null)

@@ -211,6 +211,31 @@ class Builder
         return $this->extension->getIm($query);
     }
 
+    public function getImInfo()
+    {
+        $query = $this->query->getQuery();
+        return $this->extension->getImInfo($query);
+    }
+
+    public function blob()
+    {
+        $query = $this->query->getQuery();
+        return $this->extension->blob($query);
+    }
+
+    public function tmp()
+    {
+        $query = $this->query->getQuery();
+        return $this->extension->tmp($query);
+    }
+
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0)
+    {
+        $crop = [$x, $y, $width, $height];
+        $this->query->setQuery('crop', $crop);
+        return $this;
+    }
+
     protected function setImages(...$params)
     {
         $this->images[] = $params;

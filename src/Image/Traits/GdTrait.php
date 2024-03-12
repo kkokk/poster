@@ -38,13 +38,24 @@ trait GdTrait
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
         if(PHP_SAPI === 'cli') {
-            ob_start();
-            $this->poster_type[$type]($this->im);
-            return ob_get_clean();
+            return $this->getBlob($type, $this->im);
         }
 
         header('Content-Type:Image/' . $this->type);
         $this->poster_type[$type]($this->im);
+    }
+
+    protected function getBlob($type, $im)
+    {
+        ob_start();
+        $this->poster_type[$type]($im);
+        return ob_get_clean();
+    }
+
+    protected function getTmp($type, $im){
+        $output = tempnam(sys_get_temp_dir(), uniqid('gdImage'));
+        $this->poster_type[$type]($im, $output);
+        return $output;
     }
 
     protected function setImage($source)

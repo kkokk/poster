@@ -132,11 +132,53 @@ interface ExtensionInterface
 
     /**
      * 获取 im 对象
-     * User: lang
+     * Author: lang
      * Date: 2023/8/10
      * Time: 16:00
      * @param $query
      * @return mixed
      */
     public function getIm($query);
+
+    /**
+     * 获取 im 对象 图片类型，宽高
+     * Author: lang
+     * Date: 2023/8/10
+     * Time: 16:00
+     * @param $query
+     * @return mixed
+     */
+    public function getImInfo($query);
+
+    /**
+     * 获取流
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 15:03
+     * @param $query
+     * @return mixed
+     */
+    public function blob($query);
+
+    /**
+     * 获取临时路径
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 15:34
+     * @param $query
+     * @return mixed
+     */
+    public function tmp($query);
+
+    /**
+     * 裁剪
+     * Author: lang
+     * Date: 2024/3/12
+     * Time: 11:22
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     */
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0);
 }
