@@ -713,7 +713,7 @@ trait GdTrait
     {
         for ($i = 0; $i < $weight; $i++) {
             list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-            imagettftext($this->im, $fontSize, $angle, $really_dst_x, $really_dst_y, $color, $font, $contents);
+            imagettftext($this->im, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font, $contents);
         }
     }
 
