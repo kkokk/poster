@@ -86,13 +86,16 @@ class GdDriver extends Driver implements DriverInterface
         if (!empty($w) && !empty($h)) {
             $this->im_w = $w;
             $this->im_h = $h;
-            $circle_new = $this->createIm($w, $h, [255, 255, 255, 127], $alpha = true);
+            $circle_new = $this->createIm($w, $h, [255, 255, 255, 127], true);
             imagecopyresized($circle_new, $cut, 0, 0, 0, 0, $w, $h, $bgWidth, $bgHeight);
             $cut = $circle_new;
             // $this->destroyImage($circle_new);
         } else {
             $this->im_w = $bgWidth;
             $this->im_h = $bgHeight;
+            $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], true);
+            imagecopy($circle_new, $cut, 0, 0, 0, 0, $bgWidth, $bgHeight);
+            $cut = $circle_new;
         }
 
         $this->im = $cut;
