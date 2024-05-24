@@ -69,13 +69,6 @@ lang
 
 注意：没有特别说明，统一都是px。
 
-##### 通过 PosterManager 调用
-
-```php
-use Kkokk\Poster\PosterManager; // 使用 PosterManager 调用
-$poster = PosterManager::Poster();
-```
-
 ##### 通过 Facades 调用
 
 ```php
@@ -99,14 +92,12 @@ $result = $Poster->getPoster(); # 获取合成后图片文件地址
 ##### 使用 Gd 拓展
 
 ```php
-$poster = PosterManager::Poster(); // 使用 PosterManager 调用
 $Poster = Poster::config($params); // 使用 Facades\Poster 调用
 ```
 
 ##### 使用 Imagick 拓展
 
 ```php
-$poster = PosterManager::Poster()->extension('imagick'); // 使用 PosterManager 调用
 $Poster = Poster::extension('imagick')->config($params); // 使用 Facades\Poster 调用
 ```
 
@@ -447,7 +438,7 @@ $poster->baseData(); # 返回base64
 ##### 生成二维码
 
 ```php
-$qr = PosterManager::Poster()->Qr('http://www.520yummy.com','poster/1.png'); # 生成二维码
+$qr = Poster::Qr('http://www.520yummy.com','poster/1.png'); # 生成二维码
 ```
 
 参数说明
@@ -670,7 +661,7 @@ $type = 'slider';
   * @param array  $params 验证码自定义参数
   * @return arary
   */
-$data = PosterManager::Captcha()->type($type)->config($params)->get();
+$data = Captcha::type($type)->config($params)->get();
 
 /** 
   * 验证
@@ -680,7 +671,7 @@ $data = PosterManager::Captcha()->type($type)->config($params)->get();
   * @param int        $leeway  误差值
   * @return boolean
   */
-$res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
+$res = Captcha::type($type)->check($key, $value, $leeway);
 ```
 
 ##### 旋转图片验证
@@ -704,7 +695,7 @@ $type = 'rotate';
   * @param array  $params 验证码自定义参数
   * @return arary
   */
-$data = PosterManager::Captcha()->type($type)->config($params)->get();
+$data = Captcha::type($type)->config($params)->get();
 
 /** 
   * 验证
@@ -714,7 +705,7 @@ $data = PosterManager::Captcha()->type($type)->config($params)->get();
   * @param int        $leeway  误差值
   * @return boolean
   */
-$res = PosterManager::Captcha()->type($type)->check($key, $value, $leeway);
+$res = Captcha::type($type)->check($key, $value, $leeway);
 ```
 
 ##### 点击图片验证
@@ -742,7 +733,7 @@ $type = 'click';
   * @param array  $params 验证码自定义参数
   * @return arary
   */
-$data = PosterManager::Captcha()->type($type)->config($params)->get();
+$data = Captcha::type($type)->config($params)->get();
 
 /** 
   * 验证
@@ -751,7 +742,7 @@ $data = PosterManager::Captcha()->type($type)->config($params)->get();
   * @param string|int|array  $value   前端传回来的坐标数组
   * @return boolean
   */
-$res = PosterManager::Captcha()->type($type)->check($key, $value);
+$res = Captcha::type($type)->check($key, $value);
 ```
 
 ##### 手动输入验证
@@ -781,7 +772,7 @@ $type = 'click';
   * @param array  $params 验证码自定义参数
   * @return arary
   */
-$data = PosterManager::Captcha()->type($type)->config($params)->get();
+$data = Captcha::type($type)->config($params)->get();
 
 /** 
   * 验证
@@ -790,7 +781,7 @@ $data = PosterManager::Captcha()->type($type)->config($params)->get();
   * @param string|int|array  $value   输入结果
   * @return boolean
   */
-$res = PosterManager::Captcha()->type($type)->check($key, $value);
+$res = Captcha::type($type)->check($key, $value);
 ```
 
 #### 示例
@@ -798,29 +789,29 @@ $res = PosterManager::Captcha()->type($type)->check($key, $value);
 ##### 图片验证
 
 ```php
-	use Kkokk\Poster\PosterManager;
+	use Kkokk\Poster\Facades\Captcha;
 	use Kkokk\Poster\Exception\PosterException;
 	
 	try {
         # 滑块验证
 		$type = 'slider';
-		$data = PosterManager::Captcha()->type($type)->get();
-		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+		$data = Captcha::type($type)->get();
+		$res = Captcha::type($type)->check($key, $value);
         
         # 旋转图片验证
 		$type = 'rotate';
-		$data = PosterManager::Captcha()->type($type)->get();
-		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+		$data = Captcha::type($type)->get();
+		$res = Captcha::type($type)->check($key, $value);
         
         # 点击验证
 		$type = 'click';
-		$data = PosterManager::Captcha()->type($type)->get();
-		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+		$data = Captcha::type($type)->get();
+		$res = Captcha::type($type)->check($key, $value);
         
         # 输入验证
 		$type = 'input';
-		$data = PosterManager::Captcha()->type($type)->get();
-		$res = PosterManager::Captcha()->type($type)->check($key, $value);
+		$data = Captcha::type($type)->get();
+		$res = Captcha::type($type)->check($key, $value);
 		
 	} catch (PosterException $e) {
 		print_r($e->getMessage())
@@ -830,7 +821,7 @@ $res = PosterManager::Captcha()->type($type)->check($key, $value);
 ##### 海报类门面调用
 
 ```php
-use Kkokk\Poster\PosterManager;
+use Kkokk\Poster\Facades\Poster;
 use Kkokk\Poster\Exception\Exception;
 # 合成图片
 try {
@@ -873,142 +864,6 @@ try {
             // $im->buildText('明月几时有', ['custom', 'right', 200, 400], ['custom', 'bottom', 200, 500, -20], 20, [0, 0, 0, 50]);
         })
     ->getPoster();
-} catch (Exception $e){
-	echo $e->getMessage();
-}
-```
-
-
-
-##### 海报类静态调用
-
-```php
-use Kkokk\Poster\PosterManager;
-use Kkokk\Poster\Exception\Exception;
-# 合成图片
-try {
-    $addImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
-    $result = PosterManager::Poster('poster/poster_user') //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
-        ->buildIm(638,826,[255,255,255,127],false)
-        ->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-        ->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-        ->buildImage($addImage,253,326,0,0,131,131,false,'circle')
-        ->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-        ->buildText('苏 轼','center',477,16,[51, 51, 51,1])
-        ->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
-        ->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
-        ->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
-        ->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
-        ->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
-        ->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
-        ->buildText('长按识别',497,720,15,[53, 153, 153, 1])
-        ->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
-        ->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
-        ->getPoster();
-
-	# 批量合成
-	$buildImageManyArr = [
-		[
-        	'src' => 'https://test.acyapi.51acy.com/wechat/poster/top_bg.png'
-        ],
-	];
-	$buildTextManyArr  = [
-        [
-            'content'=> '明月几时有，把酒问青天。不知天上宫阙，今夕是何年。',
-            'dst_x' => 'center',
-            'dst_y' => 515,
-            'font' => 16,
-            'rgba' => [51, 51, 51, 1],
-            'max_w'=> 0,
-            'font_family' => '',
-            'weight' => 1,
-            'space'=>20
-        ],
-	];
-	$buildQrManyArr    = [
-		[
-			'text'=>'http://www.520yummy.com',
-            'dst_x'=>37,
-            'dst_y'=>692,
-            'src_x'=>0,
-            'src_y'=>0,
-            'src_w'=>0,
-            'src_h'=>0,
-            'size'=>4,
-            'margin'=>1
-		],
-	];
-
-	$result = PosterManager::Poster('poster/poster_user')
-        ->buildIm(638,826,[255,255,255,127],false)
-        ->buildImageMany($buildImageManyArr)
-        ->buildTextMany($buildImageManyArr)
-        ->buildQrMany($buildQrManyArr)
-        ->buildBg(400,526,
-            ['color'=>[[0,0,162], [0,255,162], [255,255,162], [255, 0, 0], [0, 255, 0]], 
-             'alpha'=>50, 
-             'to'=>'bottom'
-            ],
-            true, 
-            ['center', -10], 
-            ['center', 10], 
-            0, 
-            0 ,
-            function($im){
-              $im->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',100,20,[255, 255, 255, 50]);
-        	}
-        )->getPoster();
-    
-    # 给图片添加水印
-    $setImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
-    $result = PosterManager::Poster() //给指定图片添加水印，这里为空就好
-        ->buildImDst(__DIR__.'/test.jpeg')
-        ->buildImage($setImage,'-20%','-20%',0,0,0,0,false)
-        ->setPoster();
-
-    # 生成二维码
-    $result = PosterManager::Poster()->Qr('http://www.baidu.com','poster/1.png');
-} catch (Exception $e){
-	echo $e->getMessage();
-}
-```
-
-##### 海报类实例化调用
-```php
-use Kkokk\Poster\PosterManager;
-use Kkokk\Poster\Exception\Exception;
-# 合成图片
-try {
-    $addImage = "https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png";
-	$PosterManager = new PosterManager('poster/poster_user'); //生成海报，这里写保存路径和文件名，可以指定图片后缀。默认png
-	$result = $PosterManager->buildIm(638,826,255,255,255,1]27,false)
-	->buildIm(638,826,[255,255,255,127],false)
-	->buildImage('https://test.acyapi.51acy.com/wechat/poster/top_bg.png')
-	->buildImage('https://test.acyapi.51acy.com/wechat/poster/half_circle.png',254,321)
-	->buildImage($addImage,253,326,0,0,131,131,false,'circle')
-	->buildImage('https://test.acyapi.51acy.com/wechat/poster/fengexian.png',0,655)
-	->buildText('苏 轼','center',477,16,[51, 51, 51,1])
-	->buildText('明月几时有，把酒问青天。不知天上宫阙，今夕是何年。','center',515,14,[53, 53, 53, 1])
-	->buildText('我欲乘风归去，又恐琼楼玉宇，高处不胜寒。','center',535,14,[53, 153, 153, 1])
-	->buildText('起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。','center',555,14,[53, 153, 153, 1])
-	->buildText('不应有恨，何事长向别时圆？','center',575,14,[53, 153, 153, 1])
-	->buildText('人有悲欢离合，月有阴晴圆缺，此事古难全。','center',595,14,[53, 153, 153, 1])
-	->buildText('但愿人长久，千里共婵娟。','center',615,14,[53, 153, 153, 1])
-	->buildText('长按识别',497,720,15,[53, 153, 153, 1])
-	->buildText('查看TA的更多作品',413,757,15,[53, 153, 153, 1])
-	->buildQr('http://www.520yummy.com',37,692,0,0,0,0,4,1)
-	->getPoster();
-
-	# 给图片添加水印
-    $setImage = 'https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png';
-	$PosterManager = new PosterManager(); //给指定图片添加水印，这里为空就好
-	$result = $PosterManager->buildImDst(__DIR__.'/test.jpeg')
-	->buildImage($setImage,'center','-20%',0,0,0,0,true)
-	->setPoster();
-
-	# 生成二维码
-	$result = $PosterManager->Qr('http://www.baidu.com','poster/1.png');
-
 } catch (Exception $e){
 	echo $e->getMessage();
 }
