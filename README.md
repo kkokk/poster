@@ -28,7 +28,7 @@ lang
 
 #### 使用文档
 
-> 文档地址：http://langlanglang.gitee.io/poster-doc/
+> 文档地址：http://www.520yummy.com/poster-doc/
 
 #### 安装或更新
 
