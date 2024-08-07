@@ -1,6 +1,6 @@
 {
     "name": "kkokk/poster",
-    "description": "PHP生成海报",
+    "description": "PHP生成海报、验证码、行为验证码",
     "type": "project",
     "require": {
         "php": ">=5.6.0",
