@@ -26,7 +26,9 @@ trait GdTrait
      */
     protected function returnImage($type, $outfile = true)
     {
-        if (!isset($this->im) || empty($this->im)) throw new PosterException('没有创建任何资源');
+        if (!isset($this->im) || empty($this->im)) {
+            throw new PosterException('没有创建任何资源');
+        }
         if ($outfile) {
             $this->dirExists($this->pathname);
             if (strripos($this->filename, '.') === false) {
@@ -37,7 +39,7 @@ trait GdTrait
 
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
-        if(PHP_SAPI === 'cli') {
+        if (PHP_SAPI === 'cli') {
             return $this->getBlob($type, $this->im);
         }
 
@@ -52,7 +54,8 @@ trait GdTrait
         return ob_get_clean();
     }
 
-    protected function getTmp($type, $im){
+    protected function getTmp($type, $im)
+    {
         $output = tempnam(sys_get_temp_dir(), uniqid('gdImage'));
         $this->poster_type[$type]($im, $output);
         return $output;
@@ -74,9 +77,9 @@ trait GdTrait
 
     public function createImage($src = '')
     {
-        if($src instanceof DriverInterface) {
+        if ($src instanceof DriverInterface) {
             return $this->returnImageInfoByBlob($src->getImageBlob());
-        } elseif(strpos($src, 'http') === 0 || file_exists($src)) {
+        } elseif (strpos($src, 'http') === 0 || file_exists($src)) {
             return $this->returnImageInfoBySrc($src);
         } else {
             return $this->returnImageInfoByBlob($src);
@@ -94,7 +97,9 @@ trait GdTrait
     {
         list($width, $height, $bgType) = @getimagesize($src);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+        if (empty($bgType)) {
+            throw new PosterException('image resources cannot be empty (' . $src . ')');
+        }
 
         $bgType = image_type_to_extension($bgType, false);
 
@@ -132,8 +137,12 @@ trait GdTrait
     public function createColorAlpha($cut, $rgba = [255, 255, 255, 127])
     {
 
-        if (empty($rgba)) $rgba = [255, 255, 255, 127];
-        if (count($rgba) != 4) throw new PosterException('The length of the rgba parameter is 4');
+        if (empty($rgba)) {
+            $rgba = [255, 255, 255, 127];
+        }
+        if (count($rgba) != 4) {
+            throw new PosterException('The length of the rgba parameter is 4');
+        }
         foreach ($rgba as $k => $value) {
             if (!is_int($rgba[$k])) {
                 throw new PosterException('The value must be an integer');
@@ -150,20 +159,13 @@ trait GdTrait
     /**
      * 获取颜色值，没有透明度
      */
-    public function createColor($cut, $rgba = [255, 255, 255, 1])
+    public function createColor($image, $rgba = [255, 255, 255, 255])
     {
-
-        if (empty($rgba)) $rgba = [255, 255, 255, 1];
-        if (count($rgba) < 4) throw new PosterException('The length of the rgba parameter is 4');
-        foreach ($rgba as $k => $value) {
-            if (!is_int($rgba[$k])) {
-                throw new PosterException('The text value must be an integer');
-            } elseif ($k < 3 && ($rgba[$k] > 255 || $rgba[$k] < 0)) {
-                throw new PosterException('The text color value is between 0-255');
-            }
+        $rgba = parse_color($rgba);
+        if (isset($rgba[3]) && !is_null($rgba[3])) {
+            return imagecolorallocatealpha($image, $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
         }
-
-        return imagecolorallocate($cut, $rgba[0], $rgba[1], $rgba[2]);
+        return imagecolorallocate($image, $rgba[0], $rgba[1], $rgba[2]);
     }
 
     /**
@@ -253,7 +255,7 @@ trait GdTrait
     /**
      * 计算颜色渐变方向
      * @Author lang
-     * @Email: 732853989@qq.com
+     * @Email  : 732853989@qq.com
      * Date: 2022/10/20
      * Time: 上午12:17
      * @param $im
@@ -329,7 +331,7 @@ trait GdTrait
     /**
      * 获取渐变颜色值
      * @Author lang
-     * @Email: 732853989@qq.com
+     * @Email  : 732853989@qq.com
      * Date: 2022/10/20
      * Time: 上午12:15
      * @param $im
@@ -369,14 +371,14 @@ trait GdTrait
      * Email: 732853989@qq.com
      * Date: 2022/10/20
      * Time: 10:04
-     * @param $im resource 画布资源
-     * @param $toi double 宽或高
-     * @param $toj double 高或宽
-     * @param $rgbaColor array 渐变色值
-     * @param $rgbaCount int 渐变色数量
-     * @param int $radius int 圆角
-     * @param string $ii string x,y 变量取值替换
-     * @param string $jj string x,y 变量取值替换
+     * @param        $im        resource 画布资源
+     * @param        $toi       double 宽或高
+     * @param        $toj       double 高或宽
+     * @param        $rgbaColor array 渐变色值
+     * @param        $rgbaCount int 渐变色数量
+     * @param int    $radius    int 圆角
+     * @param string $ii        string x,y 变量取值替换
+     * @param string $jj        string x,y 变量取值替换
      * @return mixed|resource
      */
     protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $ii = 'i', $jj = 'j')
@@ -402,9 +404,9 @@ trait GdTrait
      * Email: 732853989@qq.com
      * Date: 2022/10/20
      * Time: 9:55
-     * @param $im resource 画布资源
-     * @param $w double 宽
-     * @param $h double 高
+     * @param $im     resource 画布资源
+     * @param $w      double 宽
+     * @param $h      double 高
      * @param $radius int 圆角
      * @return mixed|resource
      */
@@ -414,7 +416,8 @@ trait GdTrait
 
         $len = $w > $h ? $h / 2 : $w / 2;
 
-        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius, $len);
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius,
+            $len);
 
         for ($x = 0; $x < $w; $x++) {
             for ($y = 0; $y < $h; $y++) {
@@ -463,14 +466,14 @@ trait GdTrait
     /**
      * 渐变处理方法 对角 分两段循环
      * @Author lang
-     * @Email: 732853989@qq.com
+     * @Email  : 732853989@qq.com
      * Date: 2022/10/20
      * Time: 上午12:13
-     * @param $im
-     * @param $toi
-     * @param $toj
-     * @param $rgbaColor
-     * @param $rgbaCount
+     * @param     $im
+     * @param     $toi
+     * @param     $toj
+     * @param     $rgbaColor
+     * @param     $rgbaCount
      * @param int $x
      * @param int $y
      * @return mixed
@@ -548,11 +551,11 @@ trait GdTrait
      * Email: 732853989@qq.com
      * Date: 2022/11/23
      * Time: 11:35
-     * @param $im
-     * @param $toi
-     * @param $toj
-     * @param $rgbaColor
-     * @param $rgbaCount
+     * @param     $im
+     * @param     $toi
+     * @param     $toj
+     * @param     $rgbaColor
+     * @param     $rgbaCount
      * @param int $x
      * @param int $y
      * @return mixed
@@ -624,13 +627,13 @@ trait GdTrait
      * Email: 732853989@qq.com
      * Date: 2022/12/12
      * Time: 9:51
-     * @param $im
-     * @param $num
-     * @param $centerNum
-     * @param $total
-     * @param $color
-     * @param $toiTag
-     * @param $tojTag
+     * @param     $im
+     * @param     $num
+     * @param     $centerNum
+     * @param     $total
+     * @param     $color
+     * @param     $toiTag
+     * @param     $tojTag
      * @param int $x
      * @param int $y
      * @return mixed
@@ -678,10 +681,10 @@ trait GdTrait
      * Email: 732853989@qq.com
      * Date: 2022/12/12
      * Time: 9:52
-     * @param $im
-     * @param $num
-     * @param $centerNum
-     * @param $color
+     * @param     $im
+     * @param     $num
+     * @param     $centerNum
+     * @param     $color
      * @param int $x
      * @param int $y
      * @return mixed
@@ -713,7 +716,8 @@ trait GdTrait
     {
         for ($i = 0; $i < $weight; $i++) {
             list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-            imagettftext($this->im, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font, $contents);
+            imagettftext($this->im, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font,
+                $contents);
         }
     }
 
@@ -758,7 +762,8 @@ trait GdTrait
             for ($y = 0; $y < $h; $y++) {
                 $rgbColor = imagecolorat($pic, $x, $y);
                 $thisColor = imagecolorsforindex($pic, $rgbColor);
-                $color = $this->createColorAlpha($pic, [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);
+                $color = $this->createColorAlpha($pic,
+                    [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);
                 imagesetpixel($mask, $x, $y, $color);
             }
         }

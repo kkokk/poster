@@ -1,0 +1,13 @@
+<?php
+/**
+ * User: lang
+ * Date: 2024/11/26
+ * Time: 11:05
+ */
+
+namespace Kkokk\Poster\Image\Gd;
+
+class Mask
+{
+
+}

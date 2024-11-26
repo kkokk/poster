@@ -1,27 +1,31 @@
 {
-    "name": "kkokk/poster",
-    "description": "PHP生成海报、验证码、行为验证码",
-    "type": "project",
-    "require": {
-        "php": ">=5.6.0",
-        "ext-gd": "*"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "lang",
-            "email": "732853989@qq.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "autoload":{
-        "psr-4":{
-            "Kkokk\\Poster\\":"src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Kkokk\\Tests\\": "tests/"
-        }
+  "name": "kkokk/poster",
+  "description": "PHP生成海报、验证码、行为验证码",
+  "type": "project",
+  "require": {
+    "php": ">=5.6.0",
+    "ext-gd": "*",
+    "ext-mbstring": "*"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "lang",
+      "email": "732853989@qq.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Kkokk\\Poster\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kkokk\\Tests\\": "tests/"
+    }
+  }
 }
