@@ -137,7 +137,9 @@ trait GdTrait
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
         }
-        $rgba = parse_color($rgba);
+        if (!is_array($rgba)) {
+            $rgba = parse_color($rgba);
+        }
         if (isset($rgba[3]) && !is_null($rgba[3])) {
             return imagecolorallocatealpha($image, $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
         }
@@ -752,14 +754,25 @@ trait GdTrait
         return imagecrop($image, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
     }
 
-    public function createCanvas($w, $h, $rgba, $alpha = false)
+    /**
+     * 释放资源
+     */
+    public function destroyImage($resource = null)
+    {
+        if (is_null($resource)) {
+            $resource = $this->image;
+        }
+        !is_resource($resource) || imagedestroy($resource);
+    }
+
+    public function createCanvas($w, $h, $rgba)
     {
         $cut = imagecreatetruecolor($w, $h);
-        if ($alpha) {
-            imagealphablending($cut, false);
-            imagesavealpha($cut, true);
-        }
         if (!is_null($rgba)) {
+            $rgba = parse_color($rgba);
+            if (isset($rgba[3]) && !empty($rgba[3])) {
+                imagesavealpha($cut, true);
+            }
             $color = $this->createColor($cut, $rgba);
             imagefill($cut, 0, 0, $color);
         }

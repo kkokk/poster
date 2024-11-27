@@ -181,7 +181,7 @@ trait ImagickTrait
         $rgba = parse_color($rgba);
 
         if (isset($rgba[3]) && !is_null($rgba[3])) {
-            $rgba[3] = sprintf("%.2f", (128 - $rgba[3]) / 127);
+            $rgba[3] = round(floor((128 - $rgba[3]) / 127 * 100) / 100, 2);
             return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
         }
 
@@ -428,14 +428,11 @@ trait ImagickTrait
         empty($Imagick) || $Imagick->destroy();
     }
 
-    public function createCanvas($w, $h, $rgba, $type = null, $alpha = false)
+    public function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
     {
         $background = $this->createColor($rgba);
         $image = $this->createImagick();
-        $image->newImage($w, $h, $background, $type ?: $this->type);//设置画布的信息以及画布的格式
-        if ($alpha) {
-            $image->setImageAlphaChannel($image::ALPHACHANNEL_ACTIVATE);
-        }
+        $image->newImage($w, $h, $background, $this->type);//设置画布的信息以及画布的格式
         return $image;
     }
 }

@@ -66,3 +66,71 @@ if (!function_exists('color_to_rgba')) {
         return "rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])";
     }
 }
+
+if (!function_exists('calc_dst_x')) {
+    /**
+     * 计算画布X轴位置
+     * User: lang
+     * Date: 2024/11/27
+     * Time: 15:47
+     * @param $dstX
+     * @param $imWidth
+     * @param $bgWidth
+     * @return float
+     */
+    function calc_dst_x($dstX, $imWidth, $bgWidth)
+    {
+        if ($dstX == '0') {
+            return $dstX;
+        } elseif ($dstX === 'center') {
+            $dstX = ceil(($imWidth - $bgWidth) / 2);
+        } elseif (is_numeric($dstX) && $dstX < 0) {
+            $dstX = ceil($imWidth + $dstX);
+        } elseif (is_array($dstX)) {
+            if ($dstX[0] == 'center') {
+                $dstX = ceil(($imWidth - $bgWidth) / 2) + $dstX[1];
+            }
+        } elseif (strpos($dstX, '%') !== false) {
+            if (substr($dstX, 0, strpos($dstX, '%')) < 0) {
+                $dstX = ceil($imWidth + ($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100));
+            } else {
+                $dstX = ceil($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100);
+            }
+        }
+        return $dstX;
+    }
+}
+
+if (!function_exists('calc_dst_y')) {
+    /**
+     * 计算画布Y轴位置
+     * User: lang
+     * Date: 2024/11/27
+     * Time: 15:48
+     * @param $dstY
+     * @param $imHeight
+     * @param $bgHeight
+     * @return false|float|mixed
+     */
+    function calc_dst_y($dstY, $imHeight, $bgHeight)
+    {
+        if ($dstY == '0') {
+            return $dstY;
+        } elseif ($dstY == 'center') {
+            $dstY = ceil(($imHeight - $bgHeight) / 2);
+        } elseif (is_numeric($dstY) && $dstY < 0) {
+            $dstY = ceil($imHeight + $dstY);
+        } elseif (is_array($dstY)) {
+            if ($dstY[0] == 'center') {
+                $dstY = ceil(($imHeight - $bgHeight) / 2) + $dstY[1];
+            }
+        } elseif (strpos($dstY, '%') !== false) {
+            if (substr($dstY, 0, strpos($dstY, '%')) < 0) {
+                $dstY = ceil($imHeight + (($imHeight * substr($dstY, 0, strpos($dstY, '%'))) / 100));
+            } else {
+                $dstY = ceil($imHeight * substr($dstY, 0, strpos($dstY, '%')) / 100);
+            }
+        }
+        return $dstY;
+    }
+}

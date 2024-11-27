@@ -15,11 +15,17 @@ class Canvas
 
     private $image;
 
+    private $width;
+
+    private $height;
+
     private $type = 'png';
 
-    public function __construct($width, $height, $background = null, $alpha = false)
+    public function __construct($width, $height, $background = [255, 255, 255, 127])
     {
-        $this->image = $this->createCanvas($width, $height, $background, $alpha);
+        $this->image = $this->createCanvas($width, $height, $background);
+        $this->width = $this->image->getImageWidth();
+        $this->height = $this->image->getImageHeight();
     }
 
     public function background($background)
@@ -29,6 +35,10 @@ class Canvas
 
     public function addImage(Image $image, $x, $y)
     {
+        # 处理目标 x 轴
+        $x = calc_dst_x($x, $this->width, $image->getWidth());
+        # 处理目标 y 轴
+        $y = calc_dst_Y($y, $this->height, $image->getHeight());
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
@@ -38,7 +48,6 @@ class Canvas
         } else {
             $this->image->compositeImage($image->getImage(), ($this->image)::COMPOSITE_DEFAULT, $x, $y);
         }
-        $image->destroyImage();
     }
 
     public function addText(Text $text, $x, $y)
@@ -54,5 +63,10 @@ class Canvas
             header('Content-Type: image/png');
             echo $this->image;
         }
+    }
+
+    public function __clone()
+    {
+        $this->image = clone $this->image;
     }
 }

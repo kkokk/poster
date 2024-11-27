@@ -59,6 +59,7 @@ class Image
         $this->image->scaleImage($newWidth, $newHeight, $bestFit);
         $this->width = $newWidth;
         $this->height = $newHeight;
+        return $this;
     }
 
     /**
@@ -89,9 +90,8 @@ class Image
 
         $mask->drawImage($circle);
 
-        $pic = $this->image;
         // 合并原始图片和圆形遮罩图片
-        $this->image->compositeImage($mask, $pic::COMPOSITE_DSTIN, 0, 0);
+        $this->image->compositeImage($mask, ($this->image)::COMPOSITE_DSTIN, 0, 0);
 
         $this->destroyImage($circle);
         $this->destroyImage($mask);
@@ -100,10 +100,10 @@ class Image
         return $this;
     }
 
-    public function rotate($angle)
+    public function rotate($angle, $bgColor = [255, 255, 255, 127])
     {
         // 旋转图片
-        $this->image->rotateImage($this->createColor([255, 255, 255, 127]), $angle);
+        $this->image->rotateImage($this->createColor($bgColor), $angle);
 
         // 获取旋转后图片的尺寸
         $rotatedWidth = $this->image->getImageWidth();
@@ -131,11 +131,16 @@ class Image
 
     public function getWidth()
     {
-        return $this->image->getImageWidth();
+        return $this->width;
     }
 
     public function getHeight()
     {
-        return $this->image->getImageHeight();
+        return $this->height;
+    }
+
+    public function __clone()
+    {
+        $this->image = clone $this->image;
     }
 }

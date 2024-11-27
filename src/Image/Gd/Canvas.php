@@ -14,19 +14,19 @@ class Canvas
 {
     use GdTrait;
 
-    public $image;
+    private $image;
 
-    public $width;
+    private $width;
 
-    public $height;
+    private $height;
 
     private $type = 'png';
 
-    public function __construct($width, $height, $background = null, $alpha = false)
+    public function __construct($width, $height, $background = [255, 255, 255, 127])
     {
         $this->width = $width;
         $this->height = $height;
-        $this->image = $this->createCanvas($width, $height, $background, $alpha);
+        $this->image = $this->createCanvas($width, $height, $background);
     }
 
     public function background($color = [255, 255, 255, 127])
@@ -36,8 +36,12 @@ class Canvas
         return $this;
     }
 
-    public function addImage($image, $x, $y)
+    public function addImage(Image $image, $x, $y)
     {
+        # 处理目标 x 轴
+        $x = calc_dst_x($x, $this->width, $image->getWidth());
+        # 处理目标 y 轴
+        $y = calc_dst_Y($y, $this->height, $image->getHeight());
         imagecopy($this->image, $image->getImage(), $x, $y, 0, 0, $image->getWidth(), $image->getHeight());
         return $this;
     }
@@ -57,13 +61,5 @@ class Canvas
             imagepng($this->image);
         }
         imagedestroy($this->image);
-    }
-
-    public function getData($path = '')
-    {
-        if ($path) {
-            $this->setFilePath($path);
-        }
-        return $this->returnImage($this->type);
     }
 }

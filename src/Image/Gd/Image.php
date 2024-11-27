@@ -81,7 +81,7 @@ class Image
     public function circle()
     {
         $size = min($this->width, $this->height);
-        $circleImage = $this->createCanvas($size, $size, [], true);
+        $circleImage = $this->createCanvas($size, $size, [255, 255, 255, 127]);
 
         // 绘制圆形区域
         $centerX = $size / 2;
@@ -104,7 +104,7 @@ class Image
     }
 
     // 旋转图片
-    public function rotate($angle, $bgColor = [255, 255, 255])
+    public function rotate($angle, $bgColor = [255, 255, 255, 127])
     {
         $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($bgColor));
 

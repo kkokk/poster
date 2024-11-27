@@ -834,18 +834,6 @@ class GdDriver extends Driver implements DriverInterface
     }
 
     /**
-     * 释放资源
-     * @Author lang
-     * @Date   2020-08-14T14:29:46+0800
-     * @param Resource
-     */
-    protected function destroyImage($Resource)
-    {
-
-        !is_resource($Resource) || imagedestroy($Resource);
-    }
-
-    /**
      * 析构方法，用于销毁图像资源
      */
     public function __destruct()
