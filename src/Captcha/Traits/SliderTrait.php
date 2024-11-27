@@ -37,7 +37,7 @@ trait SliderTrait
         $w = $slider_width;
         $h = $slider_height;
 
-        $bgColor = $this->PosterDriver->createColorAlpha($this->im, [0, 0, 0, 60]);
+        $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
         $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
 
@@ -49,12 +49,15 @@ trait SliderTrait
 
         $halfBorder = $border / 2;
 
-        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
+        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255]);
 
         $points = [
-            $x1 + $w / 2, $y1,
-            $x2, $y2,
-            $x1, $y2,
+            $x1 + $w / 2,
+            $y1,
+            $x2,
+            $y2,
+            $x1,
+            $y2,
         ];
 
         // 三角形
@@ -88,9 +91,12 @@ trait SliderTrait
         $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
-            $w / 2, 0,
-            $w, $h - $halfBorder / 2,
-            0, $h - $halfBorder / 2,
+            $w / 2,
+            0,
+            $w,
+            $h - $halfBorder / 2,
+            0,
+            $h - $halfBorder / 2,
         ];
         imagesetthickness($ims, $halfBorder); // 划线的线宽加粗
         imagepolygon($ims, $borderPoints, count($borderPoints) / 2, $borderColor);
@@ -103,9 +109,12 @@ trait SliderTrait
             $x = mt_rand($slider_width * 2, $bg_width - $w);
             $y = mt_rand(0, $bg_height - $h);
             $points = [
-                $x + $w / 2, $y,
-                $x + $w, $y + $h,
-                $x, $y + $h,
+                $x + $w / 2,
+                $y,
+                $x + $w,
+                $y + $h,
+                $x,
+                $y + $h,
             ];
             $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
@@ -140,7 +149,7 @@ trait SliderTrait
         $w = $slider_width - $border;
         $h = $slider_height - $border;
 
-        $bgColor = $this->PosterDriver->createColorAlpha($this->im, [0, 0, 0, 60]);
+        $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
         $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], false); // 创建抠图背景
 
@@ -153,10 +162,10 @@ trait SliderTrait
         $halfBorder = $border / 2;
 
         // 矩形
-        $p1 = [$x1 + $halfBorder - 1, $y2 + $halfBorder]; // 左下
-        $p2 = [$x2 + $halfBorder, $y2 + $halfBorder]; // 右下
-        $p3 = [$x2 + $halfBorder, $y1 + $halfBorder - 1]; // 右上
-        $p4 = [$x1 + $halfBorder - 1, $y1 + $halfBorder - 1]; // 左上
+        $p1 = [$x1 + $halfBorder - 1, $y2 + $halfBorder];                               // 左下
+        $p2 = [$x2 + $halfBorder, $y2 + $halfBorder];                                   // 右下
+        $p3 = [$x2 + $halfBorder, $y1 + $halfBorder - 1];                               // 右上
+        $p4 = [$x1 + $halfBorder - 1, $y1 + $halfBorder - 1];                           // 左上
 
         for ($i = 0; $i < $bg_width; $i++) {
             for ($j = 0; $j < $bg_height; $j++) {
@@ -172,7 +181,8 @@ trait SliderTrait
                 $p = [$i, $j];
 
                 // 叉积计算 点在四条平行线内部则是在矩形内 p1->p2 p1->p3 参考点 p1  叉积大于0点p3在p2逆时针方向 等于0 三点一线 小于0 点p3在p2顺时针防线
-                $isCross = $this->getCross($p1, $p2, $p) * $this->getCross($p3, $p4, $p) > 0 && $this->getCross($p2, $p3, $p) * $this->getCross($p4, $p1, $p) > 0;
+                $isCross = $this->getCross($p1, $p2, $p) * $this->getCross($p3, $p4, $p) > 0 && $this->getCross($p2,
+                        $p3, $p) * $this->getCross($p4, $p1, $p) > 0;
                 if ($isCross) {
                     $rgbColor = imagecolorat($this->im, $i, $j);
                     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 抠图
@@ -223,7 +233,7 @@ trait SliderTrait
         $w = $slider_width;
         $h = $slider_height;
 
-        $bgColor = $this->PosterDriver->createColorAlpha($this->im, [0, 0, 0, 60]);
+        $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
         $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
 
@@ -235,14 +245,19 @@ trait SliderTrait
 
         $halfBorder = $border / 2;
 
-        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
+        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255]);
 
         $points = [
-            $x1 + $w / 2, $y1,
-            $x2, $y1 + $h / 2,
-            $x1 + $w * 3 / 4, $y2,
-            $x1 + $w / 4, $y2,
-            $x1, $y1 + $h / 2,
+            $x1 + $w / 2,
+            $y1,
+            $x2,
+            $y1 + $h / 2,
+            $x1 + $w * 3 / 4,
+            $y2,
+            $x1 + $w / 4,
+            $y2,
+            $x1,
+            $y1 + $h / 2,
         ];
 
         // 五边形
@@ -276,11 +291,16 @@ trait SliderTrait
         $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
-            $w / 2, 0,
-            $w, $h / 2,
-            $w * 3 / 4, $h - $halfBorder / 2,
-            $w * 1 / 4, $h - $halfBorder / 2,
-            0, $h / 2,
+            $w / 2,
+            0,
+            $w,
+            $h / 2,
+            $w * 3 / 4,
+            $h - $halfBorder / 2,
+            $w * 1 / 4,
+            $h - $halfBorder / 2,
+            0,
+            $h / 2,
         ];
         imagesetthickness($ims, $halfBorder); // 划线的线宽加粗
         imagepolygon($ims, $borderPoints, count($borderPoints) / 2, $borderColor);
@@ -293,11 +313,16 @@ trait SliderTrait
             $x = mt_rand($slider_width * 2, $bg_width - $w);
             $y = mt_rand(0, $bg_height - $h);
             $points = [
-                $x + $w / 2, $y,
-                $x + $w, $y + $h / 2,
-                $x + $w * 3 / 4, $y + $h,
-                $x + $w / 4, $y + $h,
-                $x, $y + $h / 2,
+                $x + $w / 2,
+                $y,
+                $x + $w,
+                $y + $h / 2,
+                $x + $w * 3 / 4,
+                $y + $h,
+                $x + $w / 4,
+                $y + $h,
+                $x,
+                $y + $h / 2,
             ];
             $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
@@ -332,7 +357,7 @@ trait SliderTrait
         $w = $slider_width;
         $h = $slider_height;
 
-        $bgColor = $this->PosterDriver->createColorAlpha($this->im, [0, 0, 0, 60]);
+        $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
         $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
 
@@ -344,15 +369,21 @@ trait SliderTrait
 
         $halfBorder = $border / 2;
 
-        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
+        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255]);
 
         $points = [
-            $x1 + $w / 4, $y1,
-            $x1 + $w * 3 / 4, $y1,
-            $x2, $y1 + $h / 2,
-            $x1 + $w * 3 / 4, $y2,
-            $x1 + $w / 4, $y2,
-            $x1, $y1 + $h / 2,
+            $x1 + $w / 4,
+            $y1,
+            $x1 + $w * 3 / 4,
+            $y1,
+            $x2,
+            $y1 + $h / 2,
+            $x1 + $w * 3 / 4,
+            $y2,
+            $x1 + $w / 4,
+            $y2,
+            $x1,
+            $y1 + $h / 2,
         ];
 
         // 五边形
@@ -388,12 +419,18 @@ trait SliderTrait
         $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
 
         $borderPoints = [
-            $w / 4, 0,
-            $w * 3 / 4, 0,
-            $w, $h / 2,
-            $w * 3 / 4, $h - $halfBorder / 2,
-            $w * 1 / 4, $h - $halfBorder / 2,
-            0, $h / 2,
+            $w / 4,
+            0,
+            $w * 3 / 4,
+            0,
+            $w,
+            $h / 2,
+            $w * 3 / 4,
+            $h - $halfBorder / 2,
+            $w * 1 / 4,
+            $h - $halfBorder / 2,
+            0,
+            $h / 2,
         ];
         imagesetthickness($ims, $halfBorder); // 划线的线宽加粗
         imagepolygon($ims, $borderPoints, count($borderPoints) / 2, $borderColor);
@@ -406,12 +443,18 @@ trait SliderTrait
             $x = mt_rand($slider_width * 2, $bg_width - $w);
             $y = mt_rand(0, $bg_height - $h);
             $points = [
-                $x + $w / 4, $y,
-                $x + $w * 3 / 4, $y,
-                $x + $w, $y + $h / 2,
-                $x + $w * 3 / 4, $y + $h,
-                $x + $w / 4, $y + $h,
-                $x, $y + $h / 2,
+                $x + $w / 4,
+                $y,
+                $x + $w * 3 / 4,
+                $y,
+                $x + $w,
+                $y + $h / 2,
+                $x + $w * 3 / 4,
+                $y + $h,
+                $x + $w / 4,
+                $y + $h,
+                $x,
+                $y + $h / 2,
             ];
             $this->drawImageFilledPolygon($this->im, $points, count($points) / 2, $bgColor);
             $bgCount++;
@@ -437,15 +480,18 @@ trait SliderTrait
      * @param $color
      * @return void
      */
-    protected function drawImageFilledPolygon($im, $points, $points_count, $color){
-        if(PHP_VERSION < 8.1)
+    protected function drawImageFilledPolygon($im, $points, $points_count, $color)
+    {
+        if (PHP_VERSION < 8.1) {
             imagefilledpolygon($im, $points, $points_count, $color);
-        else
+        } else {
             imagefilledpolygon($im, $points, $color);
+        }
     }
 
     protected function getImBg()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'slider_bg' . DIRECTORY_SEPARATOR . 'layer0' . mt_rand(1, 3) . '.jpg';
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'slider_bg' . DIRECTORY_SEPARATOR . 'layer0' . mt_rand(1,
+                3) . '.jpg';
     }
 }

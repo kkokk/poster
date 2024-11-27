@@ -16,8 +16,8 @@ use Kkokk\Poster\Image\Drivers\GdDriver;
 class CaptchaGenerator
 {
     protected $PosterDriver; // GdDriver
-    protected $Common; // Common
-    protected $im; // im
+    protected $Common;       // Common
+    protected $im;           // im
     protected $expire = 180; // 过期时间
     protected $leeway = 5;   // 误差值
 
@@ -33,7 +33,7 @@ class CaptchaGenerator
      * Email: 732853989@qq.com
      * Date: 2022/12/15
      * Time: 10:38
-     * @param $im
+     * @param        $im
      * @param string $type
      * @return string
      */
@@ -91,17 +91,25 @@ class CaptchaGenerator
      * Date: 2022/12/15
      * Time: 10:37
      * @param string $src
-     * @param false $resize
-     * @param int $dst_x
-     * @param int $dst_y
-     * @param int $src_x
-     * @param int $src_y
-     * @param int $src_width
-     * @param int $src_height
+     * @param false  $resize
+     * @param int    $dst_x
+     * @param int    $dst_y
+     * @param int    $src_x
+     * @param int    $src_y
+     * @param int    $src_width
+     * @param int    $src_height
      * @throws PosterException
      */
-    protected function drawImage($src = '', $resize = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_width = 0, $src_height = 0)
-    {
+    protected function drawImage(
+        $src = '',
+        $resize = false,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_width = 0,
+        $src_height = 0
+    ) {
         $src = $src ?: $this->getImBg();
 
         list($Width, $Height, $bgType) = @getimagesize($src);
@@ -111,7 +119,9 @@ class CaptchaGenerator
 
         $bgType = image_type_to_extension($bgType, false);
 
-        if (empty($bgType)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+        if (empty($bgType)) {
+            throw new PosterException('image resources cannot be empty (' . $src . ')');
+        }
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);
         if ($getGdVersion && (float)$matches[1] < 2 && $bgType == 'gif') {
@@ -122,7 +132,8 @@ class CaptchaGenerator
         }
 
         if ($resize) {
-            imagecopyresized($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $this->configs['im_width'], $this->configs['im_height'], $Width, $Height);
+            imagecopyresized($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $this->configs['im_width'],
+                $this->configs['im_height'], $Width, $Height);
         } else {
             imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $Width, $Height);
         }
@@ -148,7 +159,8 @@ class CaptchaGenerator
             $im_height = $height ?: $this->configs['im_height'];
 
             for ($i = 0; $i <= $lineCount; $i++) {
-                $color = $this->PosterDriver->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+                $color = $this->PosterDriver->createColor($this->im,
+                    [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
                 $x1 = mt_rand(0, $im_width);
                 $y1 = mt_rand(0, $im_height);
                 $x2 = mt_rand(0, $im_width);
@@ -180,7 +192,7 @@ class CaptchaGenerator
 
             $contents = $this->getChar($this->configs['type']);
 
-            $color = $this->PosterDriver->createColorAlpha($this->im, [255, 255, 255, 1]);
+            $color = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
 
             $im_width = $width ?: $this->configs['im_width'];
             $im_height = $height ?: $this->configs['im_height'];

@@ -107,7 +107,7 @@ trait InputTrait
         if (is_array($contents)) {
             $equally = $im_width / count($contents);
             foreach ($contents as $k => $v) {
-                $color = $this->PosterDriver->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+                $color = $this->PosterDriver->createColor($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
                 $content = $v;
                 $x = mt_rand($k * $equally + 10, ($k + 1) * $equally - $font);
                 $y = mt_rand($font + 10, $im_height);
@@ -119,7 +119,7 @@ trait InputTrait
             $equally = $im_width / mb_strlen($contents);
 
             for ($i = 0; $i < mb_strlen($contents); $i++) {
-                $color = $this->PosterDriver->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+                $color = $this->PosterDriver->createColor($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
                 $content = mb_substr($contents, $i, 1);
                 $x = mt_rand($i * $equally + 10, ($i + 1) * $equally - $font);
                 $y = mt_rand($font + 10, $im_height);

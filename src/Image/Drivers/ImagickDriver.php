@@ -216,10 +216,10 @@ class ImagickDriver extends Driver implements DriverInterface
 
                 $mask = $this->createImagick();
 
-                $mask->newImage($bgWidth, $bgHeight, $this->createColorAlpha([255, 255, 255, 127]));
+                $mask->newImage($bgWidth, $bgHeight, $this->createColor([255, 255, 255, 127]));
 
                 $circle = $this->createImagickDraw();
-                $circle->setFillColor($this->createColorAlpha([255, 255, 255, 1]));
+                $circle->setFillColor($this->createColor());
                 $circle->circle($bgWidth / 2, $bgHeight / 2, $bgWidth / 2, $bgHeight);
 
                 $mask->drawImage($circle);
@@ -247,7 +247,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         # 处理旋转
         if ($angle > 0) {
-            $pic->rotateimage($this->createColorAlpha(), $angle);
+            $pic->rotateimage($this->createColor(), $angle);
         }
 
 
@@ -300,7 +300,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
 
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
 
         $max_ws = $this->im_w;
         if (isset($max_w) && !empty($max_w)) {
@@ -352,7 +352,7 @@ class ImagickDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColorAlpha($common->getNodeStyleColor($colorValue));
+                        $colorCustom = $this->createColor($common->getNodeStyleColor($colorValue));
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
@@ -456,13 +456,13 @@ class ImagickDriver extends Driver implements DriverInterface
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
         $draw = $this->createImagickDraw();
         $draw->setStrokeColor($color);
         $draw->setStrokeWidth($weight);
         switch ($type) {
             case 'rectangle':
-                $draw->setFillColor($this->createColorAlpha());
+                $draw->setFillColor($this->createColor());
                 $draw->rectangle($x1, $y1, $x2, $y2);
                 break;
             case 'filled_rectangle':
@@ -496,7 +496,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $style = '',
         $weight = 1
     ) {
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
         $draw = $this->createImagickDraw();
         $draw->setStrokeColor($color);
         $draw->setStrokeWidth($weight);
@@ -508,7 +508,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
             default:
-                $draw->setFillColor($this->createColorAlpha());
+                $draw->setFillColor($this->createColor());
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
         }
@@ -614,11 +614,6 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         return $driver;
-    }
-
-    public function destroyImage($Imagick)
-    {
-        empty($Imagick) || $Imagick->destroy();
     }
 
     /**

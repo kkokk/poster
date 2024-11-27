@@ -133,7 +133,7 @@ trait ClickTrait
 
         $contents = $this->getContents($contentsLen);
 
-        $color = $this->PosterDriver->createColorAlpha($this->im, [255, 255, 255, 1]);
+        $color = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
 
         $spaces = $this->getSpace($contentsLen);
 
@@ -164,13 +164,13 @@ trait ClickTrait
             $ttfCount = 6;
             for ($j = 1; $j <= $ttfCount; $j++) {
                 // 随机颜色
-                $ttfColor = $this->PosterDriver->createColorAlpha($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
+                $ttfColor = $this->PosterDriver->createColor($this->im, [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
                 imagettftext($this->im, $font - ($j * 2), $angle, $x + $j, $y - $j, $ttfColor, $font_family, $v['contents']);
             }
         }
 
         // 显示字体为黑色
-        $color = $this->PosterDriver->createColorAlpha($this->im, [0, 0, 0, 1]);
+        $color = $this->PosterDriver->createColor($this->im, [0, 0, 0, 1]);
 
         $viewFont = 22; // 显示字体大小
         $fontBox = imagettfbbox($viewFont, 0, $font_family, $content); // 计算文字长宽

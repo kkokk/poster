@@ -272,20 +272,9 @@ class GdDriver extends Driver implements DriverInterface
                 for ($x = 0; $x < $w_circle; $x++) {
                     for ($y = 0; $y < $h_circle; $y++) {
                         $rgbColor = imagecolorat($circle_new, $x, $y);
-                        // $thisColor = imagecolorsforindex($circle_new, $rgbColor); // imagecolorallocatealpha
-
                         if (((($x - $r) * ($x - $r) + ($y - $r) * ($y - $r)) < ($r * $r))) {
-
                             imagesetpixel($circle, $x, $y, $rgbColor);
-
                         }
-
-                        // $newR = $r - 0.5;
-                        // if (((($x - $newR) * ($x - $newR) + ($y - $newR) * ($y - $newR)) == ($newR * $newR))) {
-                        //     imagesetpixel($circle, $x + 1, $y, $rgbColor);
-                        //     imagesetpixel($circle, $x, $y + 1, $rgbColor);
-                        //     imagesetpixel($circle, $x + 1, $y + 1, $rgbColor);
-                        // }
                     }
                 }
 
@@ -303,7 +292,7 @@ class GdDriver extends Driver implements DriverInterface
 
         # 处理旋转
         if ($angle > 0) {
-            $pic = imagerotate($pic, abs($angle % 360 - 360), $this->createColorAlpha($this->im));
+            $pic = imagerotate($pic, abs($angle % 360 - 360), $this->createColor($this->im));
             //获取旋转后的宽高
             $newWidth = imagesx($pic);
             $newHeight = imagesy($pic);
@@ -512,7 +501,7 @@ class GdDriver extends Driver implements DriverInterface
 
         $fontSize = ($fontSize * 3) / 4; // px 转化为 pt
 
-        $color = $this->createColorAlpha($this->im, $rgba);
+        $color = $this->createColor($this->im, $rgba);
 
         mb_internal_encoding('UTF-8'); // 设置编码
 
@@ -558,7 +547,7 @@ class GdDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColorAlpha($this->im,
+                        $colorCustom = $this->createColor($this->im,
                             $this->common->getNodeStyleColor($colorValue));
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
@@ -686,7 +675,7 @@ class GdDriver extends Driver implements DriverInterface
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
-        $color = $this->createColorAlpha($this->im, $rgba);
+        $color = $this->createColor($this->im, $rgba);
 
         switch ($type) {
             case 'rectangle':
@@ -716,7 +705,7 @@ class GdDriver extends Driver implements DriverInterface
         $weight = 1
     ) {
         imagesetthickness($this->im, $weight); // 划线的线宽加粗
-        $color = $this->createColorAlpha($this->im, $rgba);
+        $color = $this->createColor($this->im, $rgba);
 
         switch ($type) {
             case 'filled_arc':
@@ -828,7 +817,7 @@ class GdDriver extends Driver implements DriverInterface
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->im = imagecrop($this->im, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
+        $this->im = $this->cropHandle($this->im, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
         $this->im_w = $width;
         $this->im_h = $height;
     }

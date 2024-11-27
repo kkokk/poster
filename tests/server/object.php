@@ -13,3 +13,6 @@ $color = "#fffffff0";
 $rgb = sscanf($color, "#%02x%02x%02x%02x");
 
 var_dump($rgb);
+
+
+echo sprintf("%.3f", 1 / 127);

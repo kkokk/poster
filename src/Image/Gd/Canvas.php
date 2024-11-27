@@ -20,50 +20,19 @@ class Canvas
 
     public $height;
 
-    public function __construct($width, $height)
+    private $type = 'png';
+
+    public function __construct($width, $height, $background = null, $alpha = false)
     {
         $this->width = $width;
         $this->height = $height;
-        $this->image = imagecreatetruecolor($width, $height);
+        $this->image = $this->createCanvas($width, $height, $background, $alpha);
     }
 
     public function background($color = [255, 255, 255, 127])
     {
-        if (is_array($color)) {
-            if (count($color) != 4) {
-                throw new PosterException('The length of the color parameter is 4');
-            }
-            foreach ($color as $k => $value) {
-                if (!is_int($color[$k])) {
-                    throw new PosterException('The value must be an integer');
-                } elseif ($k < 3 && ($color[$k] > 255 || $color[$k] < 0)) {
-                    throw new PosterException('The color value is between 0-255');
-                } elseif ($k == 3 && ($color[$k] > 127 || $color[$k] < 0)) {
-                    throw new PosterException('The alpha value is between 0-127');
-                }
-            }
-            $rgba = $color;
-        } elseif (strpos($color, '#') !== false) {
-            $rgba = sscanf($color, "#%02x%02x%02x%02x");
-        } elseif (strpos($color, 'rgb') !== false) {
-            $rgba = sscanf($color, "#%02x%02x%02x%02x");
-        } else {
-            throw new PosterException('The background color format error');
-        }
-
-
-        if (isset($rgba[3]) && !is_null($rgba[3])) {
-            $bgColor = imagecolorallocatealpha($this->image, $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
-        } else {
-            $bgColor = imagecolorallocate($this->image, $rgba[0], $rgba[1], $rgba[2]);
-        }
+        $bgColor = $this->createColor($color);
         imagefill($this->image, 0, 0, $bgColor);
-        return $this;
-    }
-
-    public function alpha()
-    {
-        imagesavealpha($this->image, true);
         return $this;
     }
 
@@ -88,5 +57,13 @@ class Canvas
             imagepng($this->image);
         }
         imagedestroy($this->image);
+    }
+
+    public function getData($path = '')
+    {
+        if ($path) {
+            $this->setFilePath($path);
+        }
+        return $this->returnImage($this->type);
     }
 }

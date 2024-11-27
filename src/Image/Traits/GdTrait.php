@@ -120,10 +120,8 @@ trait GdTrait
     public function createIm($w, $h, $rgba, $alpha = false)
     {
         $cut = imagecreatetruecolor($w, $h);
-
-        $color = $alpha ? $this->createColorAlpha($cut, $rgba) : $this->createColor($cut, $rgba);
+        $color = $this->createColor($cut, $rgba);
         if ($alpha) {
-            // imagecolortransparent($cut, $color);
             imagesavealpha($cut, true);
         }
         imagefill($cut, 0, 0, $color);
@@ -132,35 +130,13 @@ trait GdTrait
     }
 
     /**
-     * 获取颜色值，可设置透明度
+     * 获取颜色值
      */
-    public function createColorAlpha($cut, $rgba = [255, 255, 255, 127])
+    public function createColor($image, $rgba = [255, 255, 255])
     {
-
         if (empty($rgba)) {
-            $rgba = [255, 255, 255, 127];
+            $rgba = [255, 255, 255];
         }
-        if (count($rgba) != 4) {
-            throw new PosterException('The length of the rgba parameter is 4');
-        }
-        foreach ($rgba as $k => $value) {
-            if (!is_int($rgba[$k])) {
-                throw new PosterException('The value must be an integer');
-            } elseif ($k < 3 && ($rgba[$k] > 255 || $rgba[$k] < 0)) {
-                throw new PosterException('The color value is between 0-255');
-            } elseif ($k == 3 && ($rgba[$k] > 127 || $rgba[$k] < 0)) {
-                throw new PosterException('The alpha value is between 0-127');
-            }
-        }
-
-        return imagecolorallocatealpha($cut, $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
-    }
-
-    /**
-     * 获取颜色值，没有透明度
-     */
-    public function createColor($image, $rgba = [255, 255, 255, 255])
-    {
         $rgba = parse_color($rgba);
         if (isset($rgba[3]) && !is_null($rgba[3])) {
             return imagecolorallocatealpha($image, $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
@@ -762,12 +738,32 @@ trait GdTrait
             for ($y = 0; $y < $h; $y++) {
                 $rgbColor = imagecolorat($pic, $x, $y);
                 $thisColor = imagecolorsforindex($pic, $rgbColor);
-                $color = $this->createColorAlpha($pic,
+                $color = $this->createColor($pic,
                     [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);
                 imagesetpixel($mask, $x, $y, $color);
             }
         }
 
         return $mask;
+    }
+
+    public function cropHandle($image, $x = 0, $y = 0, $width = 0, $height = 0)
+    {
+        return imagecrop($image, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
+    }
+
+    public function createCanvas($w, $h, $rgba, $alpha = false)
+    {
+        $cut = imagecreatetruecolor($w, $h);
+        if ($alpha) {
+            imagealphablending($cut, false);
+            imagesavealpha($cut, true);
+        }
+        if (!is_null($rgba)) {
+            $color = $this->createColor($cut, $rgba);
+            imagefill($cut, 0, 0, $color);
+        }
+
+        return $cut;
     }
 }

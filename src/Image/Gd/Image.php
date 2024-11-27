@@ -40,18 +40,36 @@ class Image
         return $this->height;
     }
 
-    // 等比缩放
-    public function resize($newWidth, $newHeight)
+    public function thumb($newWidth, $newHeight, $bestFit = false)
     {
-        $aspectRatio = $this->width / $this->height;
-        if ($newWidth / $newHeight > $aspectRatio) {
-            $newWidth = $newHeight * $aspectRatio;
-        } else {
-            $newHeight = $newWidth / $aspectRatio;
+        if ($bestFit) {
+            $aspectRatio = $this->width / $this->height;
+            if ($newWidth / $newHeight > $aspectRatio) {
+                $newWidth = $newHeight * $aspectRatio;
+            } else {
+                $newHeight = $newWidth / $aspectRatio;
+            }
         }
-        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-        imagealphablending($resizedImage, false);
-        imagesavealpha($resizedImage, true);
+        $resizedImage = $this->createCanvas($newWidth, $newHeight, [], true);
+        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
+        $this->image = $resizedImage;
+        $this->width = $newWidth;
+        $this->height = $newHeight;
+        return $this;
+    }
+
+    public function scale($newWidth, $newHeight, $bestFit = false)
+    {
+        if ($bestFit) {
+            $aspectRatio = $this->width / $this->height;
+            if ($newWidth / $newHeight > $aspectRatio) {
+                $newWidth = $newHeight * $aspectRatio;
+            } else {
+                $newHeight = $newWidth / $aspectRatio;
+            }
+        }
+
+        $resizedImage = $this->createCanvas($newWidth, $newHeight, [], true);
         imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
         $this->image = $resizedImage;
         $this->width = $newWidth;
@@ -60,16 +78,10 @@ class Image
     }
 
     // 圆形裁剪
-    public function cropToCircle()
+    public function circle()
     {
         $size = min($this->width, $this->height);
-        $circleImage = imagecreatetruecolor($size, $size);
-        imagealphablending($circleImage, false);
-        imagesavealpha($circleImage, true);
-
-        // 填充透明背景
-        $transparent = imagecolorallocatealpha($circleImage, 0, 0, 0, 127);
-        imagefill($circleImage, 0, 0, $transparent);
+        $circleImage = $this->createCanvas($size, $size, [], true);
 
         // 绘制圆形区域
         $centerX = $size / 2;
@@ -88,6 +100,30 @@ class Image
         $this->image = $circleImage;
         $this->width = $size;
         $this->height = $size;
+        return $this;
+    }
+
+    // 旋转图片
+    public function rotate($angle, $bgColor = [255, 255, 255])
+    {
+        $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($bgColor));
+
+        // 获取旋转后图片的尺寸
+        $rotatedWidth = imagesx($rotatedImage);
+        $rotatedHeight = imagesy($rotatedImage);
+
+        // 创建与原图相同大小的裁剪区域
+        $croppedImage = $this->createCanvas($this->width, $this->height, [], true);
+
+        // 计算偏移（将旋转后的图像中心对齐到裁剪区域中心）
+        $offsetX = ($rotatedWidth - $this->width) / 2;
+        $offsetY = ($rotatedHeight - $this->height) / 2;
+
+        // 裁剪旋转后的图像
+        imagecopy($croppedImage, $rotatedImage, 0, 0, $offsetX, $offsetY, $this->width, $this->height);
+
+        // 更新图像资源
+        $this->image = $croppedImage;
         return $this;
     }
 }

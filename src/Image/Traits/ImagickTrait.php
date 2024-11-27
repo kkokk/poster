@@ -17,7 +17,9 @@ trait ImagickTrait
 
     protected function setDPI()
     {
-        if (!isset($this->im) || empty($this->im)) throw new PosterException('没有创建任何资源');
+        if (!isset($this->im) || empty($this->im)) {
+            throw new PosterException('没有创建任何资源');
+        }
         if (!empty($this->dpi)) {
             $this->im->resampleImage($this->dpi[0], $this->dpi[1], ($this->im)::RESOLUTION_PIXELSPERINCH, 0); //设置画布的dpi
         }
@@ -78,7 +80,9 @@ trait ImagickTrait
         }
 
         if (!empty($source)) {
-            if ($this->type == 'gif') return $this->im->writeImages($source, true);
+            if ($this->type == 'gif') {
+                return $this->im->writeImages($source, true);
+            }
             return $this->im->writeImage($source);
         }
 
@@ -113,11 +117,13 @@ trait ImagickTrait
         if ($src) {
             if ($src instanceof DriverInterface) {
                 $Imagick->readImageBlob($src->getImageBlob());
-            } elseif (strpos($src, 'http') === 0 ) {
-                $stream = @file_get_contents($src, NULL);
-                if (empty($stream)) throw new PosterException('image resources cannot be empty (' . $src . ')');
+            } elseif (strpos($src, 'http') === 0) {
+                $stream = @file_get_contents($src, null);
+                if (empty($stream)) {
+                    throw new PosterException('image resources cannot be empty (' . $src . ')');
+                }
                 $Imagick->readImageBlob($stream);
-            } elseif(file_exists($src)) {
+            } elseif (file_exists($src)) {
                 $Imagick->readImage($this->getRealRoute($src));
             } else {
                 $Imagick->readImageBlob($src);
@@ -132,7 +138,7 @@ trait ImagickTrait
      */
     public function createIm($w, $h, $rgba, $alpha = false, $type = null)
     {
-        $color = $alpha ? $this->createColorAlpha($rgba) : $this->createColor($rgba);
+        $color = $this->createColor($rgba);
         $image = $this->createImagick();
         $image->newImage($w, $h, $color, $type ?: $this->type);//设置画布的信息以及画布的格式
         return $image;
@@ -144,8 +150,12 @@ trait ImagickTrait
     public function createColorAlpha($rgba = [255, 255, 255, 127])
     {
 
-        if (empty($rgba)) $rgba = [255, 255, 255, 127];
-        if (count($rgba) != 4) throw new PosterException('The length of the rgba parameter is 4');
+        if (empty($rgba)) {
+            $rgba = [255, 255, 255, 127];
+        }
+        if (count($rgba) != 4) {
+            throw new PosterException('The length of the rgba parameter is 4');
+        }
         foreach ($rgba as $k => $value) {
             if (!is_int($rgba[$k])) {
                 throw new PosterException('The value must be an integer');
@@ -155,26 +165,24 @@ trait ImagickTrait
                 throw new PosterException('The alpha value is between 0-127');
             }
         }
-
         $rgba[3] = sprintf("%.2f", (128 - $rgba[3]) / 127);
 
         return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
     }
 
     /**
-     * 获取颜色值，没有透明度
+     * 获取颜色值
      */
-    public function createColor($rgba = [255, 255, 255, 1])
+    public function createColor($rgba = [255, 255, 255])
     {
+        if (empty($rgba)) {
+            $rgba = [255, 255, 255];
+        }
+        $rgba = parse_color($rgba);
 
-        if (empty($rgba)) $rgba = [255, 255, 255, 1];
-        if (count($rgba) < 4) throw new PosterException('The length of the rgba parameter is 4');
-        foreach ($rgba as $k => $value) {
-            if (!is_int($rgba[$k])) {
-                throw new PosterException('The text value must be an integer');
-            } elseif ($k < 3 && ($rgba[$k] > 255 || $rgba[$k] < 0)) {
-                throw new PosterException('The text color value is between 0-255');
-            }
+        if (isset($rgba[3]) && !is_null($rgba[3])) {
+            $rgba[3] = sprintf("%.2f", (128 - $rgba[3]) / 127);
+            return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
         }
 
         return new \ImagickPixel("rgb($rgba[0], $rgba[1], $rgba[2])");
@@ -206,11 +214,11 @@ trait ImagickTrait
      * Date: 2023/3/28
      * Time: 17:04
      * @param \Imagick $source
-     * @param $rgbaColor
-     * @param $rgbaCount
-     * @param $to
-     * @param $w
-     * @param $h
+     * @param          $rgbaColor
+     * @param          $rgbaCount
+     * @param          $to
+     * @param          $w
+     * @param          $h
      * @throws \ImagickException
      */
     public function calcColorDirection(\Imagick $source, $rgbaColor, $rgbaCount, $to, $w, $h)
@@ -252,7 +260,9 @@ trait ImagickTrait
             $chunk = ceil($h / ($rgbaCount - 1));
             foreach ($rgbaColor as $k => $v) {
 
-                if ($k == $rgbaCount - 1) break;
+                if ($k == $rgbaCount - 1) {
+                    break;
+                }
 
                 $picsC = $this->createIm($w, $chunk, [], true);
 
@@ -326,9 +336,9 @@ trait ImagickTrait
      * Date: 2023/5/19
      * Time: 15:34
      * @param \Imagick $pic
-     * @param $w double 宽
-     * @param $h double 高
-     * @param $radius int 圆角
+     * @param          $w      double 宽
+     * @param          $h      double 高
+     * @param          $radius int 圆角
      * @return mixed
      * @throws PosterException
      * @throws \ImagickDrawException
@@ -338,39 +348,51 @@ trait ImagickTrait
     {
         // 圆角处理
         $len = $w > $h ? $h / 2 : $w / 2;
-        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius, $len);
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius,
+            $len);
         // 四个角一样
         $mask = $this->createImagick();
-        $mask->newImage($w, $h, $this->createColorAlpha([255, 255, 255, 127]));
+        $mask->newImage($w, $h, $this->createColor([255, 255, 255, 127]));
         $draw = $this->createImagickDraw();
-        $draw->setFillColor($this->createColorAlpha([255, 255, 255, 1]));
+        $draw->setFillColor($this->createColor());
 
         if ($leftTopRadius == $rightTopRadius && $leftTopRadius == $leftBottomRadius && $leftTopRadius == $rightBottomRadius) {
             // 搞一个长方形
             $draw->roundRectangle(0, 0, $w, $h, $leftTopRadius, $leftTopRadius);
         } else {
             // 中间两个长方形填满
-            $draw->rectangle(max($leftTopRadius, $leftBottomRadius) * 2, 0, $w - max($rightTopRadius, $rightBottomRadius) * 2, $h);
-            $draw->rectangle(0, max($leftTopRadius, $rightTopRadius) * 2, $w, $h - max($leftBottomRadius, $rightBottomRadius) * 2);
+            $draw->rectangle(max($leftTopRadius, $leftBottomRadius) * 2, 0,
+                $w - max($rightTopRadius, $rightBottomRadius) * 2, $h);
+            $draw->rectangle(0, max($leftTopRadius, $rightTopRadius) * 2, $w,
+                $h - max($leftBottomRadius, $rightBottomRadius) * 2);
 
             // 左上角为 圆角
-            $draw->rectangle(0, $leftTopRadius, max($leftTopRadius, $leftBottomRadius) * 2, max($leftTopRadius, $rightTopRadius) * 2);
-            $draw->rectangle($leftTopRadius, 0, max($leftTopRadius, $leftBottomRadius) * 2, max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle(0, $leftTopRadius, max($leftTopRadius, $leftBottomRadius) * 2,
+                max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle($leftTopRadius, 0, max($leftTopRadius, $leftBottomRadius) * 2,
+                max($leftTopRadius, $rightTopRadius) * 2);
             $draw->ellipse($leftTopRadius, $leftTopRadius, $leftTopRadius, $leftTopRadius, 0, 360);
 
             // 右上角为 圆角
-            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, 0, $w - $rightTopRadius, max($leftTopRadius, $rightTopRadius) * 2);
-            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, $rightTopRadius, $w, max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, 0, $w - $rightTopRadius,
+                max($leftTopRadius, $rightTopRadius) * 2);
+            $draw->rectangle($w - max($rightTopRadius, $rightBottomRadius) * 2, $rightTopRadius, $w,
+                max($leftTopRadius, $rightTopRadius) * 2);
             $draw->ellipse($w - $rightTopRadius, $rightTopRadius, $rightTopRadius, $rightTopRadius, 0, 360);
 
             // 右下角为 圆角
-            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2, $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w, $h - $rightBottomRadius);
-            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2, $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w - $rightBottomRadius, $h);
-            $draw->ellipse($w - $rightBottomRadius, $h - $rightBottomRadius, $rightBottomRadius, $rightBottomRadius, 0, 360);
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2,
+                $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w, $h - $rightBottomRadius);
+            $draw->rectangle($w - max($rightBottomRadius, $rightTopRadius) * 2,
+                $h - max($rightBottomRadius, $leftBottomRadius) * 2, $w - $rightBottomRadius, $h);
+            $draw->ellipse($w - $rightBottomRadius, $h - $rightBottomRadius, $rightBottomRadius, $rightBottomRadius, 0,
+                360);
 
             // 左下角为 圆角
-            $draw->rectangle(0, $h - max($rightBottomRadius, $leftBottomRadius) * 2, max($leftTopRadius, $leftBottomRadius) * 2, $h - $leftBottomRadius);
-            $draw->rectangle($leftBottomRadius, $h - max($rightBottomRadius, $leftBottomRadius) * 2, max($leftTopRadius, $leftBottomRadius) * 2, $h);
+            $draw->rectangle(0, $h - max($rightBottomRadius, $leftBottomRadius) * 2,
+                max($leftTopRadius, $leftBottomRadius) * 2, $h - $leftBottomRadius);
+            $draw->rectangle($leftBottomRadius, $h - max($rightBottomRadius, $leftBottomRadius) * 2,
+                max($leftTopRadius, $leftBottomRadius) * 2, $h);
             $draw->ellipse($leftBottomRadius, $h - $leftBottomRadius, $leftBottomRadius, $leftBottomRadius, 0, 360);
         }
 
@@ -391,10 +413,29 @@ trait ImagickTrait
      */
     protected function setImageAlpha($pic, $alphas)
     {
-        if(method_exists($pic,'setImageOpacity')) {
+        if (method_exists($pic, 'setImageOpacity')) {
             $pic->setImageOpacity(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
-        } elseif (method_exists($pic,'setImageAlpha')) {
+        } elseif (method_exists($pic, 'setImageAlpha')) {
             $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
         }
+    }
+
+    public function destroyImage($Imagick = null)
+    {
+        if (is_null($Imagick)) {
+            $Imagick = $this->image;
+        }
+        empty($Imagick) || $Imagick->destroy();
+    }
+
+    public function createCanvas($w, $h, $rgba, $type = null, $alpha = false)
+    {
+        $background = $this->createColor($rgba);
+        $image = $this->createImagick();
+        $image->newImage($w, $h, $background, $type ?: $this->type);//设置画布的信息以及画布的格式
+        if ($alpha) {
+            $image->setImageAlphaChannel($image::ALPHACHANNEL_ACTIVATE);
+        }
+        return $image;
     }
 }
