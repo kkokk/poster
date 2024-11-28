@@ -102,7 +102,7 @@ trait ImagickTrait
      * Time: 16:58
      * @return \ImagickDraw
      */
-    public function createTextImagickDraw()
+    protected function createTextImagickDraw()
     {
         if (empty($this->ImagickDraw)) {
             $this->ImagickDraw = new \ImagickDraw();
@@ -111,12 +111,12 @@ trait ImagickTrait
         return $this->ImagickDraw;
     }
 
-    public function createImagickDraw()
+    protected function createImagickDraw()
     {
         return new \ImagickDraw();
     }
 
-    public function createImagick($src = '')
+    protected function createImagick($src = '')
     {
         $Imagick = new \Imagick();
         if ($src) {
@@ -128,11 +128,13 @@ trait ImagickTrait
                     throw new PosterException('Image resources cannot be empty (' . $src . ')');
                 }
                 $Imagick->readImageBlob($stream);
-            } else {
+            } elseif (is_file_path($src)) {
                 if (!file_exists($src)) {
                     throw new PosterException('Image resources not found (' . $src . ')');
                 }
                 $Imagick->readImage(get_real_path($src));
+            } else {
+                $Imagick->readImageBlob($src);
             }
 
         }
@@ -142,7 +144,7 @@ trait ImagickTrait
     /**
      * 创建画布
      */
-    public function createIm($w, $h, $rgba, $alpha = false, $type = null)
+    protected function createIm($w, $h, $rgba, $alpha = false, $type = null)
     {
         $color = $this->createColor($rgba);
         $image = $this->createImagick();
@@ -153,7 +155,7 @@ trait ImagickTrait
     /**
      * 获取颜色值，可设置透明度
      */
-    public function createColorAlpha($rgba = [255, 255, 255, 127])
+    protected function createColorAlpha($rgba = [255, 255, 255, 127])
     {
 
         if (empty($rgba)) {
@@ -179,7 +181,7 @@ trait ImagickTrait
     /**
      * 获取颜色值
      */
-    public function createColor($rgba = [255, 255, 255])
+    protected function createColor($rgba = [255, 255, 255])
     {
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
@@ -202,7 +204,7 @@ trait ImagickTrait
      * Time: 11:44
      * @param mixed $source 读取原图片
      */
-    public function cropImage(\Imagick $source, $src_x, $src_y)
+    protected function cropImage(\Imagick $source, $src_x, $src_y)
     {
         // 裁剪原图片，仅保留指定坐标的内容
         if ($src_x > 0 || $src_y > 0) {
@@ -227,7 +229,7 @@ trait ImagickTrait
      * @param          $h
      * @throws \ImagickException
      */
-    public function calcColorDirection(\Imagick $source, $rgbaColor, $rgbaCount, $to, $w, $h)
+    protected function calcColorDirection(\Imagick $source, $rgbaColor, $rgbaCount, $to, $w, $h)
     {
 
         switch ($to) {
@@ -281,7 +283,7 @@ trait ImagickTrait
         }
     }
 
-    public function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
+    protected function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
     {
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
@@ -310,7 +312,7 @@ trait ImagickTrait
         }
     }
 
-    public function fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contentsArr, $color)
+    protected function fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contentsArr, $color)
     {
         $dst_x_old = $dst_x;
         foreach ($contentsArr as $v) {
@@ -426,12 +428,12 @@ trait ImagickTrait
         }
     }
 
-    public function cropHandle(\Imagick $image, $x = 0, $y = 0, $width = 0, $height = 0)
+    protected function cropHandle(\Imagick $image, $x = 0, $y = 0, $width = 0, $height = 0)
     {
         return $image->cropImage($width, $height, $x, $y);
     }
 
-    public function destroyImage($Imagick = null)
+    protected function destroyImage($Imagick = null)
     {
         if (is_null($Imagick)) {
             $Imagick = $this->image;
@@ -439,7 +441,7 @@ trait ImagickTrait
         empty($Imagick) || $Imagick->destroy();
     }
 
-    public function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
+    protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
     {
         $background = $this->createColor($rgba);
         $image = $this->createImagick();

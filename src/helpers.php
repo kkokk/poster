@@ -301,3 +301,11 @@ if (!function_exists('cross_product')) {
     }
 }
 
+if (!function_exists('is_file_path')) {
+    function is_file_path($path)
+    {
+        // 正则表达式，用于匹配 Windows 和 Unix 风格的路径
+        $pattern = '/^(?:[a-zA-Z]:\/*\\\\*\/*(?:[^\\\\\/:*?"<>|\r\n]+\/*\\\\*\/*)*[^\\\\\/:*?"<>|\r\n]*|\/(?:[^\\\\\/:*?"<>|\r\n]+\/)*[^\\\\\/:*?"<>|\r\n]*)$/x';
+        return preg_match($pattern, $path) === 1;
+    }
+}

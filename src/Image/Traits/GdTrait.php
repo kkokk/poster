@@ -75,21 +75,23 @@ trait GdTrait
         throw new PosterException("Source not found {$source}");
     }
 
-    public function createImage($src = '')
+    protected function createImage($src = '')
     {
         if ($src instanceof DriverInterface) {
             return $this->returnImageInfoByBlob($src->getImageBlob());
         } elseif (strpos($src, 'http') === 0) {
             return $this->returnImageInfoBySrc($src);
-        } else {
+        } elseif (is_file_path($src)) {
             if (!file_exists($src)) {
                 throw new PosterException('Image resources not found (' . $src . ')');
             }
+            return $this->returnImageInfoBySrc($src);
+        } else {
             return $this->returnImageInfoByBlob($src);
         }
     }
 
-    public function returnImageInfoByBlob($blob)
+    protected function returnImageInfoByBlob($blob)
     {
         list($width, $height, $bgType) = @getimagesizefromstring($blob);
 
@@ -103,7 +105,7 @@ trait GdTrait
         return [$pic, $width, $height, $bgType];
     }
 
-    public function returnImageInfoBySrc($src)
+    protected function returnImageInfoBySrc($src)
     {
         list($width, $height, $bgType) = @getimagesize($src);
 
@@ -127,7 +129,7 @@ trait GdTrait
     /**
      * 创建画布
      */
-    public function createIm($w, $h, $rgba, $alpha = false)
+    protected function createIm($w, $h, $rgba, $alpha = false)
     {
         $cut = imagecreatetruecolor($w, $h);
         $color = $this->createColor($cut, $rgba);
@@ -142,7 +144,7 @@ trait GdTrait
     /**
      * 获取颜色值
      */
-    public function createColor($image, $rgba = [255, 255, 255])
+    protected function createColor($image, $rgba = [255, 255, 255])
     {
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
@@ -254,7 +256,7 @@ trait GdTrait
      * @param $h
      * @return mixed
      */
-    public function calcColorDirection($im, $rgbaColor, $rgbaCount, $to, $w, $h)
+    protected function calcColorDirection($im, $rgbaColor, $rgbaCount, $to, $w, $h)
     {
         $to = preg_replace('~\s+~', ' ', trim($to, ' '));
 
@@ -329,7 +331,7 @@ trait GdTrait
      * @param $i
      * @return false|int
      */
-    public function getColor($im, $rgbaColor, $rgbaCount, $length, $i)
+    protected function getColor($im, $rgbaColor, $rgbaCount, $length, $i)
     {
         $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
         $color = imagecolorallocate($im, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
@@ -347,7 +349,7 @@ trait GdTrait
      * @param $alphas
      * @return false|int
      */
-    public function getAlphasColor($im, $colorRgb, $alphas)
+    protected function getAlphasColor($im, $colorRgb, $alphas)
     {
         $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
         return $color;
@@ -741,7 +743,7 @@ trait GdTrait
     }
 
     /** 设置背景透明 */
-    public function setImageAlpha($pic, $w, $h, $alphas)
+    protected function setImageAlpha($pic, $w, $h, $alphas)
     {
 
         $mask = $this->createIm($w, $h, [], $alphas > 1);
@@ -759,7 +761,7 @@ trait GdTrait
         return $mask;
     }
 
-    public function cropHandle($image, $x = 0, $y = 0, $width = 0, $height = 0)
+    protected function cropHandle($image, $x = 0, $y = 0, $width = 0, $height = 0)
     {
         return imagecrop($image, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
     }
@@ -767,7 +769,7 @@ trait GdTrait
     /**
      * 释放资源
      */
-    public function destroyImage($resource = null)
+    protected function destroyImage($resource = null)
     {
         if (is_null($resource)) {
             $resource = $this->image;
@@ -775,7 +777,7 @@ trait GdTrait
         !is_resource($resource) || imagedestroy($resource);
     }
 
-    public function createCanvas($w, $h, $rgba)
+    protected function createCanvas($w, $h, $rgba)
     {
         $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {
