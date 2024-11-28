@@ -15,7 +15,7 @@ use Kkokk\Poster\Exception\PosterException;
 class Driver
 {
     /** @var resource 画布 */
-    protected $im;
+    protected $image;
 
     /** @var resource 资源文件 */
     protected $source;
@@ -58,15 +58,6 @@ class Driver
     /** @var string 图片类型 */
     protected $type = 'png';
 
-    /** @var string[] 图片类型 */
-    protected $poster_type = [
-        'gif'  => 'imagegif',
-        'jpeg' => 'imagejpeg',
-        'jpg'  => 'imagejpeg',
-        'png'  => 'imagepng',
-        'wbmp' => 'imagewbmp'
-    ];
-
     /** @var array|null 返回结果 */
     public $result = null;
 
@@ -94,7 +85,7 @@ class Driver
             $this->dpi = is_numeric($params['dpi']) ? [$params['dpi'], $params['dpi']] : $params['dpi'];
         }
         if (isset($params['font']) && !empty($params['font'])) {
-            $this->font = $this->getRealRoute($params['font']);
+            $this->font = get_real_path($params['font']);
         }
     }
 
@@ -159,88 +150,9 @@ class Driver
     public function setPath($pathFileName)
     {
         // 绝对路径 or 相对路径
-        $absolute = $this->isAbsolute($pathFileName);
-        $this->path = $this->getDocumentRoot();
+        $absolute = is_absolute($pathFileName);
+        $this->path = get_document_root();
         $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
-    }
-
-    /**
-     * 获取项目根目录
-     * @Author lang
-     * @Date   2022-03-10T15:42:38+0800
-     */
-    public function getDocumentRoot()
-    {
-        $documentRoot = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
-
-        return $documentRoot ? $documentRoot . DIRECTORY_SEPARATOR : '';
-    }
-
-    /**
-     * 判断是否是绝对路径
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2022/12/12
-     * Time: 9:54
-     * @param $pathFileName
-     * @return bool
-     */
-    public function isAbsolute($pathFileName)
-    {
-        // 区分WIN系统绝对路径、暂时只区分linux win mac
-        switch (PHP_OS) {
-            case 'Darwin':
-                $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
-                break;
-            case 'linux':
-            default:
-                if (stripos(PHP_OS, 'WIN') !== false) {
-                    $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
-                } else {
-                    $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
-                }
-                break;
-        }
-
-        return $absolute;
-    }
-
-    /**
-     * 获取真实路径
-     * @Author lang
-     * @Email  : 732853989@qq.com
-     * Date: 2023/5/2
-     * Time: 上午9:35
-     * @param $path
-     * @return false|string
-     */
-    public function getRealRoute($path)
-    {
-        $isAbsolute = $this->isAbsolute($path);
-
-        if ($this->isCli() && !$isAbsolute) {
-            throw new PosterException('For cli environment, please pass the absolute path');
-        }
-
-        return !$isAbsolute ? $this->getDocumentRoot() . $path : realpath($path);
-    }
-
-    public function isCli()
-    {
-        return php_sapi_name() === 'cli';
-    }
-
-    /**
-     * 检查文件是否存在并创建
-     * @Author lang
-     * @Date   2020-08-14T15:32:04+0800
-     * @param string $pathname 路径名称
-     */
-    public function dirExists($pathname)
-    {
-        if (!file_exists($this->path . $pathname)) {
-            mkdir($this->path . $pathname, 0777, true);
-        }
     }
 
     /**
@@ -262,7 +174,7 @@ class Driver
         if ($outfile) {
             $this->setPath($outfile);
             $this->setPathName($outfile);
-            $this->dirExists($this->pathname);
+            dir_exists($this->path . $this->pathname);
             \QRcode::png($text, $this->path . $outfile, $level, $size, $margin, $saveAndPrint);
             return ['url' => $outfile];
         } else {

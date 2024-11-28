@@ -8,13 +8,14 @@
 
 namespace Kkokk\Poster\Image\Drivers;
 
-use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
 class ImagickDriver extends Driver implements DriverInterface
 {
     use ImagickTrait;
+
+    protected $image;
 
     protected $ImagickDraw;
 
@@ -41,24 +42,23 @@ class ImagickDriver extends Driver implements DriverInterface
     public function getBaseData()
     {
         $this->setDPI();
-        $common = new Common();
-        return $common->baseData($this->im->getImageBlob(), $this->type);
+        return base64_data($this->image->getImageBlob(), $this->type);
     }
 
     public function getIm()
     {
-        return $this->im;
+        return $this->image;
     }
 
     public function blob()
     {
         $this->setDPI();
-        return $this->getBlob($this->im);
+        return $this->getBlob($this->image);
     }
 
     public function tmp()
     {
-        return $this->getTmp($this->type, $this->im);
+        return $this->getTmp($this->type, $this->image);
     }
 
     public function setData()
@@ -71,7 +71,7 @@ class ImagickDriver extends Driver implements DriverInterface
     {
         $this->im_w = $w;
         $this->im_h = $h;
-        $this->im = $this->createIm($w, $h, $rgba, $alpha);
+        $this->image = $this->createIm($w, $h, $rgba, $alpha);
     }
 
     public function ImDst($source, $w = 0, $h = 0)
@@ -93,7 +93,7 @@ class ImagickDriver extends Driver implements DriverInterface
             $this->im_h = $bgHeight;
         }
 
-        $this->im = $pic;
+        $this->image = $pic;
     }
 
     public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
@@ -107,8 +107,8 @@ class ImagickDriver extends Driver implements DriverInterface
         $rgbaCount = count($rgbaColor);
 
         // im不存在则创建
-        if (empty($this->im)) {
-            $this->im($w, $h, [], $alpha);
+        if (empty($this->image)) {
+            $this->image($w, $h, [], $alpha);
         }
         // 渐变处理->直接处理im
         // 计算颜色方向
@@ -125,13 +125,13 @@ class ImagickDriver extends Driver implements DriverInterface
 
         if (!empty($query)) {
             $that = clone $this;
-            $that->im = $pic;
+            $that->image = $pic;
             $that->im_w = $w;
             $that->im_h = $h;
             $that->execute($query, $that);
 
             // 合并图片, 合并图片移到下方，这里不需要再合并
-            // $pic->compositeImage($that->im, ($that->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            // $pic->compositeImage($that->image, ($that->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
         // 设置透明度，内容也透明
@@ -150,11 +150,11 @@ class ImagickDriver extends Driver implements DriverInterface
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->im as $frame) {
-                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            foreach ($this->image as $frame) {
+                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
             }
         } else {
-            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
         if ($that) {
@@ -175,15 +175,15 @@ class ImagickDriver extends Driver implements DriverInterface
         $type = 'normal'
     ) {
         $angle = 0;
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         if (is_array($src)) {
             $angle = isset($src['angle']) ? $src['angle'] : 0;
             $src = isset($src['src']) ? $src['src'] : '';
             if (empty($src)) {
-                throw new PosterException('image resources cannot be empty (' . $src . ')');
+                throw new PosterException('Image resources cannot be empty (' . $src . ')');
             }
         }
 
@@ -216,10 +216,10 @@ class ImagickDriver extends Driver implements DriverInterface
 
                 $mask = $this->createImagick();
 
-                $mask->newImage($bgWidth, $bgHeight, $this->createColorAlpha([255, 255, 255, 127]));
+                $mask->newImage($bgWidth, $bgHeight, $this->createColor([255, 255, 255, 127]));
 
                 $circle = $this->createImagickDraw();
-                $circle->setFillColor($this->createColorAlpha([255, 255, 255, 1]));
+                $circle->setFillColor($this->createColor());
                 $circle->circle($bgWidth / 2, $bgHeight / 2, $bgWidth / 2, $bgHeight);
 
                 $mask->drawImage($circle);
@@ -247,18 +247,18 @@ class ImagickDriver extends Driver implements DriverInterface
 
         # 处理旋转
         if ($angle > 0) {
-            $pic->rotateimage($this->createColorAlpha(), $angle);
+            $pic->rotateimage($this->createColor(), $angle);
         }
 
 
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->im as $frame) {
-                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            foreach ($this->image as $frame) {
+                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
             }
         } else {
-            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
 
@@ -281,8 +281,8 @@ class ImagickDriver extends Driver implements DriverInterface
             return true;
         }
 
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         $fontSize = $fontSize ?: $this->font_size;
@@ -293,14 +293,14 @@ class ImagickDriver extends Driver implements DriverInterface
         $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
-            $font = $this->getRealRoute($font);
+            $font = get_real_path($font);
         } else {
             $font = $this->font;
         }
 
         $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
 
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
 
         $max_ws = $this->im_w;
         if (isset($max_w) && !empty($max_w)) {
@@ -324,10 +324,10 @@ class ImagickDriver extends Driver implements DriverInterface
         if (is_array($content)) {
 
             if (!isset($content['type'])) {
-                throw new PosterException('type is required');
+                throw new PosterException('Type is required');
             }
             if (!isset($content['content'])) {
-                throw new PosterException('content is required');
+                throw new PosterException('Content is required');
             }
 
             $type = $content['type'];
@@ -342,8 +342,6 @@ class ImagickDriver extends Driver implements DriverInterface
                 // 分割字符串
                 $matches = preg_split($pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-                $common = new Common();
-
                 for ($i = 0; $i < count($matches); $i += 3) {
                     if (!empty($matches[$i])) {
                         $this->getNodeValue($letter, $matches[$i], $color);
@@ -352,7 +350,7 @@ class ImagickDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColorAlpha($common->getNodeStyleColor($colorValue));
+                        $colorCustom = $this->createColor($colorValue);
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
@@ -365,7 +363,7 @@ class ImagickDriver extends Driver implements DriverInterface
             foreach ($letter as $l) {
 
                 $textStr = $contents . $l['value'];
-                $fontBox = $this->im->queryFontMetrics($draw, $textStr);
+                $fontBox = $this->image->queryFontMetrics($draw, $textStr);
                 $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
 
                 if ($l['value'] == "\n") {
@@ -386,7 +384,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 }
                 $contents .= $l['value'];
 
-                $fontBox1 = $this->im->queryFontMetrics($draw, $l['value']);
+                $fontBox1 = $this->image->queryFontMetrics($draw, $l['value']);
                 $l['w'] = abs($fontBox1['textWidth'] + $fontBox1['descender']) + $calcSpace;
                 $textWidthArr[$line] += $l['w'];
                 $contentsArr[] = $l;
@@ -415,7 +413,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
             foreach ($letter as $l) {
                 $textStr = $contents . $l;
-                $fontBox = $this->im->queryFontMetrics($draw, $textStr);
+                $fontBox = $this->image->queryFontMetrics($draw, $textStr);
                 $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
                 // 判断拼接后的字符串是否超过预设的宽度
                 if (($textWidth > $max_ws) && ($contents !== '')) {
@@ -456,13 +454,13 @@ class ImagickDriver extends Driver implements DriverInterface
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
         $draw = $this->createImagickDraw();
         $draw->setStrokeColor($color);
         $draw->setStrokeWidth($weight);
         switch ($type) {
             case 'rectangle':
-                $draw->setFillColor($this->createColorAlpha());
+                $draw->setFillColor($this->createColor());
                 $draw->rectangle($x1, $y1, $x2, $y2);
                 break;
             case 'filled_rectangle':
@@ -476,11 +474,11 @@ class ImagickDriver extends Driver implements DriverInterface
 
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->im as $frame) {
+            foreach ($this->image as $frame) {
                 $frame->drawImage($draw);
             }
         } else {
-            $this->im->drawImage($draw);
+            $this->image->drawImage($draw);
         }
     }
 
@@ -496,7 +494,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $style = '',
         $weight = 1
     ) {
-        $color = $this->createColorAlpha($rgba);
+        $color = $this->createColor($rgba);
         $draw = $this->createImagickDraw();
         $draw->setStrokeColor($color);
         $draw->setStrokeWidth($weight);
@@ -508,17 +506,17 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
             default:
-                $draw->setFillColor($this->createColorAlpha());
+                $draw->setFillColor($this->createColor());
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
         }
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->im as $frame) {
+            foreach ($this->image as $frame) {
                 $frame->drawImage($draw);
             }
         } else {
-            $this->im->drawImage($draw);
+            $this->image->drawImage($draw);
         }
     }
 
@@ -534,8 +532,8 @@ class ImagickDriver extends Driver implements DriverInterface
         $src_w = 0,
         $src_h = 0
     ) {
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         $qr = \QRcode::re_png($text, $level, $size, $margin);
@@ -544,7 +542,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $bgHeight = imagesy($qr);
 
         ob_start();                     // 打开一个输出缓冲区
-        $this->poster_type['png']($qr); // 将 GD 图像输出到缓冲区
+        IMAGE_TYPE['png']($qr);         // 将 GD 图像输出到缓冲区
         $imageData = ob_get_contents(); // 从缓冲区中读取图像数据
         ob_end_clean();
 
@@ -575,11 +573,11 @@ class ImagickDriver extends Driver implements DriverInterface
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->im as $frame) {
-                $frame->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            foreach ($this->image as $frame) {
+                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
             }
         } else {
-            $this->im->compositeImage($pic, ($this->im)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
         !is_resource($qr) || imagedestroy($qr);
@@ -598,7 +596,7 @@ class ImagickDriver extends Driver implements DriverInterface
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->im->cropImage($width, $height, $x, $y);
+        $this->image = $this->cropHandle($this->image, $width, $height, $x, $y);
         $this->im_w = $width;
         $this->im_h = $height;
     }
@@ -616,17 +614,12 @@ class ImagickDriver extends Driver implements DriverInterface
         return $driver;
     }
 
-    public function destroyImage($Imagick)
-    {
-        empty($Imagick) || $Imagick->destroy();
-    }
-
     /**
      * 析构方法，用于销毁图像资源
      */
     public function __destruct()
     {
-        empty($this->im) || $this->im->destroy();
+        empty($this->image) || $this->image->destroy();
         empty($this->ImagickDraw) || $this->ImagickDraw->destroy();
     }
 }

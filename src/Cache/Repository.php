@@ -26,7 +26,7 @@ class Repository
             $connector = ThinkCache5::class;
             $method = str_replace('put', 'set', $method);
         } else {
-            throw new PosterException('no cacheDriver');
+            throw new PosterException('No cache driver');
         }
         return call_user_func_array([$connector, $method], $params);
     }
