@@ -7,7 +7,9 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-class Text
+use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
+
+class Text extends ImagickGraphicsEngine
 {
 
 }

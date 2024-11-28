@@ -7,6 +7,14 @@
 
 use Kkokk\Poster\Exception\PosterException;
 
+define('IMAGE_TYPE', [
+    'gif'  => 'imagegif',
+    'jpeg' => 'imagejpeg',
+    'jpg'  => 'imagejpeg',
+    'png'  => 'imagepng',
+    'wbmp' => 'imagewbmp'
+]);
+
 if (!function_exists('parse_color')) {
     function parse_color($color)
     {
@@ -52,7 +60,7 @@ if (!function_exists('parse_color')) {
 }
 
 if (!function_exists('color_to_rgba')) {
-    function color_to_rgba($color)
+    function color_to_rgba($color, $isArray = false)
     {
         if (is_array($color)) {
             $rgba = $color;
@@ -63,7 +71,7 @@ if (!function_exists('color_to_rgba')) {
                 $rgba[3] = round($rgba[3] / 255, 2);
             }
         }
-        return "rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])";
+        return $isArray ? $rgba : "rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])";
     }
 }
 
@@ -134,3 +142,162 @@ if (!function_exists('calc_dst_y')) {
         return $dstY;
     }
 }
+
+
+if (!function_exists('is_absolute')) {
+    /**
+     * 判断是否是绝对路径
+     * Author: lang
+     * Email: 732853989@qq.com
+     * Date: 2022/12/12
+     * Time: 9:54
+     * @param $pathFileName
+     * @return bool
+     */
+    function is_absolute($pathFileName)
+    {
+        // 区分WIN系统绝对路径、暂时只区分linux win mac
+        switch (PHP_OS) {
+            case 'Darwin':
+                $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
+                break;
+            case 'linux':
+            default:
+                if (stripos(PHP_OS, 'WIN') !== false) {
+                    $absolute = substr($pathFileName, 1, 1) === ':' ?: false;
+                } else {
+                    $absolute = stripos($pathFileName, DIRECTORY_SEPARATOR) === 0 ?: false;
+                }
+                break;
+        }
+
+        return $absolute;
+    }
+}
+if (!function_exists('get_document_root')) {
+    /**
+     * 获取项目根目录
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 9:51
+     * @return string
+     */
+    function get_document_root()
+    {
+        $documentRoot = iconv('UTF-8', 'GBK', $_SERVER['DOCUMENT_ROOT']);
+
+        return $documentRoot ? $documentRoot . DIRECTORY_SEPARATOR : '';
+    }
+}
+
+if (!function_exists('get_real_path')) {
+    /**
+     * 获取真实路径
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 9:47
+     * @param $path
+     * @return false|string
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
+    function get_real_path($path)
+    {
+        $isAbsolute = is_absolute($path);
+
+        if (isCli() && !$isAbsolute) {
+            throw new PosterException('For cli environment, please pass the absolute path');
+        }
+
+        return !$isAbsolute ? get_document_root() . $path : realpath($path);
+    }
+}
+
+if (!function_exists('is_cli')) {
+    /**
+     * 是否是 cli 环境
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 9:46
+     * @return bool
+     */
+    function isCli()
+    {
+        return php_sapi_name() === 'cli';
+    }
+}
+
+if (!function_exists('dir_exists')) {
+    /**
+     * 检查文件是否存在并创建
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 9:46
+     * @param $pathname
+     * @return void
+     */
+    function dir_exists($pathname)
+    {
+        if (!is_dir($pathname)) {
+            mkdir($pathname, 0777, true);
+        }
+    }
+}
+if (!function_exists('base64_data')) {
+    function base64_data($image, $type = 'png')
+    {
+        $baseData = '';
+        if (is_resource($image) || is_object($image)) {
+            ob_start();
+            IMAGE_TYPE[$type]($image);
+            $data = ob_get_contents();
+            ob_end_clean();
+            $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            imagedestroy($image);
+        } elseif (is_string($image)) {
+            $baseData = 'data:image/' . $type . ';base64,' . base64_encode($image);
+        }
+        return $baseData;
+    }
+}
+if (!function_exists('image_out_put')) {
+    /**
+     * 输出图片
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 10:19
+     * @param $im
+     * @param $dir
+     * @param $type
+     * @param $quality
+     * @return true
+     */
+    function image_out_put($im, $dir = '', $type = 'png', $quality = 75)
+    {
+        if ($type == 'jpg' || $type == 'jpeg') {
+            IMAGE_TYPE[$type]($im, $dir, $quality);
+        } else {
+            IMAGE_TYPE[$type]($im, $dir);
+        }
+
+        return true;
+    }
+}
+
+if (!function_exists('cross_product')) {
+    /**
+     * 计算 三个点的叉乘 |p1 p2| X |p1 p|
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 10:23
+     * @param $p1
+     * @param $p2
+     * @param $p
+     * @return float|int
+     */
+    function cross_product($p1, $p2, $p)
+    {
+        // 公式 (p2.x - p1.x) * (p.y - p1.y) -(p.x - p1.x) * (p2.y - p1.y);
+        return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
+    }
+}
+

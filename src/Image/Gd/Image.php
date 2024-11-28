@@ -7,100 +7,13 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Image\Traits\GdTrait;
+use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
 
-class Image
+class Image extends GdGraphicsEngine
 {
-    use GdTrait;
-
-    private $image;
-    private $width;
-    private $height;
-
     public function __construct($path)
     {
         list($this->image, $this->width, $this->height) = $this->createImage($path);
-    }
-
-    // 获取图片资源
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    // 获取宽度
-    public function getWidth()
-    {
-        return $this->width;
-    }
-
-    // 获取高度
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    public function thumb($newWidth, $newHeight, $bestFit = false)
-    {
-        if ($bestFit) {
-            $aspectRatio = $this->width / $this->height;
-            if ($newWidth / $newHeight > $aspectRatio) {
-                $newWidth = $newHeight * $aspectRatio;
-            } else {
-                $newHeight = $newWidth / $aspectRatio;
-            }
-        }
-        $resizedImage = $this->createCanvas($newWidth, $newHeight, [], true);
-        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
-        $this->image = $resizedImage;
-        $this->width = $newWidth;
-        $this->height = $newHeight;
-        return $this;
-    }
-
-    public function scale($newWidth, $newHeight, $bestFit = false)
-    {
-        if ($bestFit) {
-            $aspectRatio = $this->width / $this->height;
-            if ($newWidth / $newHeight > $aspectRatio) {
-                $newWidth = $newHeight * $aspectRatio;
-            } else {
-                $newHeight = $newWidth / $aspectRatio;
-            }
-        }
-
-        $resizedImage = $this->createCanvas($newWidth, $newHeight, [], true);
-        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
-        $this->image = $resizedImage;
-        $this->width = $newWidth;
-        $this->height = $newHeight;
-        return $this;
-    }
-
-    // 圆形裁剪
-    public function circle()
-    {
-        $size = min($this->width, $this->height);
-        $circleImage = $this->createCanvas($size, $size, [255, 255, 255, 127]);
-
-        // 绘制圆形区域
-        $centerX = $size / 2;
-        $centerY = $size / 2;
-        $radius = $size / 2;
-        for ($x = 0; $x < $size; $x++) {
-            for ($y = 0; $y < $size; $y++) {
-                $dx = $x - $centerX;
-                $dy = $y - $centerY;
-                if ($dx * $dx + $dy * $dy <= $radius * $radius) {
-                    $color = imagecolorat($this->image, $x, $y);
-                    imagesetpixel($circleImage, $x, $y, $color);
-                }
-            }
-        }
-        $this->image = $circleImage;
-        $this->width = $size;
-        $this->height = $size;
-        return $this;
     }
 
     // 旋转图片

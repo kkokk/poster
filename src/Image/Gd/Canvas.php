@@ -7,26 +7,43 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Image\Traits\GdTrait;
+use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
 
-class Canvas
+class Canvas extends GdGraphicsEngine
 {
-    use GdTrait;
+    public function __construct($width = null, $height = null, $background = [255, 255, 255])
+    {
+        if ($width && $height) {
+            $this->newImage($width, $height, $background);
+        }
+    }
 
-    private $image;
-
-    private $width;
-
-    private $height;
-
-    private $type = 'png';
-
-    public function __construct($width, $height, $background = [255, 255, 255, 127])
+    public function newImage($width, $height, $background = [255, 255, 255])
     {
         $this->width = $width;
         $this->height = $height;
         $this->image = $this->createCanvas($width, $height, $background);
+        return $this;
+    }
+
+    public function readImage($source, $width = null, $height = null, $bestFit = false)
+    {
+        $this->source = $source;
+
+        list($image, $sourceWidth, $sourceHeight, $type) = $this->createImage($source);
+
+        imagealphablending($image, true);
+
+        $this->image = $image;
+        $this->width = $sourceWidth;
+        $this->height = $sourceHeight;
+        $this->type = $type;
+
+        if ($width && $height) {
+            $this->scale($width, $height, $bestFit);
+        }
+
+        return $this;
     }
 
     public function background($color = [255, 255, 255, 127])
@@ -36,7 +53,7 @@ class Canvas
         return $this;
     }
 
-    public function addImage(Image $image, $x, $y)
+    public function addImage(Image $image, $x = 0, $y = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());
@@ -46,20 +63,9 @@ class Canvas
         return $this;
     }
 
-    public function addText($text, $x, $y)
+    public function addText($text, $x = 0, $y = 0)
     {
         $text->draw($this->image, $x, $y);
         return $this;
-    }
-
-    public function output($filename = null)
-    {
-        if ($filename) {
-            imagepng($this->image, $filename);
-        } else {
-            header('Content-Type: image/png');
-            imagepng($this->image);
-        }
-        imagedestroy($this->image);
     }
 }

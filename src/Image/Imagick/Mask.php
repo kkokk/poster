@@ -7,7 +7,9 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-class Mask
+use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
+
+class Mask extends ImagickGraphicsEngine
 {
 
 }

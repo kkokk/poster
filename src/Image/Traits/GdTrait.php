@@ -26,71 +26,81 @@ trait GdTrait
      */
     protected function returnImage($type, $outfile = true)
     {
-        if (!isset($this->im) || empty($this->im)) {
+        if (!isset($this->image) || empty($this->image)) {
             throw new PosterException('没有创建任何资源');
         }
         if ($outfile) {
-            $this->dirExists($this->pathname);
+            dir_exists($this->path . $this->pathname);
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $this->type;
             }
 
-            $this->poster_type[$type]($this->im, $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
+            IMAGE_TYPE[$type]($this->image,
+                $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
 
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
         if (PHP_SAPI === 'cli') {
-            return $this->getBlob($type, $this->im);
+            return $this->getBlob($type, $this->image);
         }
 
         header('Content-Type:Image/' . $this->type);
-        $this->poster_type[$type]($this->im);
+        IMAGE_TYPE[$type]($this->image);
     }
 
     protected function getBlob($type, $im)
     {
         ob_start();
-        $this->poster_type[$type]($im);
+        IMAGE_TYPE[$type]($im);
         return ob_get_clean();
     }
 
     protected function getTmp($type, $im)
     {
         $output = tempnam(sys_get_temp_dir(), uniqid('gdImage'));
-        $this->poster_type[$type]($im, $output);
+        IMAGE_TYPE[$type]($im, $output);
         return $output;
     }
 
     protected function setImage($source)
     {
-
         if (strpos($source, 'http') === 0) {
-            throw new PosterException("unable to set the remote source {$source}");
+            throw new PosterException("Unable to set the remote source {$source}");
         }
 
         if (!empty($source)) {
-            return $this->poster_type[$this->type]($this->im, $source);
+            return IMAGE_TYPE[$this->type]($this->image, $source);
         }
 
-        throw new PosterException("source not found {$source}");
+        throw new PosterException("Source not found {$source}");
     }
 
     public function createImage($src = '')
     {
         if ($src instanceof DriverInterface) {
             return $this->returnImageInfoByBlob($src->getImageBlob());
-        } elseif (strpos($src, 'http') === 0 || file_exists($src)) {
+        } elseif (strpos($src, 'http') === 0) {
             return $this->returnImageInfoBySrc($src);
         } else {
+            if (!file_exists($src)) {
+                throw new PosterException('Image resources not found (' . $src . ')');
+            }
             return $this->returnImageInfoByBlob($src);
         }
     }
 
     public function returnImageInfoByBlob($blob)
     {
-        list($width, $height) = @getimagesizefromstring($blob);
+        list($width, $height, $bgType) = @getimagesizefromstring($blob);
+
+        if (empty($bgType)) {
+            throw new PosterException('Image resources cannot be empty (blob)');
+        }
+
+        $bgType = image_type_to_extension($bgType, false);
+
         $pic = imagecreatefromstring($blob);
-        return [$pic, $width, $height];
+        return [$pic, $width, $height, $bgType];
     }
 
     public function returnImageInfoBySrc($src)
@@ -98,7 +108,7 @@ trait GdTrait
         list($width, $height, $bgType) = @getimagesize($src);
 
         if (empty($bgType)) {
-            throw new PosterException('image resources cannot be empty (' . $src . ')');
+            throw new PosterException('Image resources cannot be empty (' . $src . ')');
         }
 
         $bgType = image_type_to_extension($bgType, false);
@@ -111,7 +121,7 @@ trait GdTrait
             $pic = @$fun($src);
         }
 
-        return [$pic, $width, $height];
+        return [$pic, $width, $height, $bgType];
     }
 
     /**
@@ -365,7 +375,7 @@ trait GdTrait
         for ($i = $toi; $i >= 0; $i--) {
             // 获取颜色
             $color = $this->getColor($im, $rgbaColor, $rgbaCount, $toi, $i);
-            // imagefilledrectangle($this->im, 0, $i, $w, 0, $color); // 填充颜色
+            // imagefilledrectangle($this->image, 0, $i, $w, 0, $color); // 填充颜色
             // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
                 imagesetpixel($im, $$jj, $$ii, $color);
@@ -694,7 +704,7 @@ trait GdTrait
     {
         for ($i = 0; $i < $weight; $i++) {
             list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-            imagettftext($this->im, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font,
+            imagettftext($this->image, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font,
                 $contents);
         }
     }
@@ -767,16 +777,16 @@ trait GdTrait
 
     public function createCanvas($w, $h, $rgba)
     {
-        $cut = imagecreatetruecolor($w, $h);
+        $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {
             $rgba = parse_color($rgba);
             if (isset($rgba[3]) && !empty($rgba[3])) {
-                imagesavealpha($cut, true);
+                imagesavealpha($image, true);
             }
-            $color = $this->createColor($cut, $rgba);
-            imagefill($cut, 0, 0, $color);
+            $color = $this->createColor($image, $rgba);
+            imagefill($image, 0, 0, $color);
         }
 
-        return $cut;
+        return $image;
     }
 }

@@ -17,36 +17,41 @@ trait ImagickTrait
 
     protected function setDPI()
     {
-        if (!isset($this->im) || empty($this->im)) {
+        if (!isset($this->image) || empty($this->image)) {
             throw new PosterException('没有创建任何资源');
         }
         if (!empty($this->dpi)) {
-            $this->im->resampleImage($this->dpi[0], $this->dpi[1], ($this->im)::RESOLUTION_PIXELSPERINCH, 0); //设置画布的dpi
+            $this->image->resampleImage($this->dpi[0], $this->dpi[1], ($this->image)::RESOLUTION_PIXELSPERINCH,
+                0); //设置画布的dpi
         }
     }
 
     /**
      * 返回图片流或者图片
-     * @Author lang
-     * @Date   2020-08-14T14:29:57+0800
-     * @return void|array
+     * User: lang
+     * Date: 2024/11/28
+     * Time: 10:34
+     * @param $type
+     * @param $outfile
+     * @return string|string[]|void
+     * @throws \ImagickException
      */
     protected function returnImage($type, $outfile = true)
     {
         if ($outfile) {
-            $this->dirExists($this->pathname);
+            dir_exists($this->path . $this->pathname);
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $type;
             }
             if ($type == 'gif') {
-                $this->im->writeImages($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename, true);
+                $this->image->writeImages($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename, true);
             } else {
-                $this->im->writeImage($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
+                $this->image->writeImage($this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
             }
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
 
-        $imageBlob = $this->im->getImageBlob();
+        $imageBlob = $this->image->getImageBlob();
 
         if (PHP_SAPI === 'cli') {
             return $imageBlob;
@@ -76,17 +81,17 @@ trait ImagickTrait
     {
 
         if (strpos($source, 'http') === 0) {
-            throw new PosterException("unable to set the remote source {$source}");
+            throw new PosterException("Unable to set the remote source {$source}");
         }
 
         if (!empty($source)) {
             if ($this->type == 'gif') {
-                return $this->im->writeImages($source, true);
+                return $this->image->writeImages($source, true);
             }
-            return $this->im->writeImage($source);
+            return $this->image->writeImage($source);
         }
 
-        throw new PosterException("source not found {$source}");
+        throw new PosterException("Source not found {$source}");
     }
 
     /**
@@ -120,13 +125,14 @@ trait ImagickTrait
             } elseif (strpos($src, 'http') === 0) {
                 $stream = @file_get_contents($src, null);
                 if (empty($stream)) {
-                    throw new PosterException('image resources cannot be empty (' . $src . ')');
+                    throw new PosterException('Image resources cannot be empty (' . $src . ')');
                 }
                 $Imagick->readImageBlob($stream);
-            } elseif (file_exists($src)) {
-                $Imagick->readImage($this->getRealRoute($src));
             } else {
-                $Imagick->readImageBlob($src);
+                if (!file_exists($src)) {
+                    throw new PosterException('Image resources not found (' . $src . ')');
+                }
+                $Imagick->readImage(get_real_path($src));
             }
 
         }
@@ -268,7 +274,7 @@ trait ImagickTrait
 
                 $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
 
-                $source->compositeImage($picsC, ($this->im)::COMPOSITE_DEFAULT, 0, $k * $chunk);
+                $source->compositeImage($picsC, ($this->image)::COMPOSITE_DEFAULT, 0, $k * $chunk);
 
                 $picKey++;
             }
@@ -294,12 +300,12 @@ trait ImagickTrait
             list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
 
             if ($this->type == 'gif') {
-                foreach ($this->im as $frame) {
+                foreach ($this->image as $frame) {
                     $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-                    // $this->im->nextImage();
+                    // $this->image->nextImage();
                 }
             } else {
-                $this->im->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
+                $this->image->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
             }
         }
     }
@@ -397,7 +403,7 @@ trait ImagickTrait
         }
 
         $mask->drawImage($draw);
-        $pic->compositeImage($mask, ($this->im)::COMPOSITE_DSTIN, 0, 0);
+        $pic->compositeImage($mask, ($this->image)::COMPOSITE_DSTIN, 0, 0);
 
         return $pic;
     }
@@ -418,6 +424,11 @@ trait ImagickTrait
         } elseif (method_exists($pic, 'setImageAlpha')) {
             $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
         }
+    }
+
+    public function cropHandle(\Imagick $image, $x = 0, $y = 0, $width = 0, $height = 0)
+    {
+        return $image->cropImage($width, $height, $x, $y);
     }
 
     public function destroyImage($Imagick = null)

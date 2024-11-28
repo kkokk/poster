@@ -8,7 +8,6 @@
 
 namespace Kkokk\Poster\Captcha\Generators;
 
-use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Facades\Cache;
 use Kkokk\Poster\Image\Drivers\GdDriver;
@@ -16,7 +15,7 @@ use Kkokk\Poster\Image\Drivers\GdDriver;
 class CaptchaGenerator
 {
     protected $PosterDriver; // GdDriver
-    protected $Common;       // Common
+
     protected $im;           // im
     protected $expire = 180; // 过期时间
     protected $leeway = 5;   // 误差值
@@ -24,7 +23,6 @@ class CaptchaGenerator
     function __construct()
     {
         $this->PosterDriver = new GdDriver();
-        $this->Common = new Common;
     }
 
     /**
@@ -39,19 +37,19 @@ class CaptchaGenerator
      */
     protected function baseData($im, $type = 'png')
     {
-        return $this->Common->baseData($im, $type);
+        return base64_data($im, $type);
     }
 
     public function imOutput($im, $type = 'png', $quality = 75, $filename = 'im')
     {
         $yes = 0; // 控制是否生成图片，测试时方便查看
         $dir = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
-        return $yes && $this->Common->imOutput($im, $dir, $type, $quality);
+        return $yes && image_out_put($im, $dir, $type, $quality);
     }
 
     public function getCross($p1, $p2, $p)
     {
-        return $this->Common->getCross($p1, $p2, $p);
+        return cross_product($p1, $p2, $p);
     }
 
     // 获取缓存
@@ -120,7 +118,7 @@ class CaptchaGenerator
         $bgType = image_type_to_extension($bgType, false);
 
         if (empty($bgType)) {
-            throw new PosterException('image resources cannot be empty (' . $src . ')');
+            throw new PosterException('Image resources cannot be empty (' . $src . ')');
         }
 
         $getGdVersion = preg_match('~\((.*) ~', gd_info()['GD Version'], $matches);

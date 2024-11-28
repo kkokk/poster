@@ -7,25 +7,43 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-use Kkokk\Poster\Image\Traits\ImagickTrait;
+use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
 
-class Canvas
+class Canvas extends ImagickGraphicsEngine
 {
-    use ImagickTrait;
+    public function __construct($width = null, $height = null, $background = [255, 255, 255])
+    {
+        if ($width && $height) {
+            $this->newImage($width, $height, $background);
+        }
+    }
 
-    private $image;
-
-    private $width;
-
-    private $height;
-
-    private $type = 'png';
-
-    public function __construct($width, $height, $background = [255, 255, 255, 127])
+    public function newImage($width, $height, $background = [255, 255, 255])
     {
         $this->image = $this->createCanvas($width, $height, $background);
         $this->width = $this->image->getImageWidth();
         $this->height = $this->image->getImageHeight();
+        return $this;
+    }
+
+    public function readImage($source, $width = null, $height = null, $bestFit = false)
+    {
+        $this->source = $source;
+
+        $image = $this->createImagick($source);
+        $sourceWidth = $image->getImageWidth();
+        $sourceHeight = $image->getImageHeight();
+
+        $this->image = $image;
+        $this->type = strtolower($image->getImageFormat());
+
+        if ($width && $height) {
+            $this->scale($width, $height, $bestFit);
+        } else {
+            $this->width = $sourceWidth;
+            $this->height = $sourceHeight;
+        }
+        return $this;
     }
 
     public function background($background)
@@ -33,7 +51,7 @@ class Canvas
         $this->image->setImageBackgroundColor($this->createColor($background));
     }
 
-    public function addImage(Image $image, $x, $y)
+    public function addImage(Image $image, $x = 0, $y = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());
@@ -50,23 +68,8 @@ class Canvas
         }
     }
 
-    public function addText(Text $text, $x, $y)
+    public function addText(Text $text, $x = 0, $y = 0)
     {
         $text->draw($this->image, $x, $y);
-    }
-
-    public function output($filename = null)
-    {
-        if ($filename) {
-            $this->image->writeImage($filename);
-        } else {
-            header('Content-Type: image/png');
-            echo $this->image;
-        }
-    }
-
-    public function __clone()
-    {
-        $this->image = clone $this->image;
     }
 }

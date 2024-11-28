@@ -7,7 +7,9 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-class Text
+use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
+
+class Text extends GdGraphicsEngine
 {
 
 }

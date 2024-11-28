@@ -8,8 +8,6 @@
 
 namespace Kkokk\Poster\Image\Drivers;
 
-
-use Kkokk\Poster\Common\Common;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
@@ -17,11 +15,8 @@ class GdDriver extends Driver implements DriverInterface
 {
     use GdTrait;
 
-    private $common;
-
     function __construct()
     {
-        $this->common = new Common();
     }
 
     public function getData($path = '')
@@ -39,7 +34,7 @@ class GdDriver extends Driver implements DriverInterface
 
     public function getBaseData()
     {
-        return $this->common->baseData($this->im, $this->type);
+        return base64_data($this->image, $this->type);
     }
 
     public function setData()
@@ -49,17 +44,17 @@ class GdDriver extends Driver implements DriverInterface
 
     public function getIm()
     {
-        return $this->im;
+        return $this->image;
     }
 
     public function blob()
     {
-        return $this->getBlob($this->type, $this->im);
+        return $this->getBlob($this->type, $this->image);
     }
 
     public function tmp()
     {
-        return $this->getTmp($this->type, $this->im);
+        return $this->getTmp($this->type, $this->image);
     }
 
     /**
@@ -69,7 +64,7 @@ class GdDriver extends Driver implements DriverInterface
     {
         $this->im_w = $w;
         $this->im_h = $h;
-        $this->im = $this->createIm($w, $h, $rgba, $alpha);
+        $this->image = $this->createIm($w, $h, $rgba, $alpha);
     }
 
     /**
@@ -98,7 +93,7 @@ class GdDriver extends Driver implements DriverInterface
             $cut = $circle_new;
         }
 
-        $this->im = $cut;
+        $this->image = $cut;
     }
 
     /**
@@ -128,7 +123,7 @@ class GdDriver extends Driver implements DriverInterface
         $rgbaCount = count($rgbaColor);
 
         // im不存在则创建
-        if (empty($this->im)) {
+        if (empty($this->image)) {
             $this->Im($w, $h, [], $alpha);
         }
         // 渐变处理->直接处理im
@@ -146,7 +141,7 @@ class GdDriver extends Driver implements DriverInterface
 
         if (!empty($query)) {
             $that = clone $this;
-            $that->im = $pic;
+            $that->image = $pic;
             $that->im_w = $w;
             $that->im_h = $h;
             $that->execute($query, $that);
@@ -162,7 +157,7 @@ class GdDriver extends Driver implements DriverInterface
             $pic = $this->setPixelRadius($pic, $w, $h, $radius);
         }
 
-        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+        imagecopy($this->image, $pic, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
         if (isset($pic) && is_resource($pic)) {
             $this->destroyImage($pic);
@@ -224,15 +219,15 @@ class GdDriver extends Driver implements DriverInterface
         $type = 'normal'
     ) {
         $angle = 0;
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         if (is_array($src)) {
             $angle = isset($src['angle']) ? $src['angle'] : 0;
             $src = isset($src['src']) ? $src['src'] : '';
             if (empty($src)) {
-                throw new PosterException('image resources cannot be empty (' . $src . ')');
+                throw new PosterException('Image resources cannot be empty (' . $src . ')');
             }
         }
 
@@ -292,7 +287,7 @@ class GdDriver extends Driver implements DriverInterface
 
         # 处理旋转
         if ($angle > 0) {
-            $pic = imagerotate($pic, abs($angle % 360 - 360), $this->createColor($this->im));
+            $pic = imagerotate($pic, abs($angle % 360 - 360), $this->createColor($this->image));
             //获取旋转后的宽高
             $newWidth = imagesx($pic);
             $newHeight = imagesy($pic);
@@ -315,7 +310,7 @@ class GdDriver extends Driver implements DriverInterface
         }
 
         //整合海报
-        imagecopy($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
+        imagecopy($this->image, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
 
         if (isset($pic) && is_resource($pic)) {
             $this->destroyImage($pic);
@@ -360,19 +355,19 @@ class GdDriver extends Driver implements DriverInterface
         $alpha = false,
         $type = 'normal'
     ) {
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         if (strpos($src, 'http') === false) {
-            $src = $this->getRealRoute($src);
+            $src = get_real_path($src);
         }
 
         list($Width, $Height, $bgType) = @getimagesize($src);
         $bgType = image_type_to_extension($bgType, false);
 
         if (empty($bgType)) {
-            throw new PosterException('image resources cannot be empty (' . $src . ')');
+            throw new PosterException('Image resources cannot be empty (' . $src . ')');
         }
 
         // if ($bgType == 'gif') {
@@ -436,7 +431,7 @@ class GdDriver extends Driver implements DriverInterface
         }
 
         //整合水印
-        imagecopymerge($this->im, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight, 100);
+        imagecopymerge($this->image, $pic, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight, 100);
 
         if (isset($circle) && is_resource($circle)) {
             $this->destroyImage($circle);
@@ -480,8 +475,8 @@ class GdDriver extends Driver implements DriverInterface
             return true;
         }
 
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         $fontSize = $fontSize ?: $this->font_size;
@@ -492,7 +487,7 @@ class GdDriver extends Driver implements DriverInterface
         $angle = $angle ?: $this->font_angle;
 
         if (!empty($font)) {
-            $font = $this->getRealRoute($font);
+            $font = get_real_path($font);
         } else {
             $font = $this->font;
         }
@@ -501,7 +496,7 @@ class GdDriver extends Driver implements DriverInterface
 
         $fontSize = ($fontSize * 3) / 4; // px 转化为 pt
 
-        $color = $this->createColor($this->im, $rgba);
+        $color = $this->createColor($this->image, $rgba);
 
         mb_internal_encoding('UTF-8'); // 设置编码
 
@@ -521,10 +516,10 @@ class GdDriver extends Driver implements DriverInterface
         if (is_array($content)) {
 
             if (!isset($content['type'])) {
-                throw new PosterException('type is required');
+                throw new PosterException('Type is required');
             }
             if (!isset($content['content'])) {
-                throw new PosterException('content is required');
+                throw new PosterException('Content is required');
             }
 
             $type = $content['type'];
@@ -547,8 +542,7 @@ class GdDriver extends Driver implements DriverInterface
                     if (isset($matches[$i + 1])) {
                         $style = $matches[$i + 1];
                         $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColor($this->im,
-                            $this->common->getNodeStyleColor($colorValue));
+                        $colorCustom = $this->createColor($this->image, $colorValue);
                         $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
                     }
                 }
@@ -674,20 +668,20 @@ class GdDriver extends Driver implements DriverInterface
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
     {
-        imagesetthickness($this->im, $weight); // 划线的线宽加粗
-        $color = $this->createColor($this->im, $rgba);
+        imagesetthickness($this->image, $weight); // 划线的线宽加粗
+        $color = $this->createColor($this->image, $rgba);
 
         switch ($type) {
             case 'rectangle':
-                imagerectangle($this->im, $x1, $y1, $x2, $y2, $color);
+                imagerectangle($this->image, $x1, $y1, $x2, $y2, $color);
                 break;
             case 'filled_rectangle':
             case 'filledRectangle':
-                imagerectangle($this->im, $x1, $y1, $x2, $y2, $color);
-                imagefilledrectangle($this->im, $x1, $y1, $x2, $y2, $color);
+                imagerectangle($this->image, $x1, $y1, $x2, $y2, $color);
+                imagefilledrectangle($this->image, $x1, $y1, $x2, $y2, $color);
                 break;
             default:
-                imageline($this->im, $x1, $y1, $x2, $y2, $color);
+                imageline($this->image, $x1, $y1, $x2, $y2, $color);
                 break;
         }
     }
@@ -704,22 +698,22 @@ class GdDriver extends Driver implements DriverInterface
         $style = '',
         $weight = 1
     ) {
-        imagesetthickness($this->im, $weight); // 划线的线宽加粗
-        $color = $this->createColor($this->im, $rgba);
+        imagesetthickness($this->image, $weight); // 划线的线宽加粗
+        $color = $this->createColor($this->image, $rgba);
 
         switch ($type) {
             case 'filled_arc':
             case 'filledArc':
-                imagearc($this->im, $cx, $cy, $w, $h, $s, $e, $color);
+                imagearc($this->image, $cx, $cy, $w, $h, $s, $e, $color);
                 $style = $style ?: IMG_ARC_PIE;
                 // IMG_ARC_PIE
                 // IMG_ARC_CHORD
                 // IMG_ARC_NOFILL
                 // IMG_ARC_EDGED
-                imagefilledarc($this->im, $cx, $cy, $w, $h, $s, $e, $color, $style);
+                imagefilledarc($this->image, $cx, $cy, $w, $h, $s, $e, $color, $style);
                 break;
             default:
-                imagearc($this->im, $cx, $cy, $w, $h, $s, $e, $color);
+                imagearc($this->image, $cx, $cy, $w, $h, $s, $e, $color);
                 break;
         }
     }
@@ -748,8 +742,8 @@ class GdDriver extends Driver implements DriverInterface
         $src_w = 0,
         $src_h = 0
     ) {
-        if (empty($this->im)) {
-            throw new PosterException('im resources not be found');
+        if (empty($this->image)) {
+            throw new PosterException('Image resources not be found');
         }
 
         $result = \QRcode::re_png($text, $level, $size, $margin);
@@ -796,7 +790,7 @@ class GdDriver extends Driver implements DriverInterface
 
 
         //整合海报
-        imagecopy($this->im, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
+        imagecopy($this->image, $result, $dst_x, $dst_y, $src_x, $src_y, $bgWidth, $bgHeight);
         if (isset($circle_new) && is_resource($circle_new)) {
             $this->destroyImage($circle_new);
         }
@@ -817,7 +811,7 @@ class GdDriver extends Driver implements DriverInterface
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->im = $this->cropHandle($this->im, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
+        $this->image = $this->cropHandle($this->image, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
         $this->im_w = $width;
         $this->im_h = $height;
     }
@@ -838,6 +832,6 @@ class GdDriver extends Driver implements DriverInterface
      */
     public function __destruct()
     {
-        empty($this->im) || !is_resource($this->im) || imagedestroy($this->im);
+        empty($this->image) || !is_resource($this->image) || imagedestroy($this->image);
     }
 }
