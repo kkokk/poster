@@ -9,7 +9,6 @@
 namespace Kkokk\Poster\Facades;
 
 use Kkokk\Poster\Image\ExtensionInterface;
-use Kkokk\Poster\Image\PosterManager;
 use Kkokk\Poster\Image\Builder;
 
 /**

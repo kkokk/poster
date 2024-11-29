@@ -11,7 +11,7 @@ require '../../vendor/autoload.php';
 
 $canvas = new Canvas();
 
-$file = 'C:\Users\\\32822\Pictures\\' . '朝天门.jpg';
+$file = 'C:\\\\\\\\///Users\\\////32822\Pictures////\\\\\\\\\\' . '朝天门.jpg';
 // $file = 'https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541';
 
 $canvas->readImage($file);
@@ -22,8 +22,10 @@ $image = new \Kkokk\Poster\Image\Imagick\Image('https://img2.baidu.com/it/u=1310
 // $canvas->addImage((clone $image)->scale(50, 50)->circle(), 0, 0);
 // $canvas->addImage($image->scale(100, 100)->circle(), 'center', 0);
 
-$image->crop(0, 0, 100, 100);
-$canvas->addImage($image);
+$canvas->addImage($image->crop('center', 'center', 500, 500));
+
+$qr = new \Kkokk\Poster\Image\Imagick\Qr('http://www.baidu.com', 'L', 4);
+$canvas->addImage($qr, 'center', 'center');
 
 // $canvas->getData(__DIR__ . '/../poster/test7.png');
 // $canvas->setData();

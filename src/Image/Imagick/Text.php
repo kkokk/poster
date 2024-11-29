@@ -11,5 +11,60 @@ use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
 
 class Text extends ImagickGraphicsEngine
 {
+    public function draw($canvas, $x, $y): void
+    {
+        $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
 
+        foreach ($lines as $lineIndex => $line) {
+            $lineY = $y + $lineIndex * $this->fontSize * $this->lineHeight;
+            $draw = $this->createImagickDraw();
+            $draw->setFont($this->font);
+            $draw->setFontSize($this->fontSize);
+            $draw->setFillColor($this->createColor($this->fontColor));
+
+            // 计算对齐偏移量
+            $metrics = $canvas->getImage()->queryFontMetrics($draw, $line);
+            $textWidth = $metrics['textWidth'];
+            switch ($this->textAlign) {
+                case 'center':
+                    $offsetX = ($canvas->getWidth() - $textWidth) / 2;
+                    break;
+                case 'right':
+                    $offsetX = $canvas->getWidth() - $textWidth - $x;
+                    break;
+                default:
+                    $offsetX = $x;
+            }
+
+            $canvas->getImage()->annotateImage($draw, $offsetX, $lineY, 0, $line);
+        }
+    }
+
+    private function autoWrap($maxWidth, $text): array
+    {
+        $words = explode(' ', $text);
+        $lines = [];
+        $currentLine = '';
+
+        foreach ($words as $word) {
+            $testLine = $currentLine ? "$currentLine $word" : $word;
+            $draw = $this->createImagickDraw();
+            $draw->setFont($this->font);
+            $draw->setFontSize($this->fontSize);
+            $metrics = $this->createImagick()->queryFontMetrics($draw, $testLine);
+
+            if ($metrics['textWidth'] > $maxWidth) {
+                $lines[] = $currentLine;
+                $currentLine = $word;
+            } else {
+                $currentLine = $testLine;
+            }
+        }
+
+        if ($currentLine) {
+            $lines[] = $currentLine;
+        }
+
+        return $lines;
+    }
 }

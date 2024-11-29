@@ -769,7 +769,7 @@ trait GdTrait
     /**
      * 释放资源
      */
-    protected function destroyImage($resource = null)
+    public function destroyImage($resource = null)
     {
         if (is_null($resource)) {
             $resource = $this->image;

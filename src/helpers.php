@@ -15,6 +15,14 @@ define('IMAGE_TYPE', [
     'wbmp' => 'imagewbmp'
 ]);
 
+if (!function_exists('poster_base_path')) {
+    function poster_base_path()
+    {
+        return __DIR__;
+    }
+}
+
+
 if (!function_exists('parse_color')) {
     function parse_color($color)
     {
@@ -82,27 +90,27 @@ if (!function_exists('calc_dst_x')) {
      * Date: 2024/11/27
      * Time: 15:47
      * @param $dstX
-     * @param $imWidth
+     * @param $imageWidth
      * @param $bgWidth
      * @return float
      */
-    function calc_dst_x($dstX, $imWidth, $bgWidth)
+    function calc_dst_x($dstX, $imageWidth, $bgWidth)
     {
         if ($dstX == '0') {
             return $dstX;
         } elseif ($dstX === 'center') {
-            $dstX = ceil(($imWidth - $bgWidth) / 2);
+            $dstX = ceil(($imageWidth - $bgWidth) / 2);
         } elseif (is_numeric($dstX) && $dstX < 0) {
-            $dstX = ceil($imWidth + $dstX);
+            $dstX = ceil($imageWidth + $dstX);
         } elseif (is_array($dstX)) {
             if ($dstX[0] == 'center') {
-                $dstX = ceil(($imWidth - $bgWidth) / 2) + $dstX[1];
+                $dstX = ceil(($imageWidth - $bgWidth) / 2) + $dstX[1];
             }
         } elseif (strpos($dstX, '%') !== false) {
             if (substr($dstX, 0, strpos($dstX, '%')) < 0) {
-                $dstX = ceil($imWidth + ($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100));
+                $dstX = ceil($imageWidth + ($imageWidth * substr($dstX, 0, strpos($dstX, '%')) / 100));
             } else {
-                $dstX = ceil($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100);
+                $dstX = ceil($imageWidth * substr($dstX, 0, strpos($dstX, '%')) / 100);
             }
         }
         return $dstX;
@@ -208,7 +216,26 @@ if (!function_exists('get_real_path')) {
             throw new PosterException('For cli environment, please pass the absolute path');
         }
 
-        return !$isAbsolute ? get_document_root() . $path : realpath($path);
+        // 检测是否运行在 Phar 环境中
+        $isInPhar = Phar::running(false) !== '';
+
+        if (!$isAbsolute) {
+            if ($isInPhar) {
+                $basePath = 'phar://' . Phar::running(false); // 获取运行中的 Phar 基础路径
+                return $basePath . $path;
+            } else {
+                return get_document_root() . $path;
+            }
+        }
+
+        // 绝对路径情况下
+        if ($isInPhar && strpos($path, 'phar://') === 0) {
+            // 如果是 Phar 的绝对路径，直接返回
+            return $path;
+        }
+
+        // 非 Phar 环境或普通文件系统路径，使用 realpath
+        return realpath($path);
     }
 }
 
@@ -304,8 +331,7 @@ if (!function_exists('cross_product')) {
 if (!function_exists('is_file_path')) {
     function is_file_path($path)
     {
-        // 正则表达式，用于匹配 Windows 和 Unix 风格的路径
-        $pattern = '/^(?:[a-zA-Z]:\/*\\\\*\/*(?:[^\\\\\/:*?"<>|\r\n]+\/*\\\\*\/*)*[^\\\\\/:*?"<>|\r\n]*|\/(?:[^\\\\\/:*?"<>|\r\n]+\/)*[^\\\\\/:*?"<>|\r\n]*)$/x';
-        return preg_match($pattern, $path) === 1;
+        $pattern = '~^(?:[a-zA-Z]:[/\\\]+(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*|/(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*)~';
+        return strpos($path, 'phar://') === 0 || preg_match($pattern, $path) === 1;
     }
 }
