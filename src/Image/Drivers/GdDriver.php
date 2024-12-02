@@ -136,8 +136,8 @@ class GdDriver extends Driver implements DriverInterface
             $pic = $this->setImageAlpha($pic, $w, $h, $alphas);
         }
 
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $w);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $h);
 
         if (!empty($query)) {
             $that = clone $this;
@@ -280,10 +280,10 @@ class GdDriver extends Driver implements DriverInterface
                 break;
         }
         # 处理目标 x 轴
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
 
         # 处理旋转
         if ($angle > 0) {
@@ -595,13 +595,13 @@ class GdDriver extends Driver implements DriverInterface
                 $line === 1 && $calcSpaceRes += $calcSpace;
             }
 
-            $calcFont = [
-                'text_width'  => max(array_values($textWidthArr)), // 取最宽行宽
-                'text_height' => abs($fontBox[1] - $fontBox[7]),
+            $currentFontBox = [
+                'max_width'  => max(array_values($textWidthArr)), // 取最宽行宽
+                'max_height' => abs($fontBox[1] - $fontBox[7]),
             ];
-            $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w);
 
-            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
             # 自定义间距
             $this->fontWeightArr($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contentsArr);
 
@@ -631,15 +631,15 @@ class GdDriver extends Driver implements DriverInterface
                 $contentStr .= $l;
                 $line === 1 && $calcSpaceRes += $calcSpace;
 
-                $calcFont = [
-                    'text_width'  => max(array_values($textWidthArr)),
-                    'text_height' => abs($fontBox[1] - $fontBox[7]),
+                $currentFontBox = [
+                    'max_width'  => max(array_values($textWidthArr)),
+                    'max_height' => abs($fontBox[1] - $fontBox[7]),
                 ];
             }
 
-            $dst_x = $this->calcTextDstX($dst_x, $calcFont);
+            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w);
 
-            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
 
             # 自定义间距
             if ($space > 0) {
@@ -769,11 +769,11 @@ class GdDriver extends Driver implements DriverInterface
 
 
         # 处理目标 x 轴
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
 
 
         # 处理目标 y 轴
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
 
         # 自定义宽高的时候
         if (!empty($src_w) && !empty($src_h)) {

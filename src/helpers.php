@@ -9,7 +9,28 @@ use Kkokk\Poster\Exception\PosterException;
 
 define('POSTER_BASE_PATH', dirname(__FILE__));
 
+if (!function_exists('ll')) {
+    function ll(...$values)
+    {
+        echo "<pre>";
+        foreach ($values as $value) {
+            print_r($value);
+            echo PHP_EOL;
+        }
+        exit;
+    }
+}
+
 if (!function_exists('gd_image_create')) {
+    /**
+     * 获取 GD 图片创建函数
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:34
+     * @param $type
+     * @return string
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     function gd_image_create($type)
     {
         $imageType = [
@@ -29,14 +50,29 @@ if (!function_exists('gd_image_create')) {
 }
 
 if (!function_exists('poster_base_path')) {
+    /**
+     * 获取根目录
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:34
+     * @return string
+     */
     function poster_base_path()
     {
         return dirname(__FILE__);
     }
 }
 
-
 if (!function_exists('parse_color')) {
+    /**
+     * 颜色解析
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:34
+     * @param $color
+     * @return array
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     function parse_color($color)
     {
         if (is_array($color)) {
@@ -81,6 +117,15 @@ if (!function_exists('parse_color')) {
 }
 
 if (!function_exists('color_to_rgba')) {
+    /**
+     * 颜色数组或16进制 转换为 rgba
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:33
+     * @param $color
+     * @param $isArray
+     * @return array|string
+     */
     function color_to_rgba($color, $isArray = false)
     {
         if (is_array($color)) {
@@ -164,6 +209,140 @@ if (!function_exists('calc_dst_y')) {
     }
 }
 
+if (!function_exists('calc_text_dst_x')) {
+    /**
+     * 计算文字x轴坐标
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 9:48
+     * @param $DstX
+     * @param $calcFont
+     * @param $x1
+     * @param $x2
+     * @return false|float|int|mixed
+     */
+    function calc_text_dst_x($DstX, $fontBox, $imageWidth, $x1 = null, $x2 = null)
+    {
+        $fontBoxWidth = $fontBox['max_width'];
+        $currentImageWidth = ($x1 !== null && $x2 !== null) ?
+            ($x2 - $x1)
+            : $imageWidth;
+        if ($DstX === 'center') {
+            // 如果文字宽度大于 画布宽度 则为0
+            $DstX = ceil(max(0, ($currentImageWidth - $fontBoxWidth)) / 2);
+        } elseif (is_array($DstX)) {
+            $DstX[1] = isset($DstX[1]) ? $DstX[1] : 0;
+            $x1 = $x1 !== null ? $x1 : 0;
+            switch ($DstX[0]) {
+                case 'center':
+                    $DstX = ceil(max(0, ($currentImageWidth - $fontBoxWidth)) / 2) + $x1 + $DstX[1];
+                    break;
+                case 'left': // 左对齐 且 左右偏移
+                    $DstX = $x1 + $DstX[1];
+                    break;
+                case 'right': // 右对齐 且 左右偏移
+                    $DstX = ceil(($currentImageWidth - $fontBoxWidth)) + $x1 + $DstX[1];
+                    break;
+                case 'custom': // 设置 自定义宽度居中 ['custom', 'center|top|bottom', $x1, $x2, $offset] $x1 区间起点宽度 $x2 区间终点宽度 $offset 偏移
+                    $custom = [$DstX[1], isset($DstX[4]) ? $DstX[4] : 0];
+                    $DstX = calc_text_dst_x($custom, $fontBox, $imageWidth, $DstX[2], $DstX[3]);
+                    break;
+                default:
+                    $DstX = 0;
+            }
+        } elseif (strpos($DstX, '%') !== false) {
+            if (substr($DstX, 0, strpos($DstX, '%')) < 0) {
+                $DstX = ceil($currentImageWidth + ($currentImageWidth * substr($DstX, 0, strpos($DstX, '%')) / 100));
+            } else {
+                $DstX = ceil($currentImageWidth * substr($DstX, 0, strpos($DstX, '%')) / 100);
+            }
+        }
+        return $DstX;
+    }
+}
+
+if (!function_exists('calc_text_dst_y')) {
+    /**
+     * 计算文字y轴坐标
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 9:49
+     * @param $DstY
+     * @param $calcFont
+     * @param $y1
+     * @param $y2
+     * @return false|float|int|mixed
+     */
+    function calc_text_dst_y($DstY, $fontBox, $imageHeight, $y1 = null, $y2 = null)
+    {
+        $fontBoxHeight = $fontBox['max_height']; // 文字加换行数的高度
+        $currentImageHeight = ($y1 !== null && $y2 !== null) ?
+            ($y2 - $y1)
+            : $imageHeight;
+        if ($DstY === 'center') {
+            $DstY = ceil(max(0, ($currentImageHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight));
+        } elseif (is_array($DstY)) {
+            $DstY[1] = isset($DstY[1]) ? $DstY[1] : 0;
+            $y1 = $y1 !== null ? $y1 : 0;
+            switch ($DstY[0]) {
+                case 'center':
+                    $DstY = ceil(max(0,
+                            ($currentImageHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight)) + $y1 + $DstY[1];
+                    break;
+                case 'top': // 顶对齐 且 上下偏移
+                    $DstY = $y1 + $DstY[1];
+                    break;
+                case 'bottom': // 底对齐 且 上下偏移
+                    $DstY = ceil(($currentImageHeight - $fontBoxHeight)) + $y1 + $DstY[1];
+                    break;
+                case 'custom': // 设置 自定义高度居中 ['custom', 'center|top|bottom', $y1, $y2, $offset] $y1 区间起点高度 $y2 区间终点高度 $offset 偏移
+                    $custom = [$DstY[1], isset($DstY[4]) ? $DstY[4] : 0];
+                    $DstY = calc_text_dst_y($custom, $fontBox, $imageHeight, $DstY[2], $DstY[3]);
+                    break;
+                default:
+                    $DstY = 0;
+            }
+        } elseif (strpos($DstY, '%') !== false) {
+            if (substr($DstY, 0, strpos($DstY, '%')) < 0) {
+                $DstY = ceil($currentImageHeight + (($currentImageHeight * substr($DstY, 0,
+                                strpos($DstY, '%'))) / 100));
+            } else {
+                $DstY = ceil($currentImageHeight * substr($DstY, 0, strpos($DstY, '%')) / 100);
+            }
+        }
+
+        return $DstY;
+    }
+}
+
+if (!function_exists('calc_font_weight')) {
+    /**
+     * 计算文字加粗的绘制坐标
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:32
+     * @param $num
+     * @param $weight
+     * @param $fontSize
+     * @param $DstX
+     * @param $DstY
+     * @return array|float[]
+     */
+    function calc_font_weight($num, $weight, $fontSize, $DstX, $DstY)
+    {
+        if ($weight % 2 == 0 && $num > 0) {
+            $reallyDstX = $DstX + ($num * 0.25);
+            $reallyDstY = $DstY + $fontSize;
+        } elseif ($weight % 2 != 0 && $num > 0) {
+            $reallyDstX = $DstX;
+            $reallyDstY = $DstY + $fontSize + ($num * 0.25);
+        } else {
+            $reallyDstX = $DstX;
+            $reallyDstY = $DstY + $fontSize;
+        }
+        return [$reallyDstX, $reallyDstY];
+    }
+}
 
 if (!function_exists('is_absolute')) {
     /**
@@ -195,6 +374,7 @@ if (!function_exists('is_absolute')) {
         return $absolute;
     }
 }
+
 if (!function_exists('get_document_root')) {
     /**
      * 获取项目根目录
@@ -282,7 +462,18 @@ if (!function_exists('dir_exists')) {
         }
     }
 }
+
 if (!function_exists('base64_data')) {
+    /**
+     * base64 数据
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:31
+     * @param $image
+     * @param $type
+     * @return string
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     function base64_data($image, $type = 'png')
     {
         $baseData = '';
@@ -299,7 +490,8 @@ if (!function_exists('base64_data')) {
         return $baseData;
     }
 }
-if (!function_exists('image_out_put')) {
+
+if (!function_exists('poster_image_out_put')) {
     /**
      * 输出图片
      * User: lang
@@ -311,7 +503,7 @@ if (!function_exists('image_out_put')) {
      * @param $quality
      * @return true
      */
-    function image_out_put($im, $dir = '', $type = 'png', $quality = 75)
+    function poster_image_out_put($im, $dir = '', $type = 'png', $quality = 75)
     {
         if ($type == 'jpg' || $type == 'jpeg') {
             gd_image_create($type)($im, $dir, $quality);
@@ -342,9 +534,89 @@ if (!function_exists('cross_product')) {
 }
 
 if (!function_exists('is_file_path')) {
+    /**
+     * 判断是否是文件路径
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:30
+     * @param $path
+     * @return bool
+     */
     function is_file_path($path)
     {
         $pattern = '~^(?:[a-zA-Z]:[/\\\]+(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*|/(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*)~';
         return strpos($path, 'phar://') === 0 || preg_match($pattern, $path) === 1;
+    }
+}
+
+if (!function_exists('poster_radius_type')) {
+    /**
+     * 圆角类型
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:26
+     * @param $radius
+     * @param $maxRadius
+     * @return float[]
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
+    function poster_radius_type($radius, $maxRadius)
+    {
+        if (is_string($radius)) {
+            // 把字符串格式转数组
+            $radius = preg_replace('~\s+~', ' ', trim($radius, ' '));
+            $radius = explode(' ', $radius);
+        } elseif (is_numeric($radius)) {
+            // 整形转数组
+            $radius = [$radius, $radius, $radius, $radius];
+        } else {
+            if (!is_array($radius)) {
+                throw new PosterException('圆角参数类型错误');
+            }
+        }
+        // [20] 四个角
+        // [20,30] 第一个值 左上 右下 第二个值 右上 左下
+        // [20,30,20] 第一个值 左上 第二个值 右上 左下 第三个值 右下
+        // [20,30,20,10]  左上 右上 右下  左下
+        $radiusCount = count($radius);
+        if ($radiusCount == 1) {
+            $leftTopRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightTopRadius = poster_max_radius($maxRadius, $radius[0]);
+            $leftBottomRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightBottomRadius = poster_max_radius($maxRadius, $radius[0]);
+        } elseif ($radiusCount == 2) {
+            $leftTopRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightBottomRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightTopRadius = poster_max_radius($maxRadius, $radius[1]);
+            $leftBottomRadius = poster_max_radius($maxRadius, $radius[1]);
+        } elseif ($radiusCount == 3) {
+            $leftTopRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightTopRadius = poster_max_radius($maxRadius, $radius[1]);
+            $leftBottomRadius = poster_max_radius($maxRadius, $radius[1]);
+            $rightBottomRadius = poster_max_radius($maxRadius, $radius[2]);
+        } else {
+            $leftTopRadius = poster_max_radius($maxRadius, $radius[0]);
+            $rightTopRadius = poster_max_radius($maxRadius, $radius[1]);
+            $leftBottomRadius = poster_max_radius($maxRadius, $radius[2]);
+            $rightBottomRadius = poster_max_radius($maxRadius, $radius[3]);
+        }
+
+        return [$leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius];
+    }
+}
+
+if (!function_exists('poster_max_radius')) {
+    /**
+     * 圆角最大值
+     * User: lang
+     * Date: 2024/12/2
+     * Time: 11:26
+     * @param $maxRadius
+     * @param $radius
+     * @return float
+     */
+    function poster_max_radius($maxRadius, $radius)
+    {
+        return $radius < $maxRadius ? floor($radius) : floor($maxRadius);
     }
 }

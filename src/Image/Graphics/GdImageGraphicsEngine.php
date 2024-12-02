@@ -57,7 +57,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
                 $newHeight = round($newWidth / $aspectRatio);
             }
         }
-        $resizedImage = $this->createCanvas($newWidth, $newHeight, [255, 255, 255, 127]);
+        $resizedImage = $this->createCanvas($newWidth, $newHeight);
         imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
         $this->image = $resizedImage;
         $this->width = $newWidth;
@@ -76,7 +76,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
             }
         }
 
-        $resizedImage = $this->createCanvas($newWidth, $newHeight, [255, 255, 255, 127]);
+        $resizedImage = $this->createCanvas($newWidth, $newHeight);
         imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
         $this->image = $resizedImage;
         $this->width = $newWidth;
@@ -88,7 +88,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
     public function circle()
     {
         $size = min($this->width, $this->height);
-        $circleImage = $this->createCanvas($size, $size, [255, 255, 255, 127]);
+        $circleImage = $this->createCanvas($size, $size);
         // 绘制圆形区域
         $centerX = $size / 2;
         $centerY = $size / 2;

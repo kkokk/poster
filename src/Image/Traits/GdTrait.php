@@ -404,10 +404,10 @@ trait GdTrait
     {
         $newIm = $this->createIm($w, $h, [], true);;
 
-        $len = $w > $h ? $h / 2 : $w / 2;
+        $maxRadius = $w > $h ? $h / 2 : $w / 2;
 
-        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius,
-            $len);
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = poster_radius_type($radius,
+            $maxRadius);
 
         for ($x = 0; $x < $w; $x++) {
             for ($y = 0; $y < $h; $y++) {
@@ -702,11 +702,11 @@ trait GdTrait
     /**
      * 字体加粗
      */
-    protected function fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contents)
+    protected function fontWeight($weight, $fontSize, $angle, $DstX, $DstY, $color, $font, $contents)
     {
         for ($i = 0; $i < $weight; $i++) {
-            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
-            imagettftext($this->image, $fontSize, $angle, intval($really_dst_x), intval($really_dst_y), $color, $font,
+            list($reallyDstX, $reallyDstY) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
+            imagettftext($this->image, $fontSize, $angle, intval($reallyDstX), intval($reallyDstY), $color, $font,
                 $contents);
         }
     }
@@ -717,10 +717,10 @@ trait GdTrait
      * Date: 2023/6/2
      * Time: 14:26
      */
-    protected function fontWeightArr($weight, $fontSize, $angle, $dst_x, $dst_y, $color, $font, $contentsArr)
+    protected function fontWeightArr($weight, $fontSize, $angle, $DstX, $DstY, $color, $font, $contentsArr)
     {
 
-        $dst_x_old = $dst_x;
+        $DstX_old = $DstX;
         // $max = max(array_column($contentsArr, 'w')); // 取最大宽度
 
         foreach ($contentsArr as $v) {
@@ -728,17 +728,17 @@ trait GdTrait
             $contents = $v['value'];
 
             if ($contents == "\n") {
-                $dst_x = $dst_x_old;
-                $dst_y += 1.75 * $fontSize;
+                $DstX = $DstX_old;
+                $DstY += 1.75 * $fontSize;
                 continue;
             }
 
             $customColor = !empty($v['color']) ? $v['color'] : $color;
 
-            $this->fontWeight($weight, $fontSize, $angle, $dst_x, $dst_y, $customColor, $font, $contents);
+            $this->fontWeight($weight, $fontSize, $angle, $DstX, $DstY, $customColor, $font, $contents);
 
-            // $dst_x += $max;
-            $dst_x += $v['w'];
+            // $DstX += $max;
+            $DstX += $v['w'];
         }
     }
 
@@ -777,7 +777,7 @@ trait GdTrait
         !is_resource($resource) || imagedestroy($resource);
     }
 
-    protected function createCanvas($w, $h, $rgba)
+    protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
     {
         $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {

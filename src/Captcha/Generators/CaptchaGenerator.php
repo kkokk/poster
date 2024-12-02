@@ -44,7 +44,7 @@ class CaptchaGenerator
     {
         $yes = 0; // 控制是否生成图片，测试时方便查看
         $dir = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
-        return $yes && image_out_put($im, $dir, $type, $quality);
+        return $yes && poster_image_out_put($im, $dir, $type, $quality);
     }
 
     public function getCross($p1, $p2, $p)
