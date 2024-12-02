@@ -7,10 +7,10 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
-use Kkokk\Poster\Image\Graphics\Interfaces\GraphicsEngineInterface;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 
-class Canvas extends ImagickGraphicsEngine
+class Canvas extends ImagickImageGraphicsEngine
 {
     public function __construct($width = null, $height = null, $background = [255, 255, 255])
     {
@@ -52,7 +52,7 @@ class Canvas extends ImagickGraphicsEngine
         $this->image->setImageBackgroundColor($this->createColor($background));
     }
 
-    public function addImage(GraphicsEngineInterface $image, $x = 0, $y = 0)
+    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());

@@ -7,18 +7,31 @@
 
 use Kkokk\Poster\Exception\PosterException;
 
-define('IMAGE_TYPE', [
-    'gif'  => 'imagegif',
-    'jpeg' => 'imagejpeg',
-    'jpg'  => 'imagejpeg',
-    'png'  => 'imagepng',
-    'wbmp' => 'imagewbmp'
-]);
+define('POSTER_BASE_PATH', dirname(__FILE__));
+
+if (!function_exists('gd_image_create')) {
+    function gd_image_create($type)
+    {
+        $imageType = [
+            'gif'  => 'imagegif',
+            'jpeg' => 'imagejpeg',
+            'jpg'  => 'imagejpeg',
+            'png'  => 'imagepng',
+            'wbmp' => 'imagewbmp'
+        ];
+
+        if (!isset($imageType[$type])) {
+            throw new PosterException('The image type is not supported');
+        }
+
+        return $imageType[$type];
+    }
+}
 
 if (!function_exists('poster_base_path')) {
     function poster_base_path()
     {
-        return __DIR__;
+        return dirname(__FILE__);
     }
 }
 
@@ -275,7 +288,7 @@ if (!function_exists('base64_data')) {
         $baseData = '';
         if (is_resource($image) || is_object($image)) {
             ob_start();
-            IMAGE_TYPE[$type]($image);
+            gd_image_create($type)($image);
             $data = ob_get_contents();
             ob_end_clean();
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -301,9 +314,9 @@ if (!function_exists('image_out_put')) {
     function image_out_put($im, $dir = '', $type = 'png', $quality = 75)
     {
         if ($type == 'jpg' || $type == 'jpeg') {
-            IMAGE_TYPE[$type]($im, $dir, $quality);
+            gd_image_create($type)($im, $dir, $quality);
         } else {
-            IMAGE_TYPE[$type]($im, $dir);
+            gd_image_create($type)($im, $dir);
         }
 
         return true;

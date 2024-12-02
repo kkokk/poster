@@ -7,9 +7,10 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
-class GdGraphicsEngine extends GraphicsEngine
+class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use GdTrait;
 

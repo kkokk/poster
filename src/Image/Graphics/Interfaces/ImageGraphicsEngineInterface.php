@@ -7,9 +7,11 @@
 
 namespace Kkokk\Poster\Image\Graphics\Interfaces;
 
-interface GraphicsEngineInterface
+interface ImageGraphicsEngineInterface
 {
     public function getImage();
+
     public function getWidth();
+
     public function getHeight();
 }

@@ -7,11 +7,12 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickTextGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
-class Text extends ImagickGraphicsEngine
+class Text extends ImagickTextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    public function draw($canvas, $x, $y): void
+    public function draw($canvas, $x, $y)
     {
         $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
 
@@ -24,7 +25,7 @@ class Text extends ImagickGraphicsEngine
 
             // 计算对齐偏移量
             $metrics = $canvas->getImage()->queryFontMetrics($draw, $line);
-            $textWidth = $metrics['textWidth'];
+            $textWidth = abs($metrics['textWidth'] + $metrics['descender']);
             switch ($this->textAlign) {
                 case 'center':
                     $offsetX = ($canvas->getWidth() - $textWidth) / 2;
@@ -40,7 +41,7 @@ class Text extends ImagickGraphicsEngine
         }
     }
 
-    private function autoWrap($maxWidth, $text): array
+    private function autoWrap($maxWidth, $text)
     {
         $words = explode(' ', $text);
         $lines = [];

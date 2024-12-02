@@ -7,9 +7,9 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
-class Qr extends ImagickGraphicsEngine
+class Qr extends ImagickImageGraphicsEngine
 {
     public function __construct(
         $text,
@@ -18,7 +18,7 @@ class Qr extends ImagickGraphicsEngine
         $margin = 1
     ) {
         $qr = new \Kkokk\Poster\Image\Gd\Qr($text, $level, $size, $margin);
-        // TODO 宽高108 生成二维码后添加到 canvas 会导致出现类似椭圆点的问题
+        // TODO windows 宽高108 生成二维码后添加到 canvas 会导致出现类似椭圆点的问题
         $this->image = $this->createImagick($qr->blob());
         $this->width = $this->image->getImageWidth();
         $this->height = $this->image->getImageHeight();

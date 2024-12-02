@@ -7,20 +7,19 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\GdTextGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
-class Text extends GdGraphicsEngine
+class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
 {
     public function draw($canvas, $x, $y)
     {
-        $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
+        $lines = $this->autoWrap($this->fontMaxWidth, $this->content);
         $color = $this->createColor($canvas->getImage(), $this->fontColor);
         foreach ($lines as $lineIndex => $line) {
             $lineY = $y + $lineIndex * $this->fontSize * $this->lineHeight;
-            $textBox = imagettfbbox($this->fontSize, 0, $this->font, $line);
-
             // 计算对齐偏移量
-            $textWidth = $textBox[2] - $textBox[0];
+            $textWidth = $this->textWidth($line);
             switch ($this->textAlign) {
                 case 'center':
                     $offsetX = ($canvas->getWidth() - $textWidth) / 2;
@@ -32,14 +31,9 @@ class Text extends GdGraphicsEngine
                     $offsetX = $x;
             }
 
-
-            var_dump($offsetX);
-            var_dump($lineY);
-            var_dump($color);
-            var_dump($this->font);
-            var_dump($line);
-            exit;
-            imagettftext($canvas->getImage(), $this->fontSize, 0, $offsetX, $lineY, $color, $this->font, $line);
+            imagettftext($canvas->getImage(), $this->resolveFontSize(), 0, intval($offsetX), intval($lineY), $color,
+                $this->font,
+                $line);
         }
     }
 
@@ -51,9 +45,8 @@ class Text extends GdGraphicsEngine
 
         foreach ($words as $word) {
             $testLine = $currentLine ? "$currentLine $word" : $word;
-            $textBox = imagettfbbox($this->fontSize, 0, $this->font, $testLine);
-
-            if ($textBox[2] - $textBox[0] > $maxWidth) {
+            $textWidth = $this->textWidth($testLine);
+            if ($textWidth > $maxWidth) {
                 // 当前行超出宽度，保存当前行并开始新行
                 $lines[] = $currentLine;
                 $currentLine = $word;

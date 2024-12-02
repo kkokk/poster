@@ -10,9 +10,8 @@ namespace Kkokk\Poster\Image\Graphics;
 require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Image\Graphics\Interfaces\GraphicsEngineInterface;
 
-class GraphicsEngine implements GraphicsEngineInterface
+class ImageGraphicsEngine
 {
     /** 画布 */
     protected $image;
@@ -29,29 +28,6 @@ class GraphicsEngine implements GraphicsEngineInterface
     /** @var string 存储路径 */
     protected $path;
 
-    protected $content;
-
-    /** @var string 设置字体 */
-    protected $font;
-    /** @var string 字体系列 例如 Microsoft YaHei */
-    protected $fontFamily = '';
-    /** @var int 字体大小 */
-    protected $fontSize = 16;
-    /** @var int[] 字体颜色 */
-    protected $fontColor = [52, 52, 52];
-    /** @var int 字体间距 */
-    protected $fontSpace = 0;
-    /** @var int 字体粗细 */
-    protected $fontWeight = 1;
-    /** @var float 行高倍数 */
-    protected $lineHeight = 1.2;
-    /** @var string 文本对齐方式 left center right */
-    protected $textAlign = 'left';
-    /** @var null 字体旋转角度 */
-    protected $fontAngle = 0;
-    /** @var null 字体最大换行宽度 */
-    protected $fontMaxWidth = 0;
-
     /** @var string 默认目录 */
     protected $pathname = 'poster';
 
@@ -64,18 +40,6 @@ class GraphicsEngine implements GraphicsEngineInterface
     public function config($configs = [])
     {
         isset($configs['path']) && !empty($configs['path']) && $this->setFilePath($configs['path']);
-        isset($configs['font_family']) && !empty($configs['font_family']) && $this->font = $configs['font_family'];
-        isset($configs['font_size']) && !empty($configs['font_size']) && $this->font_size = $configs['font_size'];
-        isset($configs['font_rgba']) && !empty($configs['font_rgba']) && $this->font_rgba = $configs['font_rgba'];
-        isset($configs['font_space']) && !empty($configs['font_space']) && $this->font_space = $configs['font_space'];
-        isset($configs['font_weight']) && !empty($configs['font_weight']) && $this->font_weight = $configs['font_weight'];
-        isset($configs['font_angle']) && !empty($configs['font_angle']) && $this->font_angle = $configs['font_angle'];
-        isset($configs['font_max_w']) && !empty($configs['font_max_w']) && $this->font_max_w = $configs['font_max_w'];
-
-        $this->font = poster_base_path() . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
-        if (isset($configs['font']) && !empty($configs['font'])) {
-            $this->font = get_real_path($configs['font']);
-        }
         return $this;
     }
 
@@ -150,48 +114,6 @@ class GraphicsEngine implements GraphicsEngineInterface
         $absolute = is_absolute($pathFileName);
         $this->path = get_document_root();
         $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
-    }
-
-    public function setText($content)
-    {
-        $this->content = $content;
-        return $this;
-    }
-
-    public function setFont($font)
-    {
-        $this->font = $font;
-        return $this;
-    }
-
-    public function setSize($fontSize)
-    {
-        $this->fontSize = $fontSize;
-        return $this;
-    }
-
-    public function setColor($fontColor)
-    {
-        $this->fontColor = $fontColor;
-        return $this;
-    }
-
-    public function setLineHeight($lineHeight)
-    {
-        $this->lineHeight = $lineHeight;
-        return $this;
-    }
-
-    public function setAlign($textAlign)
-    {
-        $this->textAlign = $textAlign;
-        return $this;
-    }
-
-    public function setMaxWidth($fontMaxWidth)
-    {
-        $this->fontMaxWidth = $fontMaxWidth;
-        return $this;
     }
 
     // 获取图片资源

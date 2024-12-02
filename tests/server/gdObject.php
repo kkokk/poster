@@ -32,7 +32,7 @@ $canvas->addImage($qr, 'center', 'center');
 
 $text = (new Text())
     ->setText("Hello World! This is a test for text wrapping and alignment.")
-    ->setAlign('center');
+    ->setFontAlign('center');
 
 // $canvas->getData(__DIR__ . '/../poster/test7.png');
 // $canvas->setData();

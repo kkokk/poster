@@ -7,9 +7,9 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 
-class Mask extends GdGraphicsEngine
+class Mask extends GdImageGraphicsEngine
 {
 
 }

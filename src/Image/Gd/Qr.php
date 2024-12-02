@@ -7,9 +7,9 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 
-class Qr extends GdGraphicsEngine
+class Qr extends GdImageGraphicsEngine
 {
     public function __construct(
         $text,

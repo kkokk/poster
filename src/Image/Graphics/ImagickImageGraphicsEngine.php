@@ -7,9 +7,10 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
-class ImagickGraphicsEngine extends GraphicsEngine
+class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use ImagickTrait;
 
