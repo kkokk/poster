@@ -7,9 +7,10 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
-class ImagickGraphicsEngine extends GraphicsEngine
+class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use ImagickTrait;
 
@@ -24,7 +25,7 @@ class ImagickGraphicsEngine extends GraphicsEngine
         if (isset($configs['dpi']) && !empty($configs['dpi'])) {
             $this->dpi = is_numeric($configs['dpi']) ? [$configs['dpi'], $configs['dpi']] : $configs['dpi'];
         }
-        parent::config($configs);
+        return parent::config($configs);
     }
 
     public function getData($path = '')
@@ -137,9 +138,16 @@ class ImagickGraphicsEngine extends GraphicsEngine
 
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->image = $this->cropHandle($this->image, $x, $y, $width, $height);
+        $x = calc_dst_x($x, $this->width, $width);
+        $y = calc_dst_Y($y, $this->height, $height);
+        $this->cropHandle($this->image, $x, $y, $width, $height);
         $this->width = $width;
         $this->height = $height;
         return $this;
+    }
+
+    public function __destruct()
+    {
+        $this->destroyImage();
     }
 }

@@ -35,7 +35,7 @@ trait GdTrait
                 $this->filename = $this->filename . '.' . $this->type;
             }
 
-            IMAGE_TYPE[$type]($this->image,
+            gd_image_create($type)($this->image,
                 $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
 
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
@@ -45,20 +45,20 @@ trait GdTrait
         }
 
         header('Content-Type:Image/' . $this->type);
-        IMAGE_TYPE[$type]($this->image);
+        gd_image_create($type)($this->image);
     }
 
     protected function getBlob($type, $im)
     {
         ob_start();
-        IMAGE_TYPE[$type]($im);
+        gd_image_create($type)($im);
         return ob_get_clean();
     }
 
     protected function getTmp($type, $im)
     {
         $output = tempnam(sys_get_temp_dir(), uniqid('gdImage'));
-        IMAGE_TYPE[$type]($im, $output);
+        gd_image_create($type)($im, $output);
         return $output;
     }
 
@@ -69,7 +69,7 @@ trait GdTrait
         }
 
         if (!empty($source)) {
-            return IMAGE_TYPE[$this->type]($this->image, $source);
+            return gd_image_create($this->type)($this->image, $source);
         }
 
         throw new PosterException("Source not found {$source}");
@@ -331,7 +331,7 @@ trait GdTrait
      * @param $i
      * @return false|int
      */
-    protected function getColor($im, $rgbaColor, $rgbaCount, $length, $i)
+    protected function getGradientColor($im, $rgbaColor, $rgbaCount, $length, $i)
     {
         $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
         $color = imagecolorallocate($im, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
@@ -376,7 +376,7 @@ trait GdTrait
 
         for ($i = $toi; $i >= 0; $i--) {
             // 获取颜色
-            $color = $this->getColor($im, $rgbaColor, $rgbaCount, $toi, $i);
+            $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $toi, $i);
             // imagefilledrectangle($this->image, 0, $i, $w, 0, $color); // 填充颜色
             // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
@@ -482,7 +482,7 @@ trait GdTrait
             for ($i = 0; $i < $toLen + 1; $i++) {
                 //设$i为y轴坐标
                 $f = 0;
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $i; $j++) {
                     if ($j <= $toi && ($i - $j) <= $toj) {
                         if (!$f) {
@@ -496,7 +496,7 @@ trait GdTrait
             }
             //加入右半段
             for ($i = $x + 1; $i <= $toi; $i++) {
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $y; $j++) {
                     if (($i + $j) <= $toi && ($y - $j) <= $toj) {
                         imagesetpixel($im, $i + $j, $y - $j, $color);
@@ -508,7 +508,7 @@ trait GdTrait
             for ($i = 0; $i < $toLen + 1; $i++) {
                 //设$i为y轴坐标
                 $f = false;
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $i; $j++) {
                     if ($j <= $toi && ($i - $j) <= $toj) {
                         if (!$f) {
@@ -523,7 +523,7 @@ trait GdTrait
 
             //加入后半段
             for ($i = $x + 1; $i <= $toi; $i++) {
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $len, $ii--);
                 for ($j = 0; $j <= $y; $j++) {
                     if (($i + $j) <= $toi && ($y - $j) <= $toj) {
                         imagesetpixel($im, $i + $j, $j, $color);
@@ -568,13 +568,13 @@ trait GdTrait
 
         if ($isRectangle) { // 长方形
             for ($i = 0; $i < $total; $i++) {
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointRectangle($im, $i, $centerNum, $total, $color, $toiTag, $tojTag, $x, $y);
             }
         } else {
             // 正方形
             for ($i = 0; $i < $total; $i++) {
-                $color = $this->getColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
+                $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $total, $ii--);
                 $im = $this->getPointSquare($im, $i, $centerNum, $color, $x, $y);
             }
         }
@@ -769,7 +769,7 @@ trait GdTrait
     /**
      * 释放资源
      */
-    protected function destroyImage($resource = null)
+    public function destroyImage($resource = null)
     {
         if (is_null($resource)) {
             $resource = $this->image;

@@ -542,7 +542,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $bgHeight = imagesy($qr);
 
         ob_start();                     // 打开一个输出缓冲区
-        IMAGE_TYPE['png']($qr);         // 将 GD 图像输出到缓冲区
+        gd_image_create('png')($qr);         // 将 GD 图像输出到缓冲区
         $imageData = ob_get_contents(); // 从缓冲区中读取图像数据
         ob_end_clean();
 

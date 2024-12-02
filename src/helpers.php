@@ -7,13 +7,34 @@
 
 use Kkokk\Poster\Exception\PosterException;
 
-define('IMAGE_TYPE', [
-    'gif'  => 'imagegif',
-    'jpeg' => 'imagejpeg',
-    'jpg'  => 'imagejpeg',
-    'png'  => 'imagepng',
-    'wbmp' => 'imagewbmp'
-]);
+define('POSTER_BASE_PATH', dirname(__FILE__));
+
+if (!function_exists('gd_image_create')) {
+    function gd_image_create($type)
+    {
+        $imageType = [
+            'gif'  => 'imagegif',
+            'jpeg' => 'imagejpeg',
+            'jpg'  => 'imagejpeg',
+            'png'  => 'imagepng',
+            'wbmp' => 'imagewbmp'
+        ];
+
+        if (!isset($imageType[$type])) {
+            throw new PosterException('The image type is not supported');
+        }
+
+        return $imageType[$type];
+    }
+}
+
+if (!function_exists('poster_base_path')) {
+    function poster_base_path()
+    {
+        return dirname(__FILE__);
+    }
+}
+
 
 if (!function_exists('parse_color')) {
     function parse_color($color)
@@ -82,27 +103,27 @@ if (!function_exists('calc_dst_x')) {
      * Date: 2024/11/27
      * Time: 15:47
      * @param $dstX
-     * @param $imWidth
+     * @param $imageWidth
      * @param $bgWidth
      * @return float
      */
-    function calc_dst_x($dstX, $imWidth, $bgWidth)
+    function calc_dst_x($dstX, $imageWidth, $bgWidth)
     {
         if ($dstX == '0') {
             return $dstX;
         } elseif ($dstX === 'center') {
-            $dstX = ceil(($imWidth - $bgWidth) / 2);
+            $dstX = ceil(($imageWidth - $bgWidth) / 2);
         } elseif (is_numeric($dstX) && $dstX < 0) {
-            $dstX = ceil($imWidth + $dstX);
+            $dstX = ceil($imageWidth + $dstX);
         } elseif (is_array($dstX)) {
             if ($dstX[0] == 'center') {
-                $dstX = ceil(($imWidth - $bgWidth) / 2) + $dstX[1];
+                $dstX = ceil(($imageWidth - $bgWidth) / 2) + $dstX[1];
             }
         } elseif (strpos($dstX, '%') !== false) {
             if (substr($dstX, 0, strpos($dstX, '%')) < 0) {
-                $dstX = ceil($imWidth + ($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100));
+                $dstX = ceil($imageWidth + ($imageWidth * substr($dstX, 0, strpos($dstX, '%')) / 100));
             } else {
-                $dstX = ceil($imWidth * substr($dstX, 0, strpos($dstX, '%')) / 100);
+                $dstX = ceil($imageWidth * substr($dstX, 0, strpos($dstX, '%')) / 100);
             }
         }
         return $dstX;
@@ -208,7 +229,26 @@ if (!function_exists('get_real_path')) {
             throw new PosterException('For cli environment, please pass the absolute path');
         }
 
-        return !$isAbsolute ? get_document_root() . $path : realpath($path);
+        // 检测是否运行在 Phar 环境中
+        $isInPhar = Phar::running(false) !== '';
+
+        if (!$isAbsolute) {
+            if ($isInPhar) {
+                $basePath = 'phar://' . Phar::running(false); // 获取运行中的 Phar 基础路径
+                return $basePath . $path;
+            } else {
+                return get_document_root() . $path;
+            }
+        }
+
+        // 绝对路径情况下
+        if ($isInPhar && strpos($path, 'phar://') === 0) {
+            // 如果是 Phar 的绝对路径，直接返回
+            return $path;
+        }
+
+        // 非 Phar 环境或普通文件系统路径，使用 realpath
+        return realpath($path);
     }
 }
 
@@ -248,7 +288,7 @@ if (!function_exists('base64_data')) {
         $baseData = '';
         if (is_resource($image) || is_object($image)) {
             ob_start();
-            IMAGE_TYPE[$type]($image);
+            gd_image_create($type)($image);
             $data = ob_get_contents();
             ob_end_clean();
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -274,9 +314,9 @@ if (!function_exists('image_out_put')) {
     function image_out_put($im, $dir = '', $type = 'png', $quality = 75)
     {
         if ($type == 'jpg' || $type == 'jpeg') {
-            IMAGE_TYPE[$type]($im, $dir, $quality);
+            gd_image_create($type)($im, $dir, $quality);
         } else {
-            IMAGE_TYPE[$type]($im, $dir);
+            gd_image_create($type)($im, $dir);
         }
 
         return true;
@@ -304,8 +344,7 @@ if (!function_exists('cross_product')) {
 if (!function_exists('is_file_path')) {
     function is_file_path($path)
     {
-        // 正则表达式，用于匹配 Windows 和 Unix 风格的路径
-        $pattern = '/^(?:[a-zA-Z]:\/*\\*\/*(?:[^\\\\\/:*?"<>|\r\n]+\/*\\\\*\/*)*[^\\\\\/:*?"<>|\r\n]*|\/*(?:[^\\\\\/:*?"<>|\r\n]+\/*)*[^\\\\\/:*?"<>|\r\n]*)$/x';
-        return preg_match($pattern, $path) === 1;
+        $pattern = '~^(?:[a-zA-Z]:[/\\\]+(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*|/(?:[^\\\/:*?"<>|\r\n]+[/\\\]*)*[^\\\/:*?"<>|\r\n]*)~';
+        return strpos($path, 'phar://') === 0 || preg_match($pattern, $path) === 1;
     }
 }

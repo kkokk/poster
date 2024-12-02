@@ -7,9 +7,9 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
-use Kkokk\Poster\Image\Graphics\ImagickGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
-class Image extends ImagickGraphicsEngine
+class Image extends ImagickImageGraphicsEngine
 {
     public function __construct($path)
     {

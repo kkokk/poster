@@ -186,8 +186,9 @@ trait ImagickTrait
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
         }
-        $rgba = parse_color($rgba);
-
+        if (!is_array($rgba)) {
+            $rgba = parse_color($rgba);
+        }
         if (isset($rgba[3]) && !is_null($rgba[3])) {
             $rgba[3] = round(floor((128 - $rgba[3]) / 127 * 100) / 100, 2);
             return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
@@ -433,7 +434,7 @@ trait ImagickTrait
         return $image->cropImage($width, $height, $x, $y);
     }
 
-    protected function destroyImage($Imagick = null)
+    public function destroyImage($Imagick = null)
     {
         if (is_null($Imagick)) {
             $Imagick = $this->image;

@@ -7,9 +7,10 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
-class GdGraphicsEngine extends GraphicsEngine
+class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use GdTrait;
 
@@ -88,7 +89,6 @@ class GdGraphicsEngine extends GraphicsEngine
     {
         $size = min($this->width, $this->height);
         $circleImage = $this->createCanvas($size, $size, [255, 255, 255, 127]);
-
         // 绘制圆形区域
         $centerX = $size / 2;
         $centerY = $size / 2;
@@ -111,9 +111,16 @@ class GdGraphicsEngine extends GraphicsEngine
 
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
+        $x = calc_dst_x($x, $this->width, $width);
+        $y = calc_dst_Y($y, $this->height, $height);
         $this->image = $this->cropHandle($this->image, $x, $y, $width, $height);
         $this->width = $width;
         $this->height = $height;
         return $this;
+    }
+
+    public function __destruct()
+    {
+        $this->destroyImage();
     }
 }

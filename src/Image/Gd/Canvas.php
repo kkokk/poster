@@ -7,9 +7,10 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
-use Kkokk\Poster\Image\Graphics\GdGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 
-class Canvas extends GdGraphicsEngine
+class Canvas extends GdImageGraphicsEngine
 {
     public function __construct($width = null, $height = null, $background = [255, 255, 255])
     {
@@ -53,7 +54,7 @@ class Canvas extends GdGraphicsEngine
         return $this;
     }
 
-    public function addImage(Image $image, $x = 0, $y = 0)
+    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());
