@@ -60,15 +60,16 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
         $x = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
         $y = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
 
+        ll($lines, $x, $maxTextWidth, $maxTextHeight);
         foreach ($lines as $lineIndex => $line) {
             $textWidth = $line['width'];
             $lineCharacters = $line['characters'];
             switch ($this->textAlign) {
                 case 'center':
-                    $offsetX = ($maxWidth - $textWidth) / 2;
+                    $offsetX = $x + ($maxWidth - $textWidth) / 2;
                     break;
                 case 'right':
-                    $offsetX = $maxWidth - $textWidth - $x;
+                    $offsetX = $maxWidth - $textWidth + $x;
                     break;
                 default:
                     $offsetX = $x;
@@ -76,17 +77,6 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
             $maxSize = max(array_column($lineCharacters, 'size'));
             foreach ($lineCharacters as $key => $char) {
                 $lineY = $y + ($lineIndex + 1) * $maxSize * $char['lineHeight'];
-                $charWidth = $char['width'];
-
-                // 修正位置，确保与整体绘制对齐
-                $kerning = 0;
-                if ($key > 0) {
-                    $prevChar = $lineCharacters[$key - 1];
-                    // 修正间距
-                    $kerning = $prevChar['width'] - ($prevCharWidth + $charWidth);
-                    ll($offsetX, $kerning, $offsetX += $kerning);
-                }
-                $offsetX += $kerning;
                 // 计算对齐偏移量
                 imagettftext($image->getImage(), $char['size'], $char['angle'], intval($offsetX), intval($lineY),
                     $char['color'],
@@ -94,8 +84,6 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
                     $char['text']);
 
                 $offsetX += $char['width'] + $char['space'];
-
-                $prevCharWidth = $charWidth; // 保存当前字符宽度
             }
         }
     }
@@ -109,16 +97,20 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
         $textHeights = [0];
         foreach ($characters as $char) {
             $text = $char['text'];
-            $char['width'] = $this->textWidth($text, $char['size'], $char['font'], $char['angle']);
+            $char['width'] = $this->textWidth($text, $char['size'], $char['font'],
+                    $char['angle']) + ($char['size'] * 0.3548);
             $char['height'] = $this->textHeight($text, $char['size'], $char['font'], $char['angle']);
 
-            $lineTextWidth = $textWidth + $char['width'] + $char['space'];
-            $textWidths[$line] = $textWidths[$line] + $lineTextWidth;
+            $textWidth += $char['width'] + $char['space'];
+            $textWidths[$line] = $textWidth;
             $textHeights[$line] = max($textHeights[$line], $char['height']);
+            $lineTextWidth = $textWidth;
 
             if ($textWidth > $maxWidth) {
                 $line += 1;
                 $textWidth = 0;
+                $textWidths[$line] = 0;
+                $textHeights[$line] = 0;
             }
             $lines = $this->addLineCharacters($lines, $line, $char, $lineTextWidth);
         }
