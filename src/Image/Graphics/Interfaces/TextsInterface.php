@@ -11,5 +11,5 @@ interface TextsInterface
 {
     public function addText(TextGraphicsEngineInterface $text);
 
-    public function render(ImageGraphicsEngineInterface $image);
+    public function draw(ImageGraphicsEngineInterface $image, $x = 0, $y = 0);
 }

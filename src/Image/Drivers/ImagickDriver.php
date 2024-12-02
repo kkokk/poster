@@ -120,8 +120,8 @@ class ImagickDriver extends Driver implements DriverInterface
             $this->setImageAlpha($pic, $alphas);
         }
 
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $w);
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $h);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $w);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $h);
 
         if (!empty($query)) {
             $that = clone $this;
@@ -236,10 +236,10 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         # 处理目标 x 轴
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
 
         // 裁剪图片
         $this->cropImage($pic, $src_x, $src_y);
@@ -392,13 +392,14 @@ class ImagickDriver extends Driver implements DriverInterface
                 $line === 1 && $calcSpaceRes += $calcSpace;
             }
 
-            $calcFont = [
-                'text_width'  => max(array_values($textWidthArr)), // 取最宽行宽
-                'text_height' => abs($fontBox[1] - $fontBox[7]),
+            $currentFontBox = [
+                'max_width'  => max(array_values($textWidthArr)), // 取最宽行宽
+                'max_height' => abs($fontBox[1] - $fontBox[7]),
             ];
-            $dst_x = $this->calcTextDstX($dst_x, $calcFont);
 
-            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w);
+
+            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
 
             # 自定义间距
             $this->fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $contentsArr, $color);
@@ -424,13 +425,14 @@ class ImagickDriver extends Driver implements DriverInterface
                 $line === 1 && $calcSpaceRes += $calcSpace;
             }
 
-            $calcFont = [
-                'text_width'  => $textWidth,
-                'text_height' => abs($fontBox['textHeight'] + $fontBox['descender']),
+            $currentFontBox = [
+                'max_width'  => $textWidth,
+                'max_height' => abs($fontBox['textHeight'] + $fontBox['descender']),
             ];
-            $dst_x = $this->calcTextDstX($dst_x, $calcFont) - $fontBox['descender']; // 调整和 gd 的误差值
 
-            $dst_y = $this->calcTextDstY($dst_y, $calcFont);
+            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w) - $fontBox['descender']; // 调整和 gd 的误差值
+
+            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
 
             # 自定义间距
             if ($space > 0) {
@@ -541,9 +543,9 @@ class ImagickDriver extends Driver implements DriverInterface
         $bgWidth = imagesx($qr);
         $bgHeight = imagesy($qr);
 
-        ob_start();                     // 打开一个输出缓冲区
+        ob_start();                          // 打开一个输出缓冲区
         gd_image_create('png')($qr);         // 将 GD 图像输出到缓冲区
-        $imageData = ob_get_contents(); // 从缓冲区中读取图像数据
+        $imageData = ob_get_contents();      // 从缓冲区中读取图像数据
         ob_end_clean();
 
         $pic = $this->createImagick();
@@ -558,10 +560,10 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         # 处理目标 x 轴
-        $dst_x = $this->calcDstX($dst_x, $this->im_w, $bgWidth);
+        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
-        $dst_y = $this->calcDstY($dst_y, $this->im_h, $bgHeight);
+        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
 
         # 自定义宽高的时候
         if (!empty($src_w) && !empty($src_h)) {

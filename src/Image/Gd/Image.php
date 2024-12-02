@@ -26,7 +26,7 @@ class Image extends GdImageGraphicsEngine
         $rotatedHeight = imagesy($rotatedImage);
 
         // 创建与原图相同大小的裁剪区域
-        $croppedImage = $this->createCanvas($this->width, $this->height, [], true);
+        $croppedImage = $this->createCanvas($this->width, $this->height);
 
         // 计算偏移（将旋转后的图像中心对齐到裁剪区域中心）
         $offsetX = ($rotatedWidth - $this->width) / 2;

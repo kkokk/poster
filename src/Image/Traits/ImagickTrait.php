@@ -296,11 +296,11 @@ trait ImagickTrait
         }
     }
 
-    protected function fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents)
+    protected function fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents)
     {
         for ($i = 0; $i < $weight; $i++) {
 
-            list($really_dst_x, $really_dst_y) = $this->calcWeight($i, $weight, $fontSize, $dst_x, $dst_y);
+            list($really_dst_x, $really_dst_y) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
 
             if ($this->type == 'gif') {
                 foreach ($this->image as $frame) {
@@ -313,16 +313,16 @@ trait ImagickTrait
         }
     }
 
-    protected function fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contentsArr, $color)
+    protected function fontWeightArr($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contentsArr, $color)
     {
-        $dst_x_old = $dst_x;
+        $DstX_old = $DstX;
         foreach ($contentsArr as $v) {
 
             $contents = $v['value'];
 
             if ($contents == "\n") {
-                $dst_x = $dst_x_old;
-                $dst_y += 1.75 * $fontSize;
+                $DstX = $DstX_old;
+                $DstY += 1.75 * $fontSize;
                 continue;
             }
 
@@ -332,9 +332,9 @@ trait ImagickTrait
                 $draw->setFillColor($color);
             }
 
-            $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x, $dst_y, $contents);
+            $this->fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents);
 
-            $dst_x += $v['w'];
+            $DstX += $v['w'];
         }
     }
 
@@ -356,9 +356,9 @@ trait ImagickTrait
     protected function setPixelRadius($pic, $w, $h, $radius)
     {
         // 圆角处理
-        $len = $w > $h ? $h / 2 : $w / 2;
-        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = $this->getRadiusType($radius,
-            $len);
+        $maxRadius = $w > $h ? $h / 2 : $w / 2;
+        list($leftTopRadius, $rightTopRadius, $leftBottomRadius, $rightBottomRadius) = poster_radius_type($radius,
+            $maxRadius);
         // 四个角一样
         $mask = $this->createImagick();
         $mask->newImage($w, $h, $this->createColor([255, 255, 255, 127]));

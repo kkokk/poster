@@ -25,10 +25,115 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
         return $this;
     }
 
-    public function render(ImageGraphicsEngineInterface $image)
+    public function draw(ImageGraphicsEngineInterface $image, $x = 0, $y = 0)
     {
+        $characters = [];
+        $maxWidth = $this->getMaxWidth() ?: $image->getWidth();
         foreach ($this->contents as $text) {
-            $textColor = $this->createColor($text->getFontColor());
+            $textColor = $this->createColor($image->getImage(), $text->getFontColor());
+            $textFont = $text->getFont();
+            $textFontSize = $text->resolveFontSize();
+            $textFontAngle = $text->getFontAngle();
+            $textFontSpace = $text->getFontSpace();
+            $textFontWeight = $text->getFontWeight();
+            $textLineHeight = $text->getLineHeight();
+            $textTextAlign = $text->getFontAlign();
+
+            $content = $text->getText();
+            // 将字符串拆分成一个个单字 保存到数组 $characters 中
+            for ($i = 0; $i < mb_strlen($content); $i++) {
+                $characters[] = [
+                    'text'       => mb_substr($content, $i, 1),
+                    'color'      => $textColor,
+                    'font'       => $textFont,
+                    'size'       => $textFontSize,
+                    'angle'      => $textFontAngle,
+                    'space'      => $textFontSpace,
+                    'weight'     => $textFontWeight,
+                    'lineHeight' => $textLineHeight,
+                    'align'      => $textTextAlign,
+                ];
+            }
         }
+
+        list($lines, $maxTextWidth, $maxTextHeight) = $this->autoWrap($characters, $maxWidth);
+        $x = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
+        $y = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
+
+        foreach ($lines as $lineIndex => $line) {
+            $textWidth = $line['width'];
+            $lineCharacters = $line['characters'];
+            switch ($this->textAlign) {
+                case 'center':
+                    $offsetX = ($maxWidth - $textWidth) / 2;
+                    break;
+                case 'right':
+                    $offsetX = $maxWidth - $textWidth - $x;
+                    break;
+                default:
+                    $offsetX = $x;
+            }
+            $maxSize = max(array_column($lineCharacters, 'size'));
+            foreach ($lineCharacters as $key => $char) {
+                $lineY = $y + ($lineIndex + 1) * $maxSize * $char['lineHeight'];
+                $charWidth = $char['width'];
+
+                // 修正位置，确保与整体绘制对齐
+                $kerning = 0;
+                if ($key > 0) {
+                    $prevChar = $lineCharacters[$key - 1];
+                    // 修正间距
+                    $kerning = $prevChar['width'] - ($prevCharWidth + $charWidth);
+                    ll($offsetX, $kerning, $offsetX += $kerning);
+                }
+                $offsetX += $kerning;
+                // 计算对齐偏移量
+                imagettftext($image->getImage(), $char['size'], $char['angle'], intval($offsetX), intval($lineY),
+                    $char['color'],
+                    $char['font'],
+                    $char['text']);
+
+                $offsetX += $char['width'] + $char['space'];
+
+                $prevCharWidth = $charWidth; // 保存当前字符宽度
+            }
+        }
+    }
+
+    protected function autoWrap($characters, $maxWidth)
+    {
+        $lines = [];
+        $line = 0;
+        $textWidth = 0;
+        $textWidths = [0];
+        $textHeights = [0];
+        foreach ($characters as $char) {
+            $text = $char['text'];
+            $char['width'] = $this->textWidth($text, $char['size'], $char['font'], $char['angle']);
+            $char['height'] = $this->textHeight($text, $char['size'], $char['font'], $char['angle']);
+
+            $lineTextWidth = $textWidth + $char['width'] + $char['space'];
+            $textWidths[$line] = $textWidths[$line] + $lineTextWidth;
+            $textHeights[$line] = max($textHeights[$line], $char['height']);
+
+            if ($textWidth > $maxWidth) {
+                $line += 1;
+                $textWidth = 0;
+            }
+            $lines = $this->addLineCharacters($lines, $line, $char, $lineTextWidth);
+        }
+
+        return [$lines, max(array_values($textWidths)), array_sum($textHeights)];
+    }
+
+    protected function addLineCharacters($lines, $line, $charConfig, $textWidth)
+    {
+        if (!isset($lines[$line])) {
+            $lines[$line] = [];
+            $lines[$line]['characters'] = [];
+        }
+        $lines[$line]['width'] = $textWidth;
+        $lines[$line]['characters'][] = $charConfig;
+        return $lines;
     }
 }

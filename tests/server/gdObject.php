@@ -8,15 +8,16 @@
 use Kkokk\Poster\Image\Gd\Canvas;
 use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Gd\Text;
+use Kkokk\Poster\Image\Gd\Texts;
 
 require '../../vendor/autoload.php';
 
-$canvas = new Canvas();
+$canvas = new Canvas(500, 500);
 
 $file = 'C:\\\\\\\\///Users\\\////32822\Pictures////\\\\\\\\\\' . '朝天门.jpg';
 // $file = 'https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541';
 
-$canvas->readImage($file);
+// $canvas->readImage($file);
 
 // $image = new Image('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png');
 $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541');
@@ -24,19 +25,60 @@ $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=
 // $canvas->addImage((clone $image)->scale(50, 50)->circle(), 0, 0);
 // $canvas->addImage($image->scale(100, 100)->circle(), 'center', 0);
 
-$canvas->addImage($image->crop('center', 'center', 500, 500));
+// $canvas->addImage($image->crop('center', 'center', 500, 500));
 
-$qr = new \Kkokk\Poster\Image\Gd\Qr('http://www.baidu.com');
+// $qr = new \Kkokk\Poster\Image\Gd\Qr('http://www.baidu.com');
 
-$canvas->addImage($qr, 'center', 'center');
+// $canvas->addImage($qr, 'center', 'center');
 
-$text = (new Text())
-    ->setText("Hello World! This is a test for text wrapping and alignment.")
-    ->setFontAlign('center');
+
+$texts = new Texts();
+$texts
+    ->addText((new Text())
+        ->setText("床前明月光，")
+        ->setFontSize(16)
+        ->setFontColor('#000000')
+    )
+    ->addText((new Text())
+        ->setText("疑似地上霜。")
+        ->setFontSize(22)
+        ->setFontColor('#00ff00')
+    )
+    ->addText((new Text())
+        ->setText("举头望明月，")
+        ->setFontSize(12)
+        ->setFontColor('#0000ff')
+    )
+    ->addText((new Text())
+        ->setText("低头思故乡。")
+        ->setFontSize(28)
+        ->setFontColor('#ff0000')
+    );
+
+$texts->draw($canvas);
+
+(new Text())
+    ->setText("床前明月光，")
+    ->setFontSize(16)
+    ->setFontColor('#000000')->draw($canvas, 0, 100);
+
+(new Text())
+    ->setText("疑似地上霜。")
+    ->setFontSize(22)
+    ->setFontColor('#00ff00')->draw($canvas, 90, 92);
+
+(new Text())
+    ->setText("举头望明月，")
+    ->setFontSize(12)
+    ->setFontColor('#0000ff')->draw($canvas, 212, 106);
+
+(new Text())
+    ->setText("低头思故乡。")
+    ->setFontSize(28)
+    ->setFontColor('#ff0000')->draw($canvas, 280, 83);
 
 // $canvas->getData(__DIR__ . '/../poster/test7.png');
 // $canvas->setData();
-$text->draw($canvas, 20, 50);
 
 
 $canvas->getStream();
