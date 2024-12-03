@@ -144,7 +144,7 @@ trait GdTrait
     /**
      * 获取颜色值
      */
-    protected function createColor($image, $rgba = [255, 255, 255])
+    public function createColor($image, $rgba = [255, 255, 255])
     {
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
@@ -790,5 +790,34 @@ trait GdTrait
         }
 
         return $image;
+    }
+
+    public function calculateTextBox($text, $fontSize, $font, $angle)
+    {
+        $rect = imagettfbbox($fontSize, $angle, $font, $text);
+        $minX = min([$rect[0], $rect[2], $rect[4], $rect[6]]);
+        $maxX = max([$rect[0], $rect[2], $rect[4], $rect[6]]);
+        $minY = min([$rect[1], $rect[3], $rect[5], $rect[7]]);
+        $maxY = max([$rect[1], $rect[3], $rect[5], $rect[7]]);
+
+        return [
+            "left"   => abs($minX) - 1,
+            "top"    => abs($minY) - 1,
+            "width"  => abs($maxX - $minX),
+            "height" => abs($maxY - $minY),
+            "box"    => $rect
+        ];
+    }
+
+    public function textWidth($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font, $angle);
+        return $calculateTextBox['width'];
+    }
+
+    public function textHeight($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font ?: $this->font, $angle);
+        return $calculateTextBox['height'];
     }
 }

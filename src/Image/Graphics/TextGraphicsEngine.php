@@ -24,8 +24,8 @@ class TextGraphicsEngine
     protected $fontSpace = 0;
     /** @var int 字体粗细 */
     protected $fontWeight = 1;
-    /** @var float 行高倍数 */
-    protected $lineHeight = 1.5;
+    /** @var int 行高倍数 1.5 */
+    protected $lineHeight = 21;
     /** @var string 文本对齐方式 left center right */
     protected $textAlign = 'left';
     /** @var null 字体旋转角度 */
@@ -50,6 +50,11 @@ class TextGraphicsEngine
         return $this;
     }
 
+    public function resolveFontSize($fontSize = null)
+    {
+        return $this->fontSize;
+    }
+
     public function setText($content)
     {
         $this->content = $content;
@@ -71,6 +76,7 @@ class TextGraphicsEngine
     public function setFontSize($fontSize)
     {
         $this->fontSize = $fontSize;
+        $this->lineHeight = round($this->resolveFontSize($fontSize) * 1.5);
         return $this;
     }
 

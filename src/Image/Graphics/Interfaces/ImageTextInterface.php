@@ -7,9 +7,11 @@
 
 namespace Kkokk\Poster\Image\Graphics\Interfaces;
 
-interface TextsInterface
+interface ImageTextInterface
 {
     public function addText(TextGraphicsEngineInterface $text);
+
+    public function addImage(ImageGraphicsEngineInterface $text);
 
     public function draw(ImageGraphicsEngineInterface $image, $x = 0, $y = 0);
 }

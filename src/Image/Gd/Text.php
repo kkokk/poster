@@ -12,54 +12,43 @@ use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
 class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    public function draw($canvas, $x, $y)
+    public function draw($image, $x, $y)
     {
-        $lines = $this->autoWrap($this->fontMaxWidth, $this->content);
-        $color = $this->createColor($canvas->getImage(), $this->fontColor);
+        $maxWidth = $this->getMaxWidth() ?: $image->getWidth();
+        $color = $this->createColor($image->getImage(), $this->fontColor);
+        $characters = $this->singleImageTextSplit($this, $color);
+        list($lines, $maxTextWidth, $maxTextHeight) = $this->autoWrap($characters, $maxWidth, false);
+
+        $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
+        $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
+
         foreach ($lines as $lineIndex => $line) {
-            $lineY = $y + $lineIndex * $this->fontSize * $this->lineHeight;
+            $lineY = $distY + $lineIndex * $this->lineHeight;
             // 计算对齐偏移量
-            $textWidth = $this->textWidth($line);
+            $textWidth = $this->textWidth($line, $this->resolveFontSize(), $this->getFont(), $this->getFontAngle());
             switch ($this->textAlign) {
                 case 'center':
-                    $offsetX = ($canvas->getWidth() - $textWidth) / 2;
+                    $offsetX = $distX + ($maxWidth - $textWidth) / 2;
                     break;
                 case 'right':
-                    $offsetX = $canvas->getWidth() - $textWidth - $x;
+                    $offsetX = $maxWidth - $textWidth + $distX;
                     break;
                 default:
-                    $offsetX = $x;
+                    $offsetX = $distX;
             }
 
-            imagettftext($canvas->getImage(), $this->resolveFontSize(), 0, intval($offsetX), intval($lineY), $color,
-                $this->font,
+            imagettftext($image->getImage(), $this->resolveFontSize(), 0, intval($offsetX), intval($lineY), $color,
+                $this->getFont(),
                 $line);
         }
     }
 
-    private function autoWrap($maxWidth, $text)
+    protected function addLineCharacters($lines, $line, $char)
     {
-        $words = explode(' ', $text);
-        $lines = [];
-        $currentLine = '';
-
-        foreach ($words as $word) {
-            $testLine = $currentLine ? "$currentLine $word" : $word;
-            $textWidth = $this->textWidth($testLine);
-            if ($textWidth > $maxWidth) {
-                // 当前行超出宽度，保存当前行并开始新行
-                $lines[] = $currentLine;
-                $currentLine = $word;
-            } else {
-                $currentLine = $testLine;
-            }
+        if (!isset($lines[$line])) {
+            $lines[$line] = '';
         }
-
-        // 添加最后一行
-        if ($currentLine) {
-            $lines[] = $currentLine;
-        }
-
+        $lines[$line] .= $char['text'];
         return $lines;
     }
 }

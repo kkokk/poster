@@ -133,9 +133,4 @@ class ImageGraphicsEngine
     {
         return $this->height;
     }
-
-    public function __clone()
-    {
-        $this->image = clone $this->image;
-    }
 }
