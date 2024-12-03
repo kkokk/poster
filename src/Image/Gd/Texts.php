@@ -57,26 +57,30 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
         }
 
         list($lines, $maxTextWidth, $maxTextHeight) = $this->autoWrap($characters, $maxWidth);
-        $x = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
-        $y = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
-
-        ll($lines, $x, $maxTextWidth, $maxTextHeight);
+        $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
+        $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
+        // if ($x == 'center') {
+        //     $distX += ($maxWidth - $maxTextWidth) / 2;
+        // }
         foreach ($lines as $lineIndex => $line) {
-            $textWidth = $line['width'];
             $lineCharacters = $line['characters'];
+            $textWidth = array_sum(array_column($lineCharacters, 'width'));
+
             switch ($this->textAlign) {
                 case 'center':
-                    $offsetX = $x + ($maxWidth - $textWidth) / 2;
+                    $offsetX = $distX + ($maxWidth - $textWidth) / 2;
                     break;
                 case 'right':
-                    $offsetX = $maxWidth - $textWidth + $x;
+                    $offsetX = $maxWidth - $textWidth + $distX;
                     break;
                 default:
-                    $offsetX = $x;
+                    $offsetX = $distX;
             }
-            $maxSize = max(array_column($lineCharacters, 'size'));
-            foreach ($lineCharacters as $key => $char) {
-                $lineY = $y + ($lineIndex + 1) * $maxSize * $char['lineHeight'];
+
+            $lineMaxHeight = max(array_column($lineCharacters, 'lineHeight'));
+            $lineHeight = $lineIndex > 0 ? $lineMaxHeight : 0;
+            foreach ($lineCharacters as $char) {
+                $lineY = $distY + $lineHeight;
                 // 计算对齐偏移量
                 imagettftext($image->getImage(), $char['size'], $char['angle'], intval($offsetX), intval($lineY),
                     $char['color'],
@@ -85,6 +89,7 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
 
                 $offsetX += $char['width'] + $char['space'];
             }
+            $distY += $lineHeight;
         }
     }
 
@@ -97,34 +102,35 @@ class Texts extends GdTextGraphicsEngine implements TextsInterface
         $textHeights = [0];
         foreach ($characters as $char) {
             $text = $char['text'];
+            $spring = ($char['size'] * 0.3548);
             $char['width'] = $this->textWidth($text, $char['size'], $char['font'],
-                    $char['angle']) + ($char['size'] * 0.3548);
+                    $char['angle']) + $spring;
             $char['height'] = $this->textHeight($text, $char['size'], $char['font'], $char['angle']);
+            $charWidth = $char['width'] + $char['space'];
 
-            $textWidth += $char['width'] + $char['space'];
+            $textWidth += $charWidth;
             $textWidths[$line] = $textWidth;
             $textHeights[$line] = max($textHeights[$line], $char['height']);
-            $lineTextWidth = $textWidth;
 
             if ($textWidth > $maxWidth) {
+                $textWidths[$line] -= $charWidth;
                 $line += 1;
                 $textWidth = 0;
                 $textWidths[$line] = 0;
                 $textHeights[$line] = 0;
             }
-            $lines = $this->addLineCharacters($lines, $line, $char, $lineTextWidth);
+            $lines = $this->addLineCharacters($lines, $line, $char);
         }
 
         return [$lines, max(array_values($textWidths)), array_sum($textHeights)];
     }
 
-    protected function addLineCharacters($lines, $line, $charConfig, $textWidth)
+    protected function addLineCharacters($lines, $line, $charConfig)
     {
         if (!isset($lines[$line])) {
             $lines[$line] = [];
             $lines[$line]['characters'] = [];
         }
-        $lines[$line]['width'] = $textWidth;
         $lines[$line]['characters'][] = $charConfig;
         return $lines;
     }

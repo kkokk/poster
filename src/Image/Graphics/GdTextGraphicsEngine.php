@@ -16,19 +16,12 @@ class GdTextGraphicsEngine extends TextGraphicsEngine implements TextGraphicsEng
 {
     use GdTrait;
 
+    protected $lineHeight = 16;
+
     protected function resolveFontSize($fontSize = null)
     {
         return (($fontSize ?: $this->fontSize) * 3) / 4;
     }
-
-    protected function horizontalOffset($fontSize = null, $font = null, $angle = 0)
-    {
-        $normalSize = $this->textWidth('好', $fontSize, $font, $angle);
-        $punctuationSize = $this->textWidth('，', $fontSize, $font, $angle);
-        // 计算标点符号的水平偏移量
-        return abs($punctuationSize - $normalSize) / 2;
-    }
-
 
     public function calculateTextBox($text, $fontSize, $font, $angle)
     {

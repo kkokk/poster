@@ -32,50 +32,139 @@ $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=
 // $canvas->addImage($qr, 'center', 'center');
 
 
-$texts = new Texts();
-$texts
-    ->addText((new Text())
-        ->setText("床前明月光，")
-        ->setFontSize(16)
-        ->setFontColor('#000000')
-    )
-    ->addText((new Text())
-        ->setText("疑似地上霜。")
-        ->setFontSize(22)
-        ->setFontColor('#00ff00')
-    )
-    ->addText((new Text())
-        ->setText("举头望明月，")
-        ->setFontSize(12)
-        ->setFontColor('#0000ff')
-    )
-    ->addText((new Text())
-        ->setText("低头思故乡。")
-        ->setFontSize(28)
-        ->setFontColor('#ff0000')
-    );
+// (new Texts())
+//     ->setMaxWidth(300)
+//     ->setFontAlign('left')
+//     ->addText((new Text())
+//         ->setText("床前明月光，")
+//         ->setFontSize(16)
+//         ->setFontColor('#000000')
+//     )
+//     ->addText((new Text())
+//         ->setText("疑似地上霜。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00ff00')
+//     )
+//     ->addText((new Text())
+//         ->setText("举头望明月，")
+//         ->setFontSize(12)
+//         ->setFontColor('#0000ff')
+//     )
+//     ->addText((new Text())
+//         ->setText("低头思故乡。")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//     )->draw($canvas, 'center', 100);
 
-$texts->draw($canvas);
+// (new Texts())
+//     ->setMaxWidth(300)
+//     ->setFontAlign('center')
+//     ->addText((new Text())
+//         ->setText("床前明月光，")
+//         ->setFontSize(16)
+//         ->setFontColor('#000000')
+//     )
+//     ->addText((new Text())
+//         ->setText("疑似地上霜。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00ff00')
+//     )
+//     ->addText((new Text())
+//         ->setText("举头望明月，")
+//         ->setFontSize(12)
+//         ->setFontColor('#0000ff')
+//     )
+//     ->addText((new Text())
+//         ->setText("低头思故乡。")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//     )->draw($canvas, 'center', 200);
 
+// (new Texts())
+//     ->setMaxWidth(300)
+//     ->setFontAlign('right')
+//     ->addText((new Text())
+//         ->setText("床前明月光，")
+//         ->setFontSize(16)
+//         ->setFontColor('#000000')
+//     )
+//     ->addText((new Text())
+//         ->setText("疑似地上霜。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00ff00')
+//     )
+//     ->addText((new Text())
+//         ->setText("举头望明月，")
+//         ->setFontSize(12)
+//         ->setFontColor('#0000ff')
+//     )
+//     ->addText((new Text())
+//         ->setText("低头思故乡。")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//     )->draw($canvas, 'center', 300);
+
+// $texts = new Texts();
+// $texts
+//     ->setMaxWidth(300)
+//     ->setFontAlign('left')
+//     ->addText((new Text())
+//         ->setText("床前明月光，")
+//         ->setFontSize(16)
+//         ->setFontColor('#000000')
+//     )
+//     ->addText((new Text())
+//         ->setText("疑似地上霜。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00ff00')
+//     )
+//     ->addText((new Text())
+//         ->setText("举头望明月，")
+//         ->setFontSize(12)
+//         ->setFontColor('#0000ff')
+//     )
+//     ->addText((new Text())
+//         ->setText("低头思故乡。")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//     )
+//     ->addText((new Text())
+//         ->setText("岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。")
+//         ->setFontSize(14)
+//         ->setFontColor('#ff00fd')
+//     )
+//     ->addText((new Text())
+//         ->setText("岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00eefd')
+//     )
+//     ->addText((new Text())
+//         ->setText("岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。")
+//         ->setFontSize(18)
+//         ->setFontColor('#ee00fd')
+//     );
+//
+// $texts->draw($canvas, 'center', 'center');
+//
 (new Text())
     ->setText("床前明月光，")
     ->setFontSize(16)
-    ->setFontColor('#000000')->draw($canvas, 0, 100);
-
-(new Text())
-    ->setText("疑似地上霜。")
-    ->setFontSize(22)
-    ->setFontColor('#00ff00')->draw($canvas, 90, 92);
-
-(new Text())
-    ->setText("举头望明月，")
-    ->setFontSize(12)
-    ->setFontColor('#0000ff')->draw($canvas, 212, 106);
-
-(new Text())
-    ->setText("低头思故乡。")
-    ->setFontSize(28)
-    ->setFontColor('#ff0000')->draw($canvas, 280, 83);
+    ->setFontColor('#0000ff')->draw($canvas, 0, 0);
+//
+// (new Text())
+//     ->setText("疑似地上霜。")
+//     ->setFontSize(22)
+//     ->setFontColor('#00ff00')->draw($canvas, 90, 14);
+//
+// (new Text())
+//     ->setText("举头望明月，")
+//     ->setFontSize(12)
+//     ->setFontColor('#0000ff')->draw($canvas, 212, 22);
+//
+// (new Text())
+//     ->setText("低头思故乡。")
+//     ->setFontSize(28)
+//     ->setFontColor('#ff0000')->draw($canvas, 280, 6);
 
 // $canvas->getData(__DIR__ . '/../poster/test7.png');
 // $canvas->setData();
