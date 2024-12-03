@@ -50,7 +50,7 @@ class TextGraphicsEngine
         return $this;
     }
 
-    protected function resolveFontSize($fontSize = null)
+    public function resolveFontSize($fontSize = null)
     {
         return $this->fontSize;
     }

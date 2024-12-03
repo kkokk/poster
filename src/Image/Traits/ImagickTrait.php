@@ -144,7 +144,7 @@ trait ImagickTrait
     /**
      * 创建画布
      */
-    protected function createIm($w, $h, $rgba, $alpha = false, $type = null)
+    public function createIm($w, $h, $rgba, $alpha = false, $type = null)
     {
         $color = $this->createColor($rgba);
         $image = $this->createImagick();

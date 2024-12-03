@@ -33,6 +33,8 @@ interface TextGraphicsEngineInterface
 
     public function setText($content);
 
+    public function resolveFontSize($fontSize = null);
+
     public function getFont();
 
     public function getFontFamily();
