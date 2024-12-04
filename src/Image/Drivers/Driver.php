@@ -151,8 +151,7 @@ class Driver
     {
         // 绝对路径 or 相对路径
         $absolute = is_absolute($pathFileName);
-        $this->path = get_document_root();
-        $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
+        $this->path = $absolute ? '' : (get_document_root() ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
     }
 
     /**
