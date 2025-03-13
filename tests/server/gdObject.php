@@ -25,7 +25,7 @@ $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=
 // $canvas->addImage((clone $image)->scale(50, 50)->circle(), 0, 0);
 // $canvas->addImage($image->scale(100, 100)->circle(), 'center', 0);
 
-// $canvas->addImage($image->crop('center', 'center', 500, 500));
+$canvas->addImage($image->crop('center', 'center', 500, 500));
 
 // $qr = new \Kkokk\Poster\Image\Gd\Qr('http://www.baidu.com');
 
@@ -149,22 +149,22 @@ $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=
 (new Text())
     ->setText("床前明月光，")
     ->setFontSize(16)
-    ->setFontColor('#0000ff')->draw($canvas, 0, 0);
-//
-// (new Text())
-//     ->setText("疑似地上霜。")
-//     ->setFontSize(22)
-//     ->setFontColor('#00ff00')->draw($canvas, 90, 14);
-//
-// (new Text())
-//     ->setText("举头望明月，")
-//     ->setFontSize(12)
-//     ->setFontColor('#0000ff')->draw($canvas, 212, 22);
-//
-// (new Text())
-//     ->setText("低头思故乡。")
-//     ->setFontSize(28)
-//     ->setFontColor('#ff0000')->draw($canvas, 280, 6);
+    ->setFontColor('#0000ff')->draw($canvas, 0, 28);
+
+(new Text())
+    ->setText("疑似地上霜。")
+    ->setFontSize(22)
+    ->setFontColor('#00ff00')->draw($canvas, 90, 28);
+
+(new Text())
+    ->setText("举头望明月，")
+    ->setFontSize(12)
+    ->setFontColor('#0000ff')->draw($canvas, 212, 28);
+
+(new Text())
+    ->setText("低头思故乡。")
+    ->setFontSize(28)
+    ->setFontColor('#ff0000')->draw($canvas, 280, 28);
 
 // $canvas->getData(__DIR__ . '/../poster/test7.png');
 // $canvas->setData();

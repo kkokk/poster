@@ -198,7 +198,9 @@ trait GdTrait
             $res[] = $gg > 0 ? ($c1[2] + $g / $h * $i) : ($c1[2] - $g / $h * $i);
         }
 
-        return $res;
+        return array_map(function ($v) {
+            return intval($v);
+        }, $res);
     }
 
     /**
