@@ -26,7 +26,7 @@ trait GdTrait
      */
     protected function returnImage($type, $outfile = true)
     {
-        if (!isset($this->image) || empty($this->image)) {
+        if (empty($this->image)) {
             throw new PosterException('没有创建任何资源');
         }
         if ($outfile) {
@@ -267,24 +267,24 @@ trait GdTrait
             case 'bottom':
                 $toi = $h;
                 $toj = $w;
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount);
+                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             case 'top':
                 $toi = $h;
                 $toj = $w;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount);
+                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount);
                 break;
             case 'left':
                 $toi = $w;
                 $toj = $h;
                 $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
+                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
                 break;
             case 'right':
                 $toi = $w;
                 $toj = $h;
-                $im = $this->linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
+                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
                 break;
             case 'right bottom':
             case 'bottom right':
@@ -336,8 +336,7 @@ trait GdTrait
     protected function getGradientColor($im, $rgbaColor, $rgbaCount, $length, $i)
     {
         $colorRgb = $this->calcColorArea($rgbaColor, $rgbaCount, $length, $i);
-        $color = imagecolorallocate($im, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
-        return $color;
+        return imagecolorallocate($im, $colorRgb[0], $colorRgb[1], $colorRgb[2]);
     }
 
     /**
@@ -353,8 +352,7 @@ trait GdTrait
      */
     protected function getAlphasColor($im, $colorRgb, $alphas)
     {
-        $color = imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
-        return $color;
+        return imagecolorallocatealpha($im, $colorRgb[0], $colorRgb[1], $colorRgb[2], $alphas);
     }
 
     /**
@@ -368,19 +366,16 @@ trait GdTrait
      * @param        $toj       double 高或宽
      * @param        $rgbaColor array 渐变色值
      * @param        $rgbaCount int 渐变色数量
-     * @param int    $radius    int 圆角
      * @param string $ii        string x,y 变量取值替换
      * @param string $jj        string x,y 变量取值替换
-     * @return mixed|resource
+     * @return resource
      */
-    protected function linearGradient($im, $toi, $toj, $rgbaColor, $rgbaCount, $ii = 'i', $jj = 'j')
+    protected function linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount, $ii = 'i', $jj = 'j')
     {
 
         for ($i = $toi; $i >= 0; $i--) {
             // 获取颜色
             $color = $this->getGradientColor($im, $rgbaColor, $rgbaCount, $toi, $i);
-            // imagefilledrectangle($this->image, 0, $i, $w, 0, $color); // 填充颜色
-            // $color = ($colorRgb[0] << 16) + ($colorRgb[1] << 8) + $colorRgb[2];  // 获取颜色参数
             for ($j = 0; $j < $toj; $j++) {
                 imagesetpixel($im, $$jj, $$ii, $color);
             }
@@ -400,7 +395,7 @@ trait GdTrait
      * @param $w      double 宽
      * @param $h      double 高
      * @param $radius int 圆角
-     * @return mixed|resource
+     * @return false|\GdImage|resource
      */
     protected function setPixelRadius($im, $w, $h, $radius)
     {
@@ -473,7 +468,7 @@ trait GdTrait
     protected function linearGradientLeftTopRightBottom($im, $toi, $toj, $rgbaColor, $rgbaCount, $x = 0, $y = 0)
     {
 
-        $toLen = $toi >= $toj ? $toi : $toj;
+        $toLen = max($toi, $toj);
 
         $len = $toi + $toj;
 
@@ -739,23 +734,21 @@ trait GdTrait
 
             $this->fontWeight($weight, $fontSize, $angle, $DstX, $DstY, $customColor, $font, $contents);
 
-            // $DstX += $max;
             $DstX += $v['w'];
         }
     }
 
     /** 设置背景透明 */
-    protected function setImageAlpha($pic, $w, $h, $alphas)
+    protected function setImageAlpha($pic, $w, $h, $transparency)
     {
-
-        $mask = $this->createIm($w, $h, [], $alphas > 1);
+        $mask = $this->createIm($w, $h, [], $transparency > 1);
 
         for ($x = 0; $x < $w; $x++) {
             for ($y = 0; $y < $h; $y++) {
                 $rgbColor = imagecolorat($pic, $x, $y);
                 $thisColor = imagecolorsforindex($pic, $rgbColor);
                 $color = $this->createColor($pic,
-                    [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $alphas]);
+                    [$thisColor['red'], $thisColor['green'], $thisColor['blue'], $transparency]);
                 imagesetpixel($mask, $x, $y, $color);
             }
         }
@@ -779,12 +772,13 @@ trait GdTrait
         !is_resource($resource) || imagedestroy($resource);
     }
 
-    protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
+    protected function createCanvas($w, $h, $rgba = [])
     {
         $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {
+            $rgba = empty($rgba) ? [255, 255, 255, 127] : $rgba;
             $rgba = parse_color($rgba);
-            if (isset($rgba[3]) && !empty($rgba[3])) {
+            if (!empty($rgba[3])) {
                 imagesavealpha($image, true);
             }
             $color = $this->createColor($image, $rgba);

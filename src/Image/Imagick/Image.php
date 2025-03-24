@@ -20,6 +20,9 @@ class Image extends ImagickImageGraphicsEngine
 
     public function rotate($angle, $bgColor = [255, 255, 255, 127])
     {
+        if ($angle == 0) {
+            return $this;
+        }
         // 旋转图片
         $this->image->rotateImage($this->createColor($bgColor), $angle);
 

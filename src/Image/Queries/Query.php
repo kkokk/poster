@@ -24,11 +24,11 @@ class Query
 
     public function setQuery($type, $params)
     {
-        $this->query[] = ['type' => $type, 'params' => $params];
+        $this->query[] = compact('type', 'params');
     }
 
     public function setPath($path)
     {
-        $this->query[] = ['type' => 'path', 'params' => $path];
+        $this->setQuery('path', $path);
     }
 }

@@ -49,6 +49,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 
     public function thumb($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         if ($bestFit) {
             $aspectRatio = $this->width / $this->height;
             if ($newWidth / $newHeight > $aspectRatio) {
@@ -67,6 +70,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 
     public function scale($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         if ($bestFit) {
             $aspectRatio = $this->width / $this->height;
             if ($newWidth / $newHeight > $aspectRatio) {
@@ -116,6 +122,18 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         $this->image = $this->cropHandle($this->image, $x, $y, $width, $height);
         $this->width = $width;
         $this->height = $height;
+        return $this;
+    }
+
+    public function transparent($transparency)
+    {
+        $this->setImageAlpha($this->image, $this->width, $this->height, $transparency);
+        return $this;
+    }
+
+    public function borderRadius($radius = 0)
+    {
+        $this->image = $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
         return $this;
     }
 

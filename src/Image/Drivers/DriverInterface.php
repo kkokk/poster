@@ -80,9 +80,9 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:31
-     * @param string $source
-     * @param int    $w
-     * @param int    $h
+     * @param string|\Kkokk\Poster\Image\Gd\Canvas|\Kkokk\Poster\Image\Imagick\Canvas $source
+     * @param int                                                                     $w
+     * @param int                                                                     $h
      * @return void
      */
     public function ImDst($source, $w = 0, $h = 0);
@@ -97,14 +97,14 @@ interface DriverInterface
      * @param int   $h
      * @param array $rgba
      * @param false $alpha
-     * @param int   $dst_x
-     * @param int   $dst_y
-     * @param int   $src_x
-     * @param int   $src_y
+     * @param int   $dstX
+     * @param int   $dstY
+     * @param int   $srcX
+     * @param int   $srcY
      * @param array $query
      * @return void
      */
-    public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = []);
+    public function Bg($w, $h, $rgba = [], $alpha = false, $dstX = 0, $dstY = 0, $srcX = 0, $srcY = 0, $query = []);
 
     /**
      * 复制图片
@@ -113,24 +113,24 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:41
      * @param string|array $src
-     * @param int          $dst_x
-     * @param int          $dst_y
-     * @param int          $src_x
-     * @param int          $src_y
-     * @param int          $src_w
-     * @param int          $src_h
+     * @param int          $dstX
+     * @param int          $dstY
+     * @param int          $srcX
+     * @param int          $srcY
+     * @param int          $srcWidth
+     * @param int          $srcHeight
      * @param false        $alpha
      * @param string       $type
      * @return void
      */
     public function CopyImage(
         $src,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0,
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0,
         $alpha = false,
         $type = 'normal'
     );
@@ -141,9 +141,9 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:41
-     * @param string $content
-     * @param int    $dst_x
-     * @param int    $dst_y
+     * @param string|\Kkokk\Poster\Image\Gd\Text|\Kkokk\Poster\Image\Imagick\Text $content
+     * @param int    $dstX
+     * @param int    $dstY
      * @param int    $fontSize
      * @param array  $rgba
      * @param int    $max_w
@@ -155,8 +155,8 @@ interface DriverInterface
      */
     public function CopyText(
         $content,
-        $dst_x = 0,
-        $dst_y = 0,
+        $dstX = 0,
+        $dstY = 0,
         $fontSize = null,
         $rgba = null,
         $max_w = null,
@@ -221,14 +221,15 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:47
      * @param string $text
+     * @param string $level
      * @param int    $size
      * @param int    $margin
-     * @param int    $dst_x
-     * @param int    $dst_y
-     * @param int    $src_x
-     * @param int    $src_y
-     * @param int    $src_w
-     * @param int    $src_h
+     * @param int    $dstX
+     * @param int    $dstY
+     * @param int    $srcX
+     * @param int    $srcY
+     * @param int    $srcWidth
+     * @param int    $srcHeight
      * @return mixed
      */
     public function CopyQr(
@@ -236,12 +237,12 @@ interface DriverInterface
         $level = 'L',
         $size = 4,
         $margin = 1,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0
     );
 
     /**

@@ -78,6 +78,9 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
      */
     public function thumb($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         $this->image->thumbnailImage($newWidth, $newHeight, $bestFit);
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -96,6 +99,9 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
      */
     public function scale($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         $this->image->scaleImage($newWidth, $newHeight, $bestFit);
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -146,8 +152,25 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this;
     }
 
+    public function transparent($transparency)
+    {
+        $this->setImageAlpha($this->image, $transparency);
+        return $this;
+    }
+
+    public function borderRadius($radius = 0)
+    {
+        $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
+        return $this;
+    }
+
     public function __destruct()
     {
         $this->destroyImage();
+    }
+
+    public function __clone()
+    {
+        $this->image = clone $this->image;
     }
 }

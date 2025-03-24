@@ -35,16 +35,16 @@ class TextGraphicsEngine
 
     public function config($configs = [])
     {
-        isset($configs['font_family']) && !empty($configs['font_family']) && $this->font = $configs['font_family'];
-        isset($configs['font_size']) && !empty($configs['font_size']) && $this->fontSize = $configs['font_size'];
-        isset($configs['font_rgba']) && !empty($configs['font_rgba']) && $this->fontColor = $configs['font_rgba'];
-        isset($configs['font_color']) && !empty($configs['font_color']) && $this->fontColor = $configs['font_color'];
-        isset($configs['font_space']) && !empty($configs['font_space']) && $this->fontSpace = $configs['font_space'];
-        isset($configs['font_weight']) && !empty($configs['font_weight']) && $this->fontWeight = $configs['font_weight'];
-        isset($configs['font_angle']) && !empty($configs['font_angle']) && $this->fontAngle = $configs['font_angle'];
-        isset($configs['font_max_w']) && !empty($configs['font_max_w']) && $this->fontMaxWidth = $configs['font_max_w'];
+        !empty($configs['font_family']) && $this->font = $configs['font_family'];
+        !empty($configs['font_size']) && $this->fontSize = $configs['font_size'];
+        !empty($configs['font_rgba']) && $this->fontColor = $configs['font_rgba'];
+        !empty($configs['font_color']) && $this->fontColor = $configs['font_color'];
+        !empty($configs['font_space']) && $this->fontSpace = $configs['font_space'];
+        !empty($configs['font_weight']) && $this->fontWeight = $configs['font_weight'];
+        !empty($configs['font_angle']) && $this->fontAngle = $configs['font_angle'];
+        !empty($configs['font_max_w']) && $this->fontMaxWidth = $configs['font_max_w'];
 
-        if (isset($configs['font']) && !empty($configs['font'])) {
+        if (!empty($configs['font'])) {
             $this->font = get_real_path($configs['font']);
         }
         return $this;

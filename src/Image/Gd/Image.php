@@ -19,6 +19,10 @@ class Image extends GdImageGraphicsEngine
     // 旋转图片
     public function rotate($angle, $bgColor = [255, 255, 255, 127])
     {
+        if ($angle == 0) {
+            return $this;
+        }
+
         $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($bgColor));
 
         // 获取旋转后图片的尺寸

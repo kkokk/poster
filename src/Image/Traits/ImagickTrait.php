@@ -262,7 +262,7 @@ trait ImagickTrait
         }
 
         if ($rgbaCount < 3) {
-            $this->linearGradient($source, $rgbaColor, $rgbaCount, $w, $h);
+            $this->linearGradientDefault($source, $rgbaColor, $rgbaCount, $w, $h);
         } else {
 
             $picKey = 0;
@@ -275,7 +275,7 @@ trait ImagickTrait
 
                 $picsC = $this->createIm($w, $chunk, [], true);
 
-                $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
+                $this->linearGradientDefault($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
 
                 $source->compositeImage($picsC, ($this->image)::COMPOSITE_DEFAULT, 0, $k * $chunk);
 
@@ -284,7 +284,7 @@ trait ImagickTrait
         }
     }
 
-    protected function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
+    protected function linearGradientDefault(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
     {
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
@@ -420,12 +420,12 @@ trait ImagickTrait
      * @param $alphas
      * @return void
      */
-    protected function setImageAlpha($pic, $alphas)
+    protected function setImageAlpha($pic, $transparency)
     {
         if (method_exists($pic, 'setImageOpacity')) {
-            $pic->setImageOpacity(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $pic->setImageOpacity(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
         } elseif (method_exists($pic, 'setImageAlpha')) {
-            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $pic->setImageAlpha(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
         }
     }
 
@@ -448,5 +448,32 @@ trait ImagickTrait
         $image = $this->createImagick();
         $image->newImage($w, $h, $background, $this->type);//设置画布的信息以及画布的格式
         return $image;
+    }
+
+    public function calculateTextBox($text, $fontSize, $font, $angle)
+    {
+        $draw = $this->createTextImagickDraw();
+        $draw->setFont($font);
+        $draw->setFontSize($fontSize);
+        $rect = $this->image->queryFontMetrics($draw, $text);
+        return [
+            "left"   => abs($rect['boundingBox']['x1']) - 1,
+            "top"    => abs($rect['boundingBox']['y1']) - 1,
+            "width"  => $rect['textWidth'],
+            "height" => $rect['textHeight'] + abs($rect['descender']),
+            "box"    => $rect
+        ];
+    }
+
+    public function textWidth($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font, $angle);
+        return $calculateTextBox['width'];
+    }
+
+    public function textHeight($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font ?: $this->font, $angle);
+        return $calculateTextBox['height'];
     }
 }

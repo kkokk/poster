@@ -14,6 +14,9 @@ use Kkokk\Poster\Exception\PosterException;
 
 class Driver
 {
+    /** @var \Kkokk\Poster\Image\Gd\Canvas|\Kkokk\Poster\Image\Imagick\Canvas 画布 */
+    protected $canvas;
+
     /** @var resource 画布 */
     protected $image;
 
@@ -29,8 +32,8 @@ class Driver
     /** @var int[] 默认 x y 分辨率 默认是 [72, 72] */
     protected $dpi = [];
 
-    /** @var string 存储路径 */
-    protected $path;
+    /** @var string|null 存储路径 */
+    protected $path = null;
 
     /** @var string 设置字体 */
     protected $font = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
@@ -61,6 +64,56 @@ class Driver
     /** @var array|null 返回结果 */
     public $result = null;
 
+    public function getCanvas()
+    {
+        return $this->canvas;
+    }
+
+    public function getWidth()
+    {
+        return $this->canvas->getWidth();
+    }
+
+    public function getHeight()
+    {
+        return $this->canvas->getHeight();
+    }
+
+    public function getData($path = '')
+    {
+        return $this->canvas->getData($path ?: $this->path);
+    }
+
+    public function getStream()
+    {
+        return $this->canvas->getStream();
+    }
+
+    public function getBaseData()
+    {
+        return $this->canvas->getBaseData();
+    }
+
+    public function setData()
+    {
+        return $this->canvas->setData();
+    }
+
+    public function getIm()
+    {
+        return $this->canvas->getImage();
+    }
+
+    public function blob()
+    {
+        return $this->canvas->blob();
+    }
+
+    public function tmp()
+    {
+        return $this->canvas->tmp();
+    }
+
     /**
      * 设置基本配置
      * @Author lang
@@ -72,19 +125,19 @@ class Driver
      */
     public function setConfig($params = [])
     {
-        isset($params['path']) && !empty($params['path']) && $this->setFilePath($params['path']);
-        isset($params['font_family']) && !empty($params['font_family']) && $this->font = $params['font_family'];
-        isset($params['font_size']) && !empty($params['font_size']) && $this->font_size = $params['font_size'];
-        isset($params['font_rgba']) && !empty($params['font_rgba']) && $this->font_rgba = $params['font_rgba'];
-        isset($params['font_space']) && !empty($params['font_space']) && $this->font_space = $params['font_space'];
-        isset($params['font_weight']) && !empty($params['font_weight']) && $this->font_weight = $params['font_weight'];
-        isset($params['font_angle']) && !empty($params['font_angle']) && $this->font_angle = $params['font_angle'];
-        isset($params['font_max_w']) && !empty($params['font_max_w']) && $this->font_max_w = $params['font_max_w'];
+        $this->canvas->config($params);
+        !empty($params['font_family']) && $this->font = $params['font_family'];
+        !empty($params['font_size']) && $this->font_size = $params['font_size'];
+        !empty($params['font_rgba']) && $this->font_rgba = $params['font_rgba'];
+        !empty($params['font_space']) && $this->font_space = $params['font_space'];
+        !empty($params['font_weight']) && $this->font_weight = $params['font_weight'];
+        !empty($params['font_angle']) && $this->font_angle = $params['font_angle'];
+        !empty($params['font_max_w']) && $this->font_max_w = $params['font_max_w'];
 
-        if (isset($params['dpi']) && !empty($params['dpi'])) {
+        if (!empty($params['dpi'])) {
             $this->dpi = is_numeric($params['dpi']) ? [$params['dpi'], $params['dpi']] : $params['dpi'];
         }
-        if (isset($params['font']) && !empty($params['font'])) {
+        if (!empty($params['font'])) {
             $this->font = get_real_path($params['font']);
         }
     }
@@ -100,17 +153,7 @@ class Driver
      */
     public function setFilePath($path)
     {
-        $path = is_array($path) ? $path : [$path];
-        $pathFileName = isset($path[0]) ? $path[0] : '';
-        $pathFileName = str_replace(['\\', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
-
-        $fileName = $pathFileName ?: time();
-        if (strripos($pathFileName, DIRECTORY_SEPARATOR) !== false) {
-            $this->setPathName($pathFileName);
-            $fileName = substr($pathFileName, strripos($pathFileName, DIRECTORY_SEPARATOR) + 1);
-        }
-        $this->setFileName($fileName);
-        $this->setPath($pathFileName);
+        $this->path = $path;
     }
 
     /**
@@ -149,9 +192,14 @@ class Driver
      */
     public function setPath($pathFileName)
     {
+        $this->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
         // 绝对路径 or 相对路径
         $absolute = is_absolute($pathFileName);
-        $this->path = $absolute ? '' : (get_document_root() ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
+        if ($absolute) {
+            $this->path = '';
+        } elseif (get_document_root()) {
+            $this->path = get_document_root();
+        }
     }
 
     /**
@@ -175,11 +223,11 @@ class Driver
             $this->setPathName($outfile);
             dir_exists($this->path . $this->pathname);
             \QRcode::png($text, $this->path . $outfile, $level, $size, $margin, $saveAndPrint);
-            return ['url' => $outfile];
+            $this->result = ['url' => $outfile];
+            return $this->result;
         } else {
             \QRcode::png($text, $outfile, $level, $size, $margin, $saveAndPrint);
         }
-
     }
 
     public function run($item, Driver $driver)
@@ -216,7 +264,7 @@ class Driver
                 $driver->CopyQr(...$item['params']);
                 break;
             case 'qr':
-                $driver->result = $driver->createQr(...$item['params']);
+                $driver->createQr(...$item['params']);
                 break;
             case 'crop':
                 $driver->crop(...$item['params']);
@@ -330,4 +378,18 @@ class Driver
         return preg_split($pattern, $content, -1, 2);
     }
 
+    protected function maskBackgroundResolve($maskRgba)
+    {
+        $rgba = isset($maskRgba['color']) ? $maskRgba['color'] : [[0, 0, 0]];
+        $transparency = isset($maskRgba['alpha']) ? $maskRgba['alpha'] : 1;
+        $to = isset($maskRgba['to']) ? $maskRgba['to'] : 'bottom';
+        $radius = isset($maskRgba['radius']) ? $maskRgba['radius'] : 0;
+        $contentAlpha = isset($maskRgba['content_alpha']) ? $maskRgba['content_alpha'] : false;
+        return [$rgba, $transparency, $to, $radius, $contentAlpha];
+    }
+
+    public function __clone()
+    {
+        $this->canvas = clone $this->canvas;
+    }
 }

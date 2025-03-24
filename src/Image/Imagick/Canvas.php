@@ -52,12 +52,21 @@ class Canvas extends ImagickImageGraphicsEngine
         $this->image->setImageBackgroundColor($this->createColor($background));
     }
 
-    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0)
+    public function linearGradient($rgbaColor, $to)
+    {
+        $rgbaCount = count($rgbaColor);
+        $this->calcColorDirection($this->image, $rgbaColor, $rgbaCount, $to, $this->width, $this->height);
+        return $this;
+    }
+
+    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0, $srcX = 0, $srcY = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());
         # 处理目标 y 轴
         $y = calc_dst_Y($y, $this->height, $image->getHeight());
+        // 裁剪图片
+        $this->cropImage($image->getImage(), $srcX, $srcY);
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
@@ -72,7 +81,13 @@ class Canvas extends ImagickImageGraphicsEngine
 
     public function addText(Text $text, $x = 0, $y = 0)
     {
-        $text->draw($this->image, $x, $y);
+        $text->draw($this, round(intval($x)), round(intval($y)));
+        return $this;
+    }
+
+    public function addImageText(ImageText $imageText, $x = 0, $y = 0)
+    {
+        $imageText->draw($this, round(intval($x)), round(intval($y)));
         return $this;
     }
 }

@@ -9,6 +9,9 @@
 namespace Kkokk\Poster\Image\Drivers;
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Imagick\Canvas;
+use Kkokk\Poster\Image\Imagick\Image;
+use Kkokk\Poster\Image\Imagick\Text;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
 class ImagickDriver extends Driver implements DriverInterface
@@ -24,161 +27,79 @@ class ImagickDriver extends Driver implements DriverInterface
 
     }
 
-    public function getData($path = '')
-    {
-        if ($path) {
-            $this->setFilePath($path);
-        }
-        $this->setDPI();
-        return $this->returnImage($this->type);
-    }
-
-    public function getStream()
-    {
-        $this->setDPI();
-        return $this->returnImage($this->type, false);
-    }
-
-    public function getBaseData()
-    {
-        $this->setDPI();
-        return base64_data($this->image->getImageBlob(), $this->type);
-    }
-
-    public function getIm()
-    {
-        return $this->image;
-    }
-
-    public function blob()
-    {
-        $this->setDPI();
-        return $this->getBlob($this->image);
-    }
-
-    public function tmp()
-    {
-        return $this->getTmp($this->type, $this->image);
-    }
-
-    public function setData()
-    {
-        $this->setDPI();
-        return $this->setImage($this->source);
-    }
-
     public function im($w, $h, $rgba = [255, 255, 255, 1], $alpha = false)
     {
-        $this->im_w = $w;
-        $this->im_h = $h;
-        $this->image = $this->createIm($w, $h, $rgba, $alpha);
+        if (!empty($rgba)) {
+            $rgba = $alpha ? array_pad($rgba, 4, 1) : array_slice($rgba, 0, 3);
+        }
+        $this->canvas = new Canvas($w, $h, $rgba);
     }
 
     public function ImDst($source, $w = 0, $h = 0)
     {
-        $this->source = $source;
-
-        $pic = $this->createImagick($source);
-
-        $bgWidth = $pic->getImageWidth();
-        $bgHeight = $pic->getImageHeight();
-        $this->type = strtolower($pic->getImageFormat());
-
-        if (!empty($w) && !empty($h)) {
-            $this->im_w = $w;
-            $this->im_h = $h;
-            $pic->resizeImage($w, $h, $pic::FILTER_LANCZOS, 1, true);
+        if ($source instanceof Canvas) {
+            $this->canvas = $source;
         } else {
-            $this->im_w = $bgWidth;
-            $this->im_h = $bgHeight;
+            $this->canvas = new Canvas();
+            $this->canvas->readImage($source, $w, $h);
         }
-
-        $this->image = $pic;
     }
 
-    public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = [])
+    public function Bg($w, $h, $rgba = [], $alpha = false, $dstX = 0, $dstY = 0, $srcX = 0, $srcY = 0, $query = [])
     {
         // 判断颜色是否渐变
-        $rgbaColor = isset($rgba['color']) ? $rgba['color'] : [[0, 0, 0]];
-        $alphas = isset($rgba['alpha']) ? $rgba['alpha'] : 1;
-        $to = isset($rgba['to']) ? $rgba['to'] : 'bottom';
-        $radius = isset($rgba['radius']) ? $rgba['radius'] : 0;
-        $contentAlpha = isset($rgba['content_alpha']) ? $rgba['content_alpha'] : false;
-        $rgbaCount = count($rgbaColor);
+        list($rgbaColor, $transparency, $to, $radius, $contentAlpha) = $this->maskBackgroundResolve($rgba);
 
         // im不存在则创建
-        if (empty($this->image)) {
-            $this->image($w, $h, [], $alpha);
+        if (empty($this->canvas)) {
+            $this->im($w, $h, [], $alpha);
         }
         // 渐变处理->直接处理im
         // 计算颜色方向
-        $pic = $this->createIm($w, $h, [], $alpha);
-        $this->calcColorDirection($pic, $rgbaColor, $rgbaCount, $to, $w, $h);
+        $background = [255, 255, 255];
+        $mask = new Canvas($w, $h, $alpha ? array_merge($background, [127]) : $background);
+        $mask->linearGradient($rgbaColor, $to);
 
         // 设置透明度，内容不透明
         if ($alpha && !$contentAlpha) {
-            $this->setImageAlpha($pic, $alphas);
+            $mask->transparent($transparency);
         }
-
-        $dst_x = calc_dst_x($dst_x, $this->im_w, $w);
-        $dst_y = calc_dst_y($dst_y, $this->im_h, $h);
 
         if (!empty($query)) {
             $that = clone $this;
-            $that->image = $pic;
-            $that->im_w = $w;
-            $that->im_h = $h;
+            $that->ImDst($mask);
             $that->execute($query, $that);
-
-            // 合并图片, 合并图片移到下方，这里不需要再合并
-            // $pic->compositeImage($that->image, ($that->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
         }
 
         // 设置透明度，内容也透明
         if ($alpha && $contentAlpha) {
-            $this->setImageAlpha($pic, $alphas);
+            $mask->transparent($transparency);
         }
 
         if ($radius) {
             // 圆角处理
-            $pic = $this->setPixelRadius($pic, $w, $h, $radius);
+            $mask->borderRadius($radius);
         }
 
-        // 裁剪图片
-        $this->cropImage($pic, $src_x, $src_y);
-
-        // 合并图片
-        if ($this->type == 'gif') {
-            // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->image as $frame) {
-                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
-            }
-        } else {
-            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
-        }
-
-        if ($that) {
-            unset($that);
-        }
-        $this->destroyImage($pic);
+        $this->canvas->addImage($mask, $dstX, $dstY, $srcX, $srcY);
     }
 
     public function CopyImage(
         $src,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0,
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0,
         $alpha = false,
         $type = 'normal'
     ) {
-        $angle = 0;
-        if (empty($this->image)) {
+        if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
 
+        $angle = 0;
         if (is_array($src)) {
             $angle = isset($src['angle']) ? $src['angle'] : 0;
             $src = isset($src['src']) ? $src['src'] : '';
@@ -186,89 +107,18 @@ class ImagickDriver extends Driver implements DriverInterface
                 throw new PosterException('Image resources cannot be empty (' . $src . ')');
             }
         }
-
-        $pic = $this->createImagick($src);
-
-        $Width = $pic->getImageWidth();
-        $Height = $pic->getImageHeight();
-
-        $bgWidth = !empty($src_w) ? $src_w : $Width;
-        $bgHeight = !empty($src_h) ? $src_h : $Height;
-
-        switch ($type) {
-            case 'normal':
-                # 自定义宽高的时候
-                if (!empty($src_w) && !empty($src_h)) {
-                    // $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true); // 等比缩放
-                    $pic->scaleImage($bgWidth, $bgHeight);
-                }
-                break;
-            case 'circle':
-                if (!empty($src_w) && !empty($src_h)) {
-                    // $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true); // 等比缩放
-                    $pic->scaleImage($bgWidth, $bgHeight);
-                }
-
-                $pic->setImageFormat("png");
-                $pic->setImageMatte(true); // 激活遮罩通道
-
-                // 创建一个圆形遮罩图片
-
-                $mask = $this->createImagick();
-
-                $mask->newImage($bgWidth, $bgHeight, $this->createColor([255, 255, 255, 127]));
-
-                $circle = $this->createImagickDraw();
-                $circle->setFillColor($this->createColor());
-                $circle->circle($bgWidth / 2, $bgHeight / 2, $bgWidth / 2, $bgHeight);
-
-                $mask->drawImage($circle);
-
-                // 合并原始图片和圆形遮罩图片
-                $pic->compositeImage($mask, $pic::COMPOSITE_DSTIN, 0, 0);
-
-                $this->destroyImage($circle);
-                $this->destroyImage($mask);
-                break;
-            default:
-                # code...
-                break;
+        $image = new Image($src);
+        $image->rotate($angle);
+        $image->scale($srcWidth, $srcHeight);
+        if ($type == 'circle') {
+            $image->circle();
         }
-
-        # 处理目标 x 轴
-        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
-
-        # 处理目标 y 轴
-        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
-
-        // 裁剪图片
-        $this->cropImage($pic, $src_x, $src_y);
-
-
-        # 处理旋转
-        if ($angle > 0) {
-            $pic->rotateimage($this->createColor(), $angle);
-        }
-
-
-        // 合并图片
-        if ($this->type == 'gif') {
-            // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->image as $frame) {
-                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
-            }
-        } else {
-            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
-        }
-
-
-        $this->destroyImage($pic);
     }
 
     public function CopyText(
         $content,
-        $dst_x = 0,
-        $dst_y = 0,
+        $dstX = 0,
+        $dstY = 0,
         $fontSize = null,
         $rgba = null,
         $max_w = null,
@@ -280,178 +130,27 @@ class ImagickDriver extends Driver implements DriverInterface
         if ($content == '') {
             return true;
         }
-
-        if (empty($this->image)) {
+        if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
-
-        $fontSize = $fontSize ?: $this->font_size;
-        $rgba = $rgba ?: $this->font_rgba;
-        $max_w = $max_w ?: $this->font_max_w;
-        $weight = $weight ?: $this->font_weight;
-        $space = $space ?: $this->font_space;
-        $angle = $angle ?: $this->font_angle;
-
         if (!empty($font)) {
             $font = get_real_path($font);
         } else {
             $font = $this->font;
         }
-
-        $calcSpace = $space > $fontSize ? ($space - $fontSize) : 0; // 获取间距计算值
-
-        $color = $this->createColor($rgba);
-
-        $max_ws = $this->im_w;
-        if (isset($max_w) && !empty($max_w)) {
-            $max_ws = $max_w;
-        }
-
-        // 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度
-        $contents = '';
-        $letter = [];
-        $line = 1;
-        $calcSpaceRes = 0;
-
-        $draw = $this->createTextImagickDraw();
-        $draw->setFont($font);
-        $draw->setFillColor($color);
-        $draw->setFontSize($fontSize);
-
-        $fontSize = ($fontSize * 3) / 4; // 使和gd一致
-
-        // 主动设置是否解析html标签
-        if (is_array($content)) {
-
-            if (!isset($content['type'])) {
-                throw new PosterException('Type is required');
-            }
-            if (!isset($content['content'])) {
-                throw new PosterException('Content is required');
-            }
-
-            $type = $content['type'];
-            $content = $content['content'];
-
-            // 确认包含才处理
-            if ($type == 'html' && preg_match('/<[^>]*>/', $content)) {
-
-                // 正则匹配 span 属性
-                $pattern = '/<span style="(.*?)">(.*?)<\/span>/i';
-
-                // 分割字符串
-                $matches = preg_split($pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-                for ($i = 0; $i < count($matches); $i += 3) {
-                    if (!empty($matches[$i])) {
-                        $this->getNodeValue($letter, $matches[$i], $color);
-                    }
-
-                    if (isset($matches[$i + 1])) {
-                        $style = $matches[$i + 1];
-                        $colorValue = $this->getStyleAttr($style);
-                        $colorCustom = $this->createColor($colorValue);
-                        $this->getNodeValue($letter, $matches[$i + 2], $colorCustom);
-                    }
-                }
-
-            } else {
-                $this->getNodeValue($letter, $content, $color);
-            }
-
-            $textWidthArr = [];
-            foreach ($letter as $l) {
-
-                $textStr = $contents . $l['value'];
-                $fontBox = $this->image->queryFontMetrics($draw, $textStr);
-                $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
-
-                if ($l['value'] == "\n") {
-                    $contents = "";
-                    $contentsArr[] = $this->getLetterArr();
-                    $line++;
-                    continue;
-                }
-
-                if (!isset($textWidthArr[$line])) {
-                    $textWidthArr[$line] = -$space / 2;
-                }
-                // 判断拼接后的字符串是否超过预设的宽度
-                if (($textWidth > $max_ws || $textWidthArr[$line] > $max_ws) && ($contents !== '')) {
-                    $contents .= "\n";
-                    $contentsArr[] = $this->getLetterArr();
-                    $line++;
-                }
-                $contents .= $l['value'];
-
-                $fontBox1 = $this->image->queryFontMetrics($draw, $l['value']);
-                $l['w'] = abs($fontBox1['textWidth'] + $fontBox1['descender']) + $calcSpace;
-                $textWidthArr[$line] += $l['w'];
-                $contentsArr[] = $l;
-
-                $line === 1 && $calcSpaceRes += $calcSpace;
-            }
-
-            $currentFontBox = [
-                'max_width'  => max(array_values($textWidthArr)), // 取最宽行宽
-                'max_height' => abs($fontBox[1] - $fontBox[7]),
-            ];
-
-            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w);
-
-            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
-
-            # 自定义间距
-            $this->fontWeightArr($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $contentsArr, $color);
-
-            return true;
-
-        } else {
-            // 将字符串拆分成一个个单字 保存到数组 letter 中
-            for ($i = 0; $i < mb_strlen($content); $i++) {
-                $letter[] = mb_substr($content, $i, 1);
-            }
-
-            foreach ($letter as $l) {
-                $textStr = $contents . $l;
-                $fontBox = $this->image->queryFontMetrics($draw, $textStr);
-                $textWidth = abs($fontBox['textWidth'] + $fontBox['descender']) + $calcSpaceRes;
-                // 判断拼接后的字符串是否超过预设的宽度
-                if (($textWidth > $max_ws) && ($contents !== '')) {
-                    $contents .= "\n";
-                    $line++;
-                }
-                $contents .= $l;
-                $line === 1 && $calcSpaceRes += $calcSpace;
-            }
-
-            $currentFontBox = [
-                'max_width'  => $textWidth,
-                'max_height' => abs($fontBox['textHeight'] + $fontBox['descender']),
-            ];
-
-            $dst_x = calc_text_dst_x($dst_x, $currentFontBox, $this->im_w) - $fontBox['descender']; // 调整和 gd 的误差值
-
-            $dst_y = calc_text_dst_y($dst_y, $currentFontBox, $this->im_h);
-
-            # 自定义间距
-            if ($space > 0) {
-                $dst_x_old = $dst_x;
-                for ($j = 0; $j < mb_strlen($contents); $j++) {
-                    $spaceStr = mb_substr($contents, $j, 1);
-                    if ($spaceStr == "\n") {
-                        $dst_x = $dst_x_old;
-                        $dst_y += 1.75 * $fontSize;
-                        continue;
-                    }
-                    $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $spaceStr);
-                    $dst_x += $space;
-                }
-
-            } else {
-                $this->fontWeight($draw, $weight, $fontSize, $angle, $dst_x - 5, $dst_y, $contents);
-            }
-        }
+        $text = new Text();
+        $text->config([
+            'font_family' => $font,
+            'font_size'   => $fontSize ?: $this->font_size,
+            'font_color'  => $rgba ?: $this->font_rgba,
+            'font_weight' => $weight ?: $this->font_weight,
+            'font_max_w'  => $max_w ?: $this->font_max_w,
+            'font_space'  => $space ?: $this->font_space,
+            'font_angle'  => $angle ?: $this->font_angle,
+        ]);
+        $text->setText($content);
+        $this->canvas->addText($text, $dstX, $dstY);
+        return true;
     }
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
@@ -476,11 +175,11 @@ class ImagickDriver extends Driver implements DriverInterface
 
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->image as $frame) {
+            foreach ($this->canvas->getImage() as $frame) {
                 $frame->drawImage($draw);
             }
         } else {
-            $this->image->drawImage($draw);
+            $this->canvas->getImage()->drawImage($draw);
         }
     }
 
@@ -527,12 +226,12 @@ class ImagickDriver extends Driver implements DriverInterface
         $level = 'L',
         $size = 4,
         $margin = 1,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0
     ) {
         if (empty($this->image)) {
             throw new PosterException('Image resources not be found');
@@ -551,35 +250,35 @@ class ImagickDriver extends Driver implements DriverInterface
         $pic = $this->createImagick();
         $pic->readImageBlob($imageData);
 
-        if ($src_w > 0) {
-            $bgWidth = $src_w;
+        if ($srcWidth > 0) {
+            $bgWidth = $srcWidth;
         }
 
-        if ($src_h > 0) {
-            $bgHeight = $src_h;
+        if ($srcHeight > 0) {
+            $bgHeight = $srcHeight;
         }
 
         # 处理目标 x 轴
-        $dst_x = calc_dst_x($dst_x, $this->im_w, $bgWidth);
+        $dstX = calc_dst_x($dstX, $this->im_w, $bgWidth);
 
         # 处理目标 y 轴
-        $dst_y = calc_dst_y($dst_y, $this->im_h, $bgHeight);
+        $dstY = calc_dst_y($dstY, $this->im_h, $bgHeight);
 
         # 自定义宽高的时候
-        if (!empty($src_w) && !empty($src_h)) {
+        if (!empty($srcWidth) && !empty($srcHeight)) {
             $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true);
         }
 
         // 裁剪图片
-        $this->cropImage($pic, $src_x, $src_y);
+        $this->cropImage($pic, $srcX, $srcY);
         // 合并图片
         if ($this->type == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->image as $frame) {
-                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dstX, $dstY);
             }
         } else {
-            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dst_x, $dst_y);
+            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dstX, $dstY);
         }
 
         !is_resource($qr) || imagedestroy($qr);

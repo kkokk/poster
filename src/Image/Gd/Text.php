@@ -12,7 +12,7 @@ use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
 class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    public function draw($image, $x, $y)
+    public function draw(Canvas $image, $x, $y)
     {
         $maxWidth = $this->getMaxWidth() ?: $image->getWidth();
         $color = $this->createColor($image->getImage(), $this->fontColor);

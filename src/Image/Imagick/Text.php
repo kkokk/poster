@@ -12,7 +12,7 @@ use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
 class Text extends ImagickTextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    public function draw($canvas, $x, $y)
+    public function draw(Canvas $canvas, $x, $y)
     {
         $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
 

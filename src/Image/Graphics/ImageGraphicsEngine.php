@@ -39,7 +39,7 @@ class ImageGraphicsEngine
 
     public function config($configs = [])
     {
-        isset($configs['path']) && !empty($configs['path']) && $this->setFilePath($configs['path']);
+        !empty($configs['path']) && $this->setFilePath($configs['path']);
         return $this;
     }
 
@@ -110,10 +110,14 @@ class ImageGraphicsEngine
      */
     public function setPath($pathFileName)
     {
+        $this->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
         // 绝对路径 or 相对路径
         $absolute = is_absolute($pathFileName);
-        $this->path = get_document_root();
-        $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
+        if ($absolute) {
+            $this->path = '';
+        } elseif (get_document_root()) {
+            $this->path = get_document_root();
+        }
     }
 
     // 获取图片资源

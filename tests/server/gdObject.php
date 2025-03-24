@@ -8,16 +8,43 @@
 use Kkokk\Poster\Image\Gd\Canvas;
 use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Gd\Text;
-use Kkokk\Poster\Image\Gd\Texts;
+use Kkokk\Poster\Facades\Poster;
 
 require '../../vendor/autoload.php';
 
-$canvas = new Canvas(500, 500);
+
+// $canvas = new Canvas(500, 500, [255, 255, 255, 127]);
 
 $file = 'C:\\\\\\\\///Users\\\////32822\Pictures////\\\\\\\\\\' . '朝天门.jpg';
 // $file = 'https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541';
 
-// $canvas->readImage($file);
+// $canvas->readImage($file, 500, 500);
+// $canvas->getStream();
+// exit;
+
+$canvas = Poster::extension('gd')
+    // ->buildIm(800, 1200, [255, 255, 255])
+    ->buildBg(638, 826, [
+        'color'  => [
+            [255, 0, 0],
+            [255, 125, 0],
+            [255, 255, 0],
+            [0, 255, 0],
+            [0, 255, 255],
+            [0, 0, 255],
+            [255, 0, 255]
+        ],
+        'alpha'  => 50,
+        'to'     => 'left top',
+        'radius' => '40'
+    ], true, 'center', 'center', 0, 0,
+        function (\Kkokk\Poster\Image\Builder $builder) {
+            $builder->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+            $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center',
+                ['custom', 'center', 0, 100, 0], 20, [255, 255, 255], 0, '', 10, 25);
+        });
+$canvas->stream();
+exit;
 
 // $image = new Image('https://portrait.gitee.com/uploads/avatars/user/721/2164500_langlanglang_1601019617.png');
 $image = new Image('https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541');
