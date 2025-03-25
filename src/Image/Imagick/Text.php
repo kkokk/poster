@@ -14,7 +14,8 @@ class Text extends ImagickTextGraphicsEngine implements TextGraphicsEngineInterf
 {
     public function draw(Canvas $canvas, $x, $y)
     {
-        $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
+        $maxWidth = $this->getMaxWidth() ?: $canvas->getWidth();
+        $lines = $this->autoWrap($maxWidth, $this->content);
 
         foreach ($lines as $lineIndex => $line) {
             $lineY = $y + $lineIndex * $this->fontSize * $this->lineHeight;

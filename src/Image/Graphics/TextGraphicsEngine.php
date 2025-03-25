@@ -28,9 +28,9 @@ class TextGraphicsEngine
     protected $lineHeight = 21;
     /** @var string 文本对齐方式 left center right */
     protected $textAlign = 'left';
-    /** @var null 字体旋转角度 */
+    /** @var int 字体旋转角度 */
     protected $fontAngle = 0;
-    /** @var null 字体最大换行宽度 */
+    /** @var int 字体最大换行宽度 */
     protected $fontMaxWidth = 0;
 
     public function config($configs = [])
@@ -133,7 +133,7 @@ class TextGraphicsEngine
         return $this->fontFamily;
     }
 
-    public function getFontSize($fontSize = null)
+    public function getFontSize()
     {
         return $this->fontSize;
     }

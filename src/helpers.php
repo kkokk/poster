@@ -331,14 +331,14 @@ if (!function_exists('calc_font_weight')) {
     function calc_font_weight($num, $weight, $fontSize, $DstX, $DstY)
     {
         if ($weight % 2 == 0 && $num > 0) {
-            $reallyDstX = $DstX + ($num * 0.25);
-            $reallyDstY = $DstY + $fontSize;
+            $reallyDstX = $DstX + ($num * 0.1);
+            $reallyDstY = $DstY;
         } elseif ($weight % 2 != 0 && $num > 0) {
             $reallyDstX = $DstX;
-            $reallyDstY = $DstY + $fontSize + ($num * 0.25);
+            $reallyDstY = $DstY + ($num * 0.1);
         } else {
             $reallyDstX = $DstX;
-            $reallyDstY = $DstY + $fontSize;
+            $reallyDstY = $DstY;
         }
         return [$reallyDstX, $reallyDstY];
     }

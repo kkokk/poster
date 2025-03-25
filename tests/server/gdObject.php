@@ -40,8 +40,8 @@ $canvas = Poster::extension('gd')
     ], true, 'center', 'center', 0, 0,
         function (\Kkokk\Poster\Image\Builder $builder) {
             $builder->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-            $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年', 'center',
-                ['custom', 'center', 0, 100, 0], 20, [255, 255, 255], 0, '', 10, 25);
+            $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年。', 'center', 'center', 28,
+                [0, 0, 0], 0, '', 6, 10);
         });
 $canvas->stream();
 exit;

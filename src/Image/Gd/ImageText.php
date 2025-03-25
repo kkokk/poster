@@ -58,16 +58,20 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
                 default:
                     $offsetX = $distX;
             }
-
             $lineMaxHeight = max(array_column($lineCharacters, 'lineHeight'));
             $lineHeight = $lineIndex > 0 ? $lineMaxHeight : 0;
             foreach ($lineCharacters as $char) {
                 $lineY = $distY + $lineHeight;
                 if ($char['type'] == 'text') {
-                    imagettftext($image->getImage(), $char['size'], $char['angle'], intval($offsetX), intval($lineY),
-                        $char['color'],
-                        $char['font'],
-                        $char['text']);
+                    for ($index = 0; $index < $char['weight']; $index++) {
+                        list($offsetX, $lineY) = calc_font_weight($index, $char['weight'], $char['size'],
+                            $offsetX, $lineY);
+                        imagettftext($image->getImage(), $char['size'], $char['angle'], intval($offsetX),
+                            intval($lineY),
+                            $char['color'],
+                            $char['font'],
+                            $char['text']);
+                    }
                     $offsetX += $char['width'] + $char['space'];
                 } else {
                     $image->addImage($char['image'], intval($offsetX), intval($lineY - $char['height']));

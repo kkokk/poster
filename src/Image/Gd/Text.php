@@ -18,7 +18,6 @@ class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
         $color = $this->createColor($image->getImage(), $this->fontColor);
         $characters = $this->singleImageTextSplit($this, $color);
         list($lines, $maxTextWidth, $maxTextHeight) = $this->autoWrap($characters, $maxWidth, false);
-
         $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $image->getWidth());
         $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $image->getHeight());
 
@@ -26,6 +25,7 @@ class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
             $lineY = $distY + $lineIndex * $this->lineHeight;
             // 计算对齐偏移量
             $textWidth = $this->textWidth($line, $this->resolveFontSize(), $this->getFont(), $this->getFontAngle());
+
             switch ($this->textAlign) {
                 case 'center':
                     $offsetX = $distX + ($maxWidth - $textWidth) / 2;
@@ -37,9 +37,14 @@ class Text extends GdTextGraphicsEngine implements TextGraphicsEngineInterface
                     $offsetX = $distX;
             }
 
-            imagettftext($image->getImage(), $this->resolveFontSize(), 0, intval($offsetX), intval($lineY), $color,
-                $this->getFont(),
-                $line);
+            for ($index = 0; $index < $this->getFontWeight(); $index++) {
+                list($offsetX, $lineY) = calc_font_weight($index, $this->getFontWeight(), $this->getFontSize(),
+                    $offsetX, $lineY);
+                imagettftext($image->getImage(), $this->resolveFontSize(), $this->getFontAngle(), intval($offsetX),
+                    intval($lineY), $color,
+                    $this->getFont(),
+                    $line);
+            }
         }
     }
 

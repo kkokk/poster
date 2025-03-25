@@ -74,7 +74,7 @@ trait TextTrait
                 $char['width'] = $this->textWidth($text, $char['size'], $char['font'],
                         $char['angle']) + $spring;
                 $char['height'] = $this->textHeight($text, $char['size'], $char['font'], $char['angle']);
-                $charWidth = $char['width'] + $char['space'];
+                $charWidth = $char['width'] + $char['space'] + $char['weight'] * 0.1;
             } else {
                 $charWidth = $char['width'];
             }

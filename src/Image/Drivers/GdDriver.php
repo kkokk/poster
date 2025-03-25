@@ -11,6 +11,7 @@ namespace Kkokk\Poster\Image\Drivers;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Gd\Canvas;
 use Kkokk\Poster\Image\Gd\Image;
+use Kkokk\Poster\Image\Gd\ImageText;
 use Kkokk\Poster\Image\Gd\Text;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
@@ -170,26 +171,25 @@ class GdDriver extends Driver implements DriverInterface
         if ($content == '') {
             return true;
         }
+
         if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
-        if (!empty($font)) {
-            $font = get_real_path($font);
-        } else {
-            $font = $this->font;
+
+        if (!$content instanceof Text) {
+            $content = (new Text())->setFont(!empty($font) ? get_real_path($font) : $this->font)
+                ->setFontSize($fontSize ?: $this->font_size)
+                ->setFontAngle($angle ?: $this->font_angle)
+                ->setFontWeight($weight ?: $this->font_weight)
+                ->setMaxWidth($max_w ?: $this->font_max_w)
+                ->setFontColor($rgba ?: $this->font_rgba)
+                ->setFontSpace($space ?: $this->font_space)
+                ->setText($content);
         }
-        $text = new Text();
-        $text->config([
-            'font_family' => $font,
-            'font_size'   => $fontSize ?: $this->font_size,
-            'font_color'  => $rgba ?: $this->font_rgba,
-            'font_weight' => $weight ?: $this->font_weight,
-            'font_max_w'  => $max_w ?: $this->font_max_w,
-            'font_space'  => $space ?: $this->font_space,
-            'font_angle'  => $angle ?: $this->font_angle,
-        ]);
-        $text->setText($content);
-        $this->canvas->addText($text, $dstX, $dstY);
+        $imageText = new ImageText();
+        $imageText->addText($content)
+            ->setFontAlign('center');
+        $this->canvas->addImageText($imageText, $dstX, $dstY);
         return true;
     }
 

@@ -73,13 +73,13 @@ class Canvas extends GdImageGraphicsEngine
 
     public function addText(Text $text, $x = 0, $y = 0)
     {
-        $text->draw($this, round(intval($x)), round(intval($y)));
+        $text->draw($this, $x, $y);
         return $this;
     }
 
     public function addImageText(ImageText $imageText, $x = 0, $y = 0)
     {
-        $imageText->draw($this, round(intval($x)), round(intval($y)));
+        $imageText->draw($this, $x, $y);
         return $this;
     }
 }
