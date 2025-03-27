@@ -17,8 +17,6 @@ class GdTextGraphicsEngine extends TextGraphicsEngine implements TextGraphicsEng
 {
     use GdTrait, GdTextTrait;
 
-    protected $lineHeight = 16;
-
     public function resolveFontSize($fontSize = null)
     {
         return (($fontSize ?: $this->fontSize) * 3) / 4;

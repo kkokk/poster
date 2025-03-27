@@ -14,6 +14,7 @@ use Kkokk\Poster\Html\Drivers\DriverInterface;
 
 trait ImagickTrait
 {
+    protected $ImagickDraw;
 
     protected function setDPI()
     {
@@ -455,7 +456,7 @@ trait ImagickTrait
         $draw = $this->createTextImagickDraw();
         $draw->setFont($font);
         $draw->setFontSize($fontSize);
-        $rect = $this->image->queryFontMetrics($draw, $text);
+        $rect = $this->getCanvas()->getImage()->queryFontMetrics($draw, $text);
         return [
             "left"   => abs($rect['boundingBox']['x1']) - 1,
             "top"    => abs($rect['boundingBox']['y1']) - 1,

@@ -21,8 +21,6 @@ class ImagickDriver extends Driver implements DriverInterface
 
     protected $image;
 
-    protected $ImagickDraw;
-
     function __construct()
     {
 
@@ -136,6 +134,11 @@ class ImagickDriver extends Driver implements DriverInterface
             throw new PosterException('Image resources not be found');
         }
 
+        if ($content instanceof ImageText) {
+            $this->canvas->addImageText($content, $dstX, $dstY);
+            return true;
+        }
+
         if (!$content instanceof Text) {
             $content = (new Text())->setFont(!empty($font) ? get_real_path($font) : $this->font)
                 ->setFontSize($fontSize ?: $this->font_size)
@@ -144,11 +147,12 @@ class ImagickDriver extends Driver implements DriverInterface
                 ->setMaxWidth($max_w ?: $this->font_max_w)
                 ->setFontColor($rgba ?: $this->font_rgba)
                 ->setFontSpace($space ?: $this->font_space)
-                ->setFontAlign('center')
                 ->setText($content);
         }
+
         $imageText = new ImageText();
-        $imageText->addText($content);
+        $imageText->addText($content)
+            ->setMaxWidth($max_w ?: $this->font_max_w);
         $this->canvas->addImageText($imageText, $dstX, $dstY);
         return true;
     }

@@ -10,9 +10,15 @@
 namespace Kkokk\Poster\Image\Graphics;
 
 use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
+use Kkokk\Poster\Image\Graphics\Traits\ImagickTextTrait;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
 class ImagickTextGraphicsEngine extends TextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    use ImagickTrait;
+    use ImagickTrait, ImagickTextTrait;
+
+    public function getLineHeight($fontSize = null)
+    {
+        return round((($fontSize ?: $this->fontSize) * 3) / 4 * 1.5);
+    }
 }

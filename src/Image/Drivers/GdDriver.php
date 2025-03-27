@@ -176,6 +176,11 @@ class GdDriver extends Driver implements DriverInterface
             throw new PosterException('Image resources not be found');
         }
 
+        if ($content instanceof ImageText) {
+            $this->canvas->addImageText($content, $dstX, $dstY);
+            return true;
+        }
+
         if (!$content instanceof Text) {
             $content = (new Text())->setFont(!empty($font) ? get_real_path($font) : $this->font)
                 ->setFontSize($fontSize ?: $this->font_size)
@@ -186,9 +191,10 @@ class GdDriver extends Driver implements DriverInterface
                 ->setFontSpace($space ?: $this->font_space)
                 ->setText($content);
         }
+
         $imageText = new ImageText();
         $imageText->addText($content)
-            ->setFontAlign('center');
+            ->setMaxWidth($max_w ?: $this->font_max_w);
         $this->canvas->addImageText($imageText, $dstX, $dstY);
         return true;
     }

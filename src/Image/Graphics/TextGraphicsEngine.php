@@ -11,6 +11,8 @@ namespace Kkokk\Poster\Image\Graphics;
 
 class TextGraphicsEngine
 {
+    protected $canvas = null;
+
     protected $content;
     /** @var string 设置字体 */
     protected $font = POSTER_BASE_PATH . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
@@ -24,7 +26,7 @@ class TextGraphicsEngine
     protected $fontSpace = 0;
     /** @var int 字体粗细 */
     protected $fontWeight = 1;
-    /** @var int 行高倍数 1.5 */
+    /** @var int 行高 */
     protected $lineHeight = 21;
     /** @var string 文本对齐方式 left center right */
     protected $textAlign = 'left';
@@ -47,6 +49,17 @@ class TextGraphicsEngine
         if (!empty($configs['font'])) {
             $this->font = get_real_path($configs['font']);
         }
+        return $this;
+    }
+
+    protected function getCanvas()
+    {
+        return $this->canvas;
+    }
+
+    protected function setCanvas($canvas)
+    {
+        $this->canvas = $canvas;
         return $this;
     }
 

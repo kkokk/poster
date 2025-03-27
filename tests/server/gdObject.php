@@ -22,7 +22,7 @@ $file = 'C:\\\\\\\\///Users\\\////32822\Pictures////\\\\\\\\\\' . '朝天门.jpg
 // $canvas->getStream();
 // exit;
 
-$canvas = Poster::extension('gd')
+$canvas = Poster::extension('imagick')
     // ->buildIm(800, 1200, [255, 255, 255])
     ->buildBg(638, 826, [
         'color'  => [
