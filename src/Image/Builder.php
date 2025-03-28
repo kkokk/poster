@@ -265,16 +265,16 @@ class Builder
         return $this->extension->baseData($query);
     }
 
-    public function getIm()
+    public function getCanvas()
     {
         $query = $this->query->getQuery();
-        return $this->extension->getIm($query);
+        return $this->extension->getCanvas($query);
     }
 
-    public function getImInfo()
+    public function getCanvasInfo()
     {
         $query = $this->query->getQuery();
-        return $this->extension->getImInfo($query);
+        return $this->extension->getCanvasInfo($query);
     }
 
     public function blob()

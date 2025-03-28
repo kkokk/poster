@@ -67,7 +67,7 @@ class Canvas extends GdImageGraphicsEngine
         $x = calc_dst_x($x, $this->width, $image->getWidth());
         # 处理目标 y 轴
         $y = calc_dst_Y($y, $this->height, $image->getHeight());
-        imagecopy($this->image, $image->getImage(), $x, $y, $srcX, $srcY, $image->getWidth(), $image->getHeight());
+        imagecopy($this->image, $image->getImage(), intval($x), intval($y), intval($srcX), intval($srcY), intval($image->getWidth()), intval($image->getHeight()));
         return $this;
     }
 

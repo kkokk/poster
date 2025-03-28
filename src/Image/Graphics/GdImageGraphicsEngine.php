@@ -61,7 +61,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
             }
         }
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
+        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight), intval($this->width), intval($this->height));
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -83,7 +83,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         }
 
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
+        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight), intval($this->width), intval($this->height));
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -127,7 +127,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 
     public function transparent($transparency)
     {
-        $this->setImageAlpha($this->image, $this->width, $this->height, $transparency);
+        $this->image = $this->setImageAlpha($this->image, $this->width, $this->height, $transparency);
         return $this;
     }
 

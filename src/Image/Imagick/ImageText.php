@@ -7,6 +7,7 @@
 
 namespace Kkokk\Poster\Image\Imagick;
 
+use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Graphics\ImagickImageTextGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageTextInterface;
 use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
@@ -19,12 +20,18 @@ class ImageText extends ImagickImageTextGraphicsEngine implements ImageTextInter
 
     public function addText(TextGraphicsEngineInterface $text)
     {
+        if (!$text instanceof Text) {
+            throw new PosterException('must be Kkokk\Poster\Image\Imagick\Text');
+        }
         $this->contents[] = $text;
         return $this;
     }
 
     public function addImage(ImageGraphicsEngineInterface $image)
     {
+        if (!$image instanceof Text) {
+            throw new PosterException('must be Kkokk\Poster\Image\Imagick\Image');
+        }
         $this->contents[] = $image;
         return $this;
     }

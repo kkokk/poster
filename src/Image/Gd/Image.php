@@ -23,7 +23,7 @@ class Image extends GdImageGraphicsEngine
             return $this;
         }
 
-        $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($bgColor));
+        $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($this->image, $bgColor));
 
         // 获取旋转后图片的尺寸
         $rotatedWidth = imagesx($rotatedImage);
@@ -37,7 +37,8 @@ class Image extends GdImageGraphicsEngine
         $offsetY = ($rotatedHeight - $this->height) / 2;
 
         // 裁剪旋转后的图像
-        imagecopy($croppedImage, $rotatedImage, 0, 0, $offsetX, $offsetY, $this->width, $this->height);
+        imagecopy($croppedImage, $rotatedImage, 0, 0, intval($offsetX), intval($offsetY), intval($this->width),
+            intval($this->height));
 
         // 更新图像资源
         $this->image = $croppedImage;

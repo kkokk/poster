@@ -7,8 +7,6 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
-require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
-
 use Kkokk\Poster\Exception\PosterException;
 
 class ImageGraphicsEngine
@@ -56,8 +54,7 @@ class ImageGraphicsEngine
     {
         $path = is_array($path) ? $path : [$path];
         $pathFileName = isset($path[0]) ? $path[0] : '';
-        $pathFileName = str_replace(['\\', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
-
+        $pathFileName = str_replace(['\\', '/', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
         $fileName = $pathFileName ?: time();
         if (strripos($pathFileName, DIRECTORY_SEPARATOR) !== false) {
             $this->setPathName($pathFileName);
@@ -136,5 +133,25 @@ class ImageGraphicsEngine
     public function getHeight()
     {
         return $this->height;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getPathName()
+    {
+        return $this->pathname;
+    }
+
+    public function getFileName()
+    {
+        return $this->filename;
     }
 }

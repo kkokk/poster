@@ -9,6 +9,7 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
+use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Graphics\GdImageTextGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
@@ -21,12 +22,18 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
 
     public function addText(TextGraphicsEngineInterface $text)
     {
+        if (!$text instanceof Text) {
+            throw new PosterException('must be Kkokk\Poster\Image\Gd\Text');
+        }
         $this->contents[] = $text;
         return $this;
     }
 
     public function addImage(ImageGraphicsEngineInterface $image)
     {
+        if (!$image instanceof Image) {
+            throw new PosterException('must be Kkokk\Poster\Image\Gd\Image');
+        }
         $this->contents[] = $image;
         return $this;
     }

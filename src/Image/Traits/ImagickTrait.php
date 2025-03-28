@@ -143,17 +143,6 @@ trait ImagickTrait
     }
 
     /**
-     * 创建画布
-     */
-    public function createIm($w, $h, $rgba, $alpha = false, $type = null)
-    {
-        $color = $this->createColor($rgba);
-        $image = $this->createImagick();
-        $image->newImage($w, $h, $color, $type ?: $this->type);//设置画布的信息以及画布的格式
-        return $image;
-    }
-
-    /**
      * 获取颜色值，可设置透明度
      */
     protected function createColorAlpha($rgba = [255, 255, 255, 127])
@@ -274,7 +263,7 @@ trait ImagickTrait
                     break;
                 }
 
-                $picsC = $this->createIm($w, $chunk, [], true);
+                $picsC = $this->createCanvas($w, $chunk);
 
                 $this->linearGradientDefault($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
 
@@ -445,6 +434,10 @@ trait ImagickTrait
 
     protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
     {
+        if (!is_null($rgba)) {
+            $rgba = empty($rgba) ? [255, 255, 255, 127] : $rgba;
+            $rgba = parse_color($rgba);
+        }
         $background = $this->createColor($rgba);
         $image = $this->createImagick();
         $image->newImage($w, $h, $background, $this->type);//设置画布的信息以及画布的格式

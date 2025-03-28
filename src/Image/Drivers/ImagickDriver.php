@@ -9,9 +9,12 @@
 namespace Kkokk\Poster\Image\Drivers;
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Graphics\ImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImageTextGraphicsEngine;
 use Kkokk\Poster\Image\Imagick\Canvas;
 use Kkokk\Poster\Image\Imagick\Image;
 use Kkokk\Poster\Image\Imagick\ImageText;
+use Kkokk\Poster\Image\Imagick\Qr;
 use Kkokk\Poster\Image\Imagick\Text;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
@@ -19,11 +22,8 @@ class ImagickDriver extends Driver implements DriverInterface
 {
     use ImagickTrait;
 
-    protected $image;
-
     function __construct()
     {
-
     }
 
     public function im($w, $h, $rgba = [255, 255, 255, 1], $alpha = false)
@@ -32,6 +32,7 @@ class ImagickDriver extends Driver implements DriverInterface
             $rgba = $alpha ? array_pad($rgba, 4, 1) : array_slice($rgba, 0, 3);
         }
         $this->canvas = new Canvas($w, $h, $rgba);
+        $this->setCanvasConfig($this->canvas);
     }
 
     public function ImDst($source, $w = 0, $h = 0)
@@ -39,7 +40,11 @@ class ImagickDriver extends Driver implements DriverInterface
         if ($source instanceof Canvas) {
             $this->canvas = $source;
         } else {
+            if ($source instanceof ImageGraphicsEngine) {
+                $source = $source->blob();
+            }
             $this->canvas = new Canvas();
+            $this->setCanvasConfig($this->canvas);
             $this->canvas->readImage($source, $w, $h);
         }
     }
@@ -51,7 +56,7 @@ class ImagickDriver extends Driver implements DriverInterface
 
         // im不存在则创建
         if (empty($this->canvas)) {
-            $this->im($w, $h, [], $alpha);
+            $this->im($w, $h, [255, 255, 255, 127], $alpha);
         }
         // 渐变处理->直接处理im
         // 计算颜色方向
@@ -120,18 +125,22 @@ class ImagickDriver extends Driver implements DriverInterface
         $dstY = 0,
         $fontSize = null,
         $rgba = null,
-        $max_w = null,
+        $maxWidth = null,
         $font = null,
         $weight = null,
         $space = null,
         $angle = null
     ) {
-        if ($content == '') {
+        if (empty($content)) {
             return true;
         }
 
         if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
+        }
+
+        if ($content instanceof ImageTextGraphicsEngine && !$content instanceof \Kkokk\Poster\Image\Imagick\ImageText) {
+            throw new PosterException('Content must be: \Kkokk\Poster\Image\Imagick\ImageText');
         }
 
         if ($content instanceof ImageText) {
@@ -140,19 +149,23 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         if (!$content instanceof Text) {
-            $content = (new Text())->setFont(!empty($font) ? get_real_path($font) : $this->font)
-                ->setFontSize($fontSize ?: $this->font_size)
-                ->setFontAngle($angle ?: $this->font_angle)
-                ->setFontWeight($weight ?: $this->font_weight)
-                ->setMaxWidth($max_w ?: $this->font_max_w)
-                ->setFontColor($rgba ?: $this->font_rgba)
-                ->setFontSpace($space ?: $this->font_space)
-                ->setText($content);
+            $content = (new Text())->config($this->configs)->setText($content);
+            $font && $content->setFont($font);
+            $fontSize && $content->setFontSize($fontSize);
+            $angle && $content->setFontAngle($angle);
+            $weight && $content->setFontWeight($weight);
+            $maxWidth && $content->setMaxWidth($maxWidth);
+            $rgba && $content->setFontColor($rgba);
+            $space && $content->setFontSpace($space);
         }
 
         $imageText = new ImageText();
-        $imageText->addText($content)
-            ->setMaxWidth($max_w ?: $this->font_max_w);
+        $imageText
+            ->config($this->configs)
+            ->addText($content);
+        if ($maxWidth) {
+            $imageText->setMaxWidth($maxWidth);
+        }
         $this->canvas->addImageText($imageText, $dstX, $dstY);
         return true;
     }
@@ -177,7 +190,7 @@ class ImagickDriver extends Driver implements DriverInterface
                 break;
         }
 
-        if ($this->type == 'gif') {
+        if ($this->canvas->getType() == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->canvas->getImage() as $frame) {
                 $frame->drawImage($draw);
@@ -211,17 +224,16 @@ class ImagickDriver extends Driver implements DriverInterface
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
             default:
-                $draw->setFillColor($this->createColor());
+                $draw->setFillColor($this->createColor([255, 255, 255, 127]));
                 $draw->arc($cx - $wr, $cy - $hr, $cx + $wr, $cy + $hr, $s, $e);
                 break;
         }
-        if ($this->type == 'gif') {
-            // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->image as $frame) {
+        if ($this->canvas->getType() == 'gif') {
+            foreach ($this->canvas->getImage() as $frame) {
                 $frame->drawImage($draw);
             }
         } else {
-            $this->image->drawImage($draw);
+            $this->canvas->getImage()->drawImage($draw);
         }
     }
 
@@ -237,56 +249,19 @@ class ImagickDriver extends Driver implements DriverInterface
         $srcWidth = 0,
         $srcHeight = 0
     ) {
-        if (empty($this->image)) {
+        if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
-
-        $qr = \QRcode::re_png($text, $level, $size, $margin);
-
-        $bgWidth = imagesx($qr);
-        $bgHeight = imagesy($qr);
-
-        ob_start();                          // 打开一个输出缓冲区
-        gd_image_create('png')($qr);         // 将 GD 图像输出到缓冲区
-        $imageData = ob_get_contents();      // 从缓冲区中读取图像数据
-        ob_end_clean();
-
-        $pic = $this->createImagick();
-        $pic->readImageBlob($imageData);
-
-        if ($srcWidth > 0) {
-            $bgWidth = $srcWidth;
+        if ($text instanceof Qr) {
+            $this->canvas->addImage($text, $dstX, $dstY, $srcX, $srcY);
+            return;
         }
-
-        if ($srcHeight > 0) {
-            $bgHeight = $srcHeight;
-        }
-
-        # 处理目标 x 轴
-        $dstX = calc_dst_x($dstX, $this->im_w, $bgWidth);
-
-        # 处理目标 y 轴
-        $dstY = calc_dst_y($dstY, $this->im_h, $bgHeight);
-
+        $qr = new Qr($text, $level, $size, $margin);
         # 自定义宽高的时候
         if (!empty($srcWidth) && !empty($srcHeight)) {
-            $pic->resizeImage($bgWidth, $bgHeight, $pic::FILTER_LANCZOS, 1, true);
+            $qr->scale($srcWidth, $srcHeight);
         }
-
-        // 裁剪图片
-        $this->cropImage($pic, $srcX, $srcY);
-        // 合并图片
-        if ($this->type == 'gif') {
-            // 每帧长宽不一致问题, 水印会不一致
-            foreach ($this->image as $frame) {
-                $frame->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dstX, $dstY);
-            }
-        } else {
-            $this->image->compositeImage($pic, ($this->image)::COMPOSITE_DEFAULT, $dstX, $dstY);
-        }
-
-        !is_resource($qr) || imagedestroy($qr);
-        $this->destroyImage($pic);
+        $this->canvas->addImage($qr, $dstX, $dstY, $srcX, $srcY);
     }
 
     /**
@@ -301,9 +276,7 @@ class ImagickDriver extends Driver implements DriverInterface
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->image = $this->cropHandle($this->image, $width, $height, $x, $y);
-        $this->im_w = $width;
-        $this->im_h = $height;
+        $this->canvas->crop($x, $y, $width, $height);
     }
 
     public function execute($query = [], Driver $driver = null)
@@ -317,14 +290,5 @@ class ImagickDriver extends Driver implements DriverInterface
         }
 
         return $driver;
-    }
-
-    /**
-     * 析构方法，用于销毁图像资源
-     */
-    public function __destruct()
-    {
-        empty($this->image) || $this->image->destroy();
-        empty($this->ImagickDraw) || $this->ImagickDraw->destroy();
     }
 }

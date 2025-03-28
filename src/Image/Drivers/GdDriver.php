@@ -12,7 +12,10 @@ use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Gd\Canvas;
 use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Gd\ImageText;
+use Kkokk\Poster\Image\Gd\Qr;
 use Kkokk\Poster\Image\Gd\Text;
+use Kkokk\Poster\Image\Graphics\ImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImageTextGraphicsEngine;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
 class GdDriver extends Driver implements DriverInterface
@@ -32,6 +35,7 @@ class GdDriver extends Driver implements DriverInterface
             $rgba = $alpha ? array_pad($rgba, 4, 1) : array_slice($rgba, 0, 3);
         }
         $this->canvas = new Canvas($w, $h, $rgba);
+        $this->setCanvasConfig($this->canvas);
     }
 
     /**
@@ -42,7 +46,11 @@ class GdDriver extends Driver implements DriverInterface
         if ($source instanceof Canvas) {
             $this->canvas = $source;
         } else {
+            if ($source instanceof ImageGraphicsEngine) {
+                $source = $source->blob();
+            }
             $this->canvas = new Canvas();
+            $this->setCanvasConfig($this->canvas);
             $this->canvas->readImage($source, $w, $h);
         }
     }
@@ -70,7 +78,7 @@ class GdDriver extends Driver implements DriverInterface
 
         // im不存在则创建
         if (empty($this->canvas)) {
-            $this->Im($w, $h, [], $alpha);
+            $this->Im($w, $h, [255, 255, 255, 127], $alpha);
         }
         // 渐变处理->直接处理im
         // 计算颜色方向
@@ -149,11 +157,11 @@ class GdDriver extends Driver implements DriverInterface
      * @param        $dstY
      * @param        $fontSize
      * @param        $rgba
-     * @param int    $max_w
+     * @param int    $maxWidth
      * @param string $font
      * @param int    $weight
      * @param int    $space
-     * @return bool
+     * @return void
      * @throws PosterException
      */
     public function CopyText(
@@ -162,41 +170,48 @@ class GdDriver extends Driver implements DriverInterface
         $dstY = 0,
         $fontSize = null,
         $rgba = null,
-        $max_w = null,
+        $maxWidth = null,
         $font = null,
         $weight = null,
         $space = null,
         $angle = null
     ) {
-        if ($content == '') {
-            return true;
+        if (empty($content)) {
+            return;
         }
 
         if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
 
+        if ($content instanceof ImageTextGraphicsEngine && !$content instanceof \Kkokk\Poster\Image\Gd\ImageText) {
+            throw new PosterException('Content must be: \Kkokk\Poster\Image\Gd\ImageText');
+        }
+
         if ($content instanceof ImageText) {
             $this->canvas->addImageText($content, $dstX, $dstY);
-            return true;
+            return;
         }
 
         if (!$content instanceof Text) {
-            $content = (new Text())->setFont(!empty($font) ? get_real_path($font) : $this->font)
-                ->setFontSize($fontSize ?: $this->font_size)
-                ->setFontAngle($angle ?: $this->font_angle)
-                ->setFontWeight($weight ?: $this->font_weight)
-                ->setMaxWidth($max_w ?: $this->font_max_w)
-                ->setFontColor($rgba ?: $this->font_rgba)
-                ->setFontSpace($space ?: $this->font_space)
-                ->setText($content);
+            $content = (new Text())->config($this->configs)->setText($content);
+            $font && $content->setFont($font);
+            $fontSize && $content->setFontSize($fontSize);
+            $angle && $content->setFontAngle($angle);
+            $weight && $content->setFontWeight($weight);
+            $maxWidth && $content->setMaxWidth($maxWidth);
+            $rgba && $content->setFontColor($rgba);
+            $space && $content->setFontSpace($space);
         }
 
         $imageText = new ImageText();
-        $imageText->addText($content)
-            ->setMaxWidth($max_w ?: $this->font_max_w);
+        $imageText
+            ->config($this->configs)
+            ->addText($content);
+        if ($maxWidth) {
+            $imageText->setMaxWidth($maxWidth);
+        }
         $this->canvas->addImageText($imageText, $dstX, $dstY);
-        return true;
     }
 
     public function CopyLine($x1 = 0, $y1 = 0, $x2 = 0, $y2 = 0, $rgba = [], $type = '', $weight = 1)
@@ -231,22 +246,22 @@ class GdDriver extends Driver implements DriverInterface
         $style = '',
         $weight = 1
     ) {
-        imagesetthickness($this->image, $weight); // 划线的线宽加粗
-        $color = $this->createColor($this->image, $rgba);
+        imagesetthickness($this->canvas->getImage(), $weight); // 划线的线宽加粗
+        $color = $this->createColor($this->canvas->getImage(), $rgba);
 
         switch ($type) {
             case 'filled_arc':
             case 'filledArc':
-                imagearc($this->image, $cx, $cy, $w, $h, $s, $e, $color);
+                imagearc($this->canvas->getImage(), $cx, $cy, $w, $h, $s, $e, $color);
                 $style = $style ?: IMG_ARC_PIE;
                 // IMG_ARC_PIE
                 // IMG_ARC_CHORD
                 // IMG_ARC_NOFILL
                 // IMG_ARC_EDGED
-                imagefilledarc($this->image, $cx, $cy, $w, $h, $s, $e, $color, $style);
+                imagefilledarc($this->canvas->getImage(), $cx, $cy, $w, $h, $s, $e, $color, $style);
                 break;
             default:
-                imagearc($this->image, $cx, $cy, $w, $h, $s, $e, $color);
+                imagearc($this->canvas->getImage(), $cx, $cy, $w, $h, $s, $e, $color);
                 break;
         }
     }
@@ -275,58 +290,19 @@ class GdDriver extends Driver implements DriverInterface
         $srcWidth = 0,
         $srcHeight = 0
     ) {
-        if (empty($this->image)) {
+        if (empty($this->canvas)) {
             throw new PosterException('Image resources not be found');
         }
-
-        $result = \QRcode::re_png($text, $level, $size, $margin);
-        if ($srcWidth > 0) {
-
-            $bgWidth = $srcWidth;
-            $Width = imagesx($result);
-        } else {
-
-            $bgWidth = imagesx($result);
-
+        if ($text instanceof Qr) {
+            $this->canvas->addImage($text, $dstX, $dstY, $srcX, $srcY);
+            return;
         }
-
-        if ($srcHeight > 0) {
-
-            $bgHeight = $srcHeight;
-            $Height = imagesy($result);
-        } else {
-
-            $bgHeight = imagesy($result);
-
-        }
-
-
-        # 处理目标 x 轴
-        $dstX = calc_dst_x($dstX, $this->im_w, $bgWidth);
-
-
-        # 处理目标 y 轴
-        $dstY = calc_dst_y($dstY, $this->im_h, $bgHeight);
-
+        $qr = new Qr($text, $level, $size, $margin);
         # 自定义宽高的时候
         if (!empty($srcWidth) && !empty($srcHeight)) {
-            $circle_new = $this->createIm($bgWidth, $bgHeight, [255, 255, 255, 127], true);
-            $w_circle_new = $bgWidth;
-            $h_circle_new = $bgHeight;
-            # 按比例缩放
-            imagecopyresized($circle_new, $result, 0, 0, 0, 0, $w_circle_new, $h_circle_new, $Width, $Height);
-            $result = $circle_new;
+            $qr->scale($srcWidth, $srcHeight);
         }
-
-
-        //整合海报
-        imagecopy($this->image, $result, $dstX, $dstY, $srcX, $srcY, $bgWidth, $bgHeight);
-        if (isset($circle_new) && is_resource($circle_new)) {
-            $this->destroyImage($circle_new);
-        }
-        if (isset($result) && is_resource($result)) {
-            $this->destroyImage($result);
-        }
+        $this->canvas->addImage($qr, $dstX, $dstY, $srcX, $srcY);
     }
 
     /**
@@ -341,9 +317,7 @@ class GdDriver extends Driver implements DriverInterface
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
-        $this->image = $this->cropHandle($this->image, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
-        $this->im_w = $width;
-        $this->im_h = $height;
+        $this->canvas->crop($x, $y, $width, $height);
     }
 
     public function execute($query = [], Driver $driver = null)
@@ -355,13 +329,5 @@ class GdDriver extends Driver implements DriverInterface
             $driver->run($item, $driver);
         }
         return $driver;
-    }
-
-    /**
-     * 析构方法，用于销毁图像资源
-     */
-    public function __destruct()
-    {
-        empty($this->image) || !is_resource($this->image) || imagedestroy($this->image);
     }
 }

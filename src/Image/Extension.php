@@ -74,13 +74,13 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->getBaseData();
     }
 
-    public function getIm($query)
+    public function getCanvas($query)
     {
-        return $this->getDriverInstance($query)->getIm();
+        return $this->getDriverInstance($query)->getCanvas();
     }
 
-    public function getImInfo($query){
-        return $this->getDriverInstance($query)->getImInfo();
+    public function getCanvasInfo($query){
+        return $this->getDriverInstance($query)->getCanvasInfo();
     }
 
     public function blob($query)

@@ -4,7 +4,7 @@
  * Date: 2024/3/12
  * Time: 13:29
  */
-require '../vendor/autoload.php';
+require '../../vendor/autoload.php';
 
 use Kkokk\Poster\Facades\Poster;
 use Kkokk\Poster\Facades\Html;
@@ -13,16 +13,20 @@ $html = '<p><img src="https://img.alicdn.com/imgextra/i3/2216558867983/O1CN01x1z
 
 $chunkHeight = 1500;
 
-$poster = Poster::extension('imagick')->buildImDst(Html::load($html)->size(480)->render());
-$imInfo = $poster->getImInfo();
-$tmpIm = $poster->tmp();
-$width = $imInfo['width'];
-$height = $imInfo['height'];
+$poster = Poster::extension('imagick')
+    ->buildImDst(Html::load($html)->size(480)->render());
+$canvasInfo = $poster->getCanvasInfo();
+$tmpCanvas = $canvasInfo['canvas'];
+$width = $canvasInfo['width'];
+$height = $canvasInfo['height'];
 $count = ceil($height / $chunkHeight);
-for ($i = 0; $i < $count; $i ++) {
-    $y =  $chunkHeight * $i;
-    if($i + 1 == $count) {
+for ($i = 0; $i < $count; $i++) {
+    $y = $chunkHeight * $i;
+    if ($i + 1 == $count) {
         $chunkHeight = $height - $y;
     }
-    $crop = Poster::buildImDst($tmpIm)->crop(0, $y,$width, $chunkHeight)->getPoster(__DIR__ . '/crop/' . $i . '.png');
+    $crop = Poster::extension('gd')
+        ->buildImDst($tmpCanvas)
+        ->crop(0, $y, $width, $chunkHeight)
+        ->getPoster(__DIR__ . '/../poster/crop/' . $i . '.png');
 }

@@ -34,7 +34,6 @@ trait GdTrait
             if (strripos($this->filename, '.') === false) {
                 $this->filename = $this->filename . '.' . $this->type;
             }
-
             gd_image_create($type)($this->image,
                 $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
 
@@ -399,7 +398,7 @@ trait GdTrait
      */
     protected function setPixelRadius($im, $w, $h, $radius)
     {
-        $newIm = $this->createIm($w, $h, [], true);;
+        $newIm = $this->createCanvas($w, $h);;
 
         $maxRadius = $w > $h ? $h / 2 : $w / 2;
 
@@ -696,52 +695,10 @@ trait GdTrait
         return $im;
     }
 
-    /**
-     * 字体加粗
-     */
-    protected function fontWeight($weight, $fontSize, $angle, $DstX, $DstY, $color, $font, $contents)
-    {
-        for ($i = 0; $i < $weight; $i++) {
-            list($reallyDstX, $reallyDstY) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
-            imagettftext($this->image, $fontSize, $angle, intval($reallyDstX), intval($reallyDstY), $color, $font,
-                $contents);
-        }
-    }
-
-    /**
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/6/2
-     * Time: 14:26
-     */
-    protected function fontWeightArr($weight, $fontSize, $angle, $DstX, $DstY, $color, $font, $contentsArr)
-    {
-
-        $DstX_old = $DstX;
-        // $max = max(array_column($contentsArr, 'w')); // 取最大宽度
-
-        foreach ($contentsArr as $v) {
-
-            $contents = $v['value'];
-
-            if ($contents == "\n") {
-                $DstX = $DstX_old;
-                $DstY += 1.75 * $fontSize;
-                continue;
-            }
-
-            $customColor = !empty($v['color']) ? $v['color'] : $color;
-
-            $this->fontWeight($weight, $fontSize, $angle, $DstX, $DstY, $customColor, $font, $contents);
-
-            $DstX += $v['w'];
-        }
-    }
-
     /** 设置背景透明 */
     protected function setImageAlpha($pic, $w, $h, $transparency)
     {
-        $mask = $this->createIm($w, $h, [], $transparency > 1);
+        $mask = $this->createCanvas($w, $h, [255, 255, 255, $transparency]);
 
         for ($x = 0; $x < $w; $x++) {
             for ($y = 0; $y < $h; $y++) {

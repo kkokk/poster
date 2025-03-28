@@ -11,56 +11,6 @@ namespace Kkokk\Poster\Image\Drivers;
 interface DriverInterface
 {
     /**
-     * 获取文件路径
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @param string $path
-     * @return array
-     */
-    public function getData($path = '');
-
-    /**
-     * 输出流
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @return resource
-     */
-    public function getStream();
-
-    /**
-     * 获取base64文件
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @return string
-     */
-    public function getBaseData();
-
-    /**
-     * 设置图片
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:24
-     * @return array|\Kkokk\Poster\Exception\PosterException
-     */
-    public function setData();
-
-    /**
-     * 获取 Im 实例
-     * User: lang
-     * Date: 2023/8/10
-     * Time: 16:16
-     * @return mixed
-     */
-    public function getIm();
-
-    /**
      * 创建画布
      * Author: lang
      * Email: 732853989@qq.com
@@ -142,15 +92,15 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:41
      * @param string|\Kkokk\Poster\Image\Gd\Text|\Kkokk\Poster\Image\Imagick\Text $content
-     * @param int    $dstX
-     * @param int    $dstY
-     * @param int    $fontSize
-     * @param array  $rgba
-     * @param int    $max_w
-     * @param string $font
-     * @param int    $weight
-     * @param int    $space
-     * @param int    $angle
+     * @param int                                                                 $dstX
+     * @param int                                                                 $dstY
+     * @param int                                                                 $fontSize
+     * @param array                                                               $rgba
+     * @param int                                                                 $max_w
+     * @param string                                                              $font
+     * @param int                                                                 $weight
+     * @param int                                                                 $space
+     * @param int                                                                 $angle
      * @return void
      */
     public function CopyText(
@@ -268,22 +218,4 @@ interface DriverInterface
      * @param $height
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0);
-
-    /**
-     * 获取流
-     * Author: lang
-     * Date: 2024/3/12
-     * Time: 15:11
-     * @return mixed
-     */
-    public function blob();
-
-    /**
-     * 保存到临时文件并返回路径
-     * User: lang
-     * Date: 2024/3/12
-     * Time: 15:28
-     * @return mixed
-     */
-    public function tmp();
 }
