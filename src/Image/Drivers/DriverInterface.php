@@ -11,56 +11,6 @@ namespace Kkokk\Poster\Image\Drivers;
 interface DriverInterface
 {
     /**
-     * 获取文件路径
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @param string $path
-     * @return array
-     */
-    public function getData($path = '');
-
-    /**
-     * 输出流
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @return resource
-     */
-    public function getStream();
-
-    /**
-     * 获取base64文件
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:23
-     * @return string
-     */
-    public function getBaseData();
-
-    /**
-     * 设置图片
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/27
-     * Time: 11:24
-     * @return array|\Kkokk\Poster\Exception\PosterException
-     */
-    public function setData();
-
-    /**
-     * 获取 Im 实例
-     * User: lang
-     * Date: 2023/8/10
-     * Time: 16:16
-     * @return mixed
-     */
-    public function getIm();
-
-    /**
      * 创建画布
      * Author: lang
      * Email: 732853989@qq.com
@@ -80,9 +30,9 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:31
-     * @param string $source
-     * @param int    $w
-     * @param int    $h
+     * @param string|\Kkokk\Poster\Image\Gd\Canvas|\Kkokk\Poster\Image\Imagick\Canvas $source
+     * @param int                                                                     $w
+     * @param int                                                                     $h
      * @return void
      */
     public function ImDst($source, $w = 0, $h = 0);
@@ -97,14 +47,14 @@ interface DriverInterface
      * @param int   $h
      * @param array $rgba
      * @param false $alpha
-     * @param int   $dst_x
-     * @param int   $dst_y
-     * @param int   $src_x
-     * @param int   $src_y
+     * @param int   $dstX
+     * @param int   $dstY
+     * @param int   $srcX
+     * @param int   $srcY
      * @param array $query
      * @return void
      */
-    public function Bg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $query = []);
+    public function Bg($w, $h, $rgba = [], $alpha = false, $dstX = 0, $dstY = 0, $srcX = 0, $srcY = 0, $query = []);
 
     /**
      * 复制图片
@@ -113,24 +63,24 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:41
      * @param string|array $src
-     * @param int          $dst_x
-     * @param int          $dst_y
-     * @param int          $src_x
-     * @param int          $src_y
-     * @param int          $src_w
-     * @param int          $src_h
+     * @param int          $dstX
+     * @param int          $dstY
+     * @param int          $srcX
+     * @param int          $srcY
+     * @param int          $srcWidth
+     * @param int          $srcHeight
      * @param false        $alpha
      * @param string       $type
      * @return void
      */
     public function CopyImage(
         $src,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0,
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0,
         $alpha = false,
         $type = 'normal'
     );
@@ -141,22 +91,22 @@ interface DriverInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/29
      * Time: 15:41
-     * @param string $content
-     * @param int    $dst_x
-     * @param int    $dst_y
-     * @param int    $fontSize
-     * @param array  $rgba
-     * @param int    $max_w
-     * @param string $font
-     * @param int    $weight
-     * @param int    $space
-     * @param int    $angle
+     * @param string|\Kkokk\Poster\Image\Gd\Text|\Kkokk\Poster\Image\Imagick\Text $content
+     * @param int                                                                 $dstX
+     * @param int                                                                 $dstY
+     * @param int                                                                 $fontSize
+     * @param array                                                               $rgba
+     * @param int                                                                 $max_w
+     * @param string                                                              $font
+     * @param int                                                                 $weight
+     * @param int                                                                 $space
+     * @param int                                                                 $angle
      * @return void
      */
     public function CopyText(
         $content,
-        $dst_x = 0,
-        $dst_y = 0,
+        $dstX = 0,
+        $dstY = 0,
         $fontSize = null,
         $rgba = null,
         $max_w = null,
@@ -221,14 +171,15 @@ interface DriverInterface
      * Date: 2023/3/29
      * Time: 15:47
      * @param string $text
+     * @param string $level
      * @param int    $size
      * @param int    $margin
-     * @param int    $dst_x
-     * @param int    $dst_y
-     * @param int    $src_x
-     * @param int    $src_y
-     * @param int    $src_w
-     * @param int    $src_h
+     * @param int    $dstX
+     * @param int    $dstY
+     * @param int    $srcX
+     * @param int    $srcY
+     * @param int    $srcWidth
+     * @param int    $srcHeight
      * @return mixed
      */
     public function CopyQr(
@@ -236,12 +187,12 @@ interface DriverInterface
         $level = 'L',
         $size = 4,
         $margin = 1,
-        $dst_x = 0,
-        $dst_y = 0,
-        $src_x = 0,
-        $src_y = 0,
-        $src_w = 0,
-        $src_h = 0
+        $dstX = 0,
+        $dstY = 0,
+        $srcX = 0,
+        $srcY = 0,
+        $srcWidth = 0,
+        $srcHeight = 0
     );
 
     /**
@@ -267,22 +218,4 @@ interface DriverInterface
      * @param $height
      */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0);
-
-    /**
-     * 获取流
-     * Author: lang
-     * Date: 2024/3/12
-     * Time: 15:11
-     * @return mixed
-     */
-    public function blob();
-
-    /**
-     * 保存到临时文件并返回路径
-     * User: lang
-     * Date: 2024/3/12
-     * Time: 15:28
-     * @return mixed
-     */
-    public function tmp();
 }

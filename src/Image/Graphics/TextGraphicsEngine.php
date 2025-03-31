@@ -11,6 +11,8 @@ namespace Kkokk\Poster\Image\Graphics;
 
 class TextGraphicsEngine
 {
+    protected $canvas = null;
+
     protected $content;
     /** @var string 设置字体 */
     protected $font = POSTER_BASE_PATH . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'simkai.ttf';
@@ -24,29 +26,40 @@ class TextGraphicsEngine
     protected $fontSpace = 0;
     /** @var int 字体粗细 */
     protected $fontWeight = 1;
-    /** @var int 行高倍数 1.5 */
+    /** @var int 行高 */
     protected $lineHeight = 21;
     /** @var string 文本对齐方式 left center right */
     protected $textAlign = 'left';
-    /** @var null 字体旋转角度 */
+    /** @var int 字体旋转角度 */
     protected $fontAngle = 0;
-    /** @var null 字体最大换行宽度 */
+    /** @var int 字体最大换行宽度 */
     protected $fontMaxWidth = 0;
 
     public function config($configs = [])
     {
-        isset($configs['font_family']) && !empty($configs['font_family']) && $this->font = $configs['font_family'];
-        isset($configs['font_size']) && !empty($configs['font_size']) && $this->fontSize = $configs['font_size'];
-        isset($configs['font_rgba']) && !empty($configs['font_rgba']) && $this->fontColor = $configs['font_rgba'];
-        isset($configs['font_color']) && !empty($configs['font_color']) && $this->fontColor = $configs['font_color'];
-        isset($configs['font_space']) && !empty($configs['font_space']) && $this->fontSpace = $configs['font_space'];
-        isset($configs['font_weight']) && !empty($configs['font_weight']) && $this->fontWeight = $configs['font_weight'];
-        isset($configs['font_angle']) && !empty($configs['font_angle']) && $this->fontAngle = $configs['font_angle'];
-        isset($configs['font_max_w']) && !empty($configs['font_max_w']) && $this->fontMaxWidth = $configs['font_max_w'];
+        !empty($configs['font_family']) && $this->setFontFamily($configs['font_family']);
+        !empty($configs['font_size']) && $this->setFontSize($configs['font_size']);
+        !empty($configs['font_rgba']) && $this->setFontColor($configs['font_rgba']);
+        !empty($configs['font_color']) && $this->setFontColor($configs['font_color']);
+        !empty($configs['font_space']) && $this->setFontSpace($configs['font_space']);
+        !empty($configs['font_weight']) && $this->setFontWeight($configs['font_weight']);
+        !empty($configs['font_angle']) && $this->setFontAngle($configs['font_angle']);
+        !empty($configs['font_max_w']) && $this->setMaxWidth($configs['font_max_w']);
 
-        if (isset($configs['font']) && !empty($configs['font'])) {
-            $this->font = get_real_path($configs['font']);
+        if (!empty($configs['font'])) {
+            $this->setFont($configs['font']);
         }
+        return $this;
+    }
+
+    protected function getCanvas()
+    {
+        return $this->canvas;
+    }
+
+    protected function setCanvas($canvas)
+    {
+        $this->canvas = $canvas;
         return $this;
     }
 
@@ -63,7 +76,7 @@ class TextGraphicsEngine
 
     public function setFont($font)
     {
-        $this->font = $font;
+        $this->font = get_real_path($font);
         return $this;
     }
 
@@ -133,7 +146,7 @@ class TextGraphicsEngine
         return $this->fontFamily;
     }
 
-    public function getFontSize($fontSize = null)
+    public function getFontSize()
     {
         return $this->fontSize;
     }

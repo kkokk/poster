@@ -7,6 +7,7 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
@@ -19,27 +20,27 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         if ($path) {
             $this->setFilePath($path);
         }
-        return $this->returnImage($this->type);
+        return $this->returnImage($this->getType());
     }
 
-    public function getStream()
+    public function getStream($type = '')
     {
-        return $this->returnImage($this->type, false);
+        return $this->returnImage($type ?: $this->getType(), false);
     }
 
     public function getBaseData()
     {
-        return base64_data($this->image, $this->type);
+        return base64_data($this->image, $this->getType());
     }
 
     public function blob()
     {
-        return $this->getBlob($this->type, $this->image);
+        return $this->getBlob($this->getType(), $this->image);
     }
 
     public function tmp()
     {
-        return $this->getTmp($this->type, $this->image);
+        return $this->getTmp($this->getType(), $this->image);
     }
 
     public function setData()
@@ -49,6 +50,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 
     public function thumb($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         if ($bestFit) {
             $aspectRatio = $this->width / $this->height;
             if ($newWidth / $newHeight > $aspectRatio) {
@@ -58,7 +62,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
             }
         }
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
+        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight),
+            intval($this->width), intval($this->height));
+        $this->destroyImage();
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -67,6 +73,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 
     public function scale($newWidth, $newHeight, $bestFit = false)
     {
+        if ($newWidth == 0 || $newHeight == 0) {
+            return $this;
+        }
         if ($bestFit) {
             $aspectRatio = $this->width / $this->height;
             if ($newWidth / $newHeight > $aspectRatio) {
@@ -77,7 +86,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         }
 
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $this->width, $this->height);
+        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight),
+            intval($this->width), intval($this->height));
+        $this->destroyImage();
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -103,6 +114,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
                 }
             }
         }
+        $this->destroyImage();
         $this->image = $circleImage;
         $this->width = $size;
         $this->height = $size;
@@ -113,9 +125,51 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
     {
         $x = calc_dst_x($x, $this->width, $width);
         $y = calc_dst_Y($y, $this->height, $height);
-        $this->image = $this->cropHandle($this->image, $x, $y, $width, $height);
+        $cropImage = $this->cropHandle($this->image, $x, $y, $width, $height);
+        $this->destroyImage();
+        $this->image = $cropImage;
         $this->width = $width;
         $this->height = $height;
+        return $this;
+    }
+
+    public function transparent($transparency)
+    {
+        $mask = $this->setImageAlpha($this->image, $this->width, $this->height, $transparency);
+        $this->destroyImage();
+        $this->image = $mask;
+        return $this;
+    }
+
+    public function borderRadius($radius = 0)
+    {
+        $radiusImage = $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
+        $this->destroyImage();
+        $this->image = $radiusImage;
+        return $this;
+    }
+
+    public function applyMask($mask)
+    {
+        imagealphablending($this->image, false);
+        $width = $this->width;
+        $height = $this->height;
+        $maskImage = (new Image($mask))->scale($width, $height);
+        // 遍历每个像素，调整 Alpha 透明度
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = 0; $y < $height; $y++) {
+                $maskColor = imagecolorat($maskImage->getImage(), $x, $y) & 0xFF; // 取 R 分量作为透明度
+                $fgColor = imagecolorat($this->image, $x, $y);
+                // 提取 RGBA 组件
+                $r = ($fgColor >> 16) & 0xFF;
+                $g = ($fgColor >> 8) & 0xFF;
+                $b = $fgColor & 0xFF;
+                $alpha = 127 - ($maskColor / 255) * 127; // 计算透明度
+                $newColor = imagecolorallocatealpha($this->image, $r, $g, $b, round($alpha));
+                imagesetpixel($this->image, $x, $y, $newColor);
+            }
+        }
+        $this->destroyImage($maskImage->getImage());
         return $this;
     }
 

@@ -11,9 +11,13 @@ namespace Kkokk\Poster\Image\Traits;
 
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Image\Enums\ImageType;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 trait ImagickTrait
 {
+    protected $ImagickDraw;
 
     protected function setDPI()
     {
@@ -38,6 +42,9 @@ trait ImagickTrait
      */
     protected function returnImage($type, $outfile = true)
     {
+        if (in_array($type, ImageType::setQuantityTypes())) {
+            $this->image->setImageCompressionQuality($this->getQuantity());
+        }
         if ($outfile) {
             dir_exists($this->path . $this->pathname);
             if (strripos($this->filename, '.') === false) {
@@ -61,18 +68,24 @@ trait ImagickTrait
         echo $imageBlob;
     }
 
-    protected function getBlob($im)
+    protected function getBlob($image)
     {
-        return $im->getImageBlob();
+        if (in_array($this->getType(), ImageType::setQuantityTypes())) {
+            $image->setImageCompressionQuality($this->getQuantity());
+        }
+        return $image->getImageBlob();
     }
 
-    protected function getTmp($type, $im)
+    protected function getTmp($type, $image)
     {
+        if (in_array($type, ImageType::setQuantityTypes())) {
+            $image->setImageCompressionQuality($this->getQuantity());
+        }
         $output = tempnam(sys_get_temp_dir(), uniqid('imagickImage'));
         if ($type == 'gif') {
-            $im->writeImages($output, true);
+            $image->writeImages($output, true);
         } else {
-            $im->writeImage($output);
+            $image->writeImage($output);
         }
         return $output;
     }
@@ -84,8 +97,12 @@ trait ImagickTrait
             throw new PosterException("Unable to set the remote source {$source}");
         }
 
+        if (in_array($this->getType(), ImageType::setQuantityTypes())) {
+            $this->image->setImageCompressionQuality($this->getQuantity());
+        }
+
         if (!empty($source)) {
-            if ($this->type == 'gif') {
+            if ($this->getType() == 'gif') {
                 return $this->image->writeImages($source, true);
             }
             return $this->image->writeImage($source);
@@ -122,6 +139,11 @@ trait ImagickTrait
         if ($src) {
             if ($src instanceof DriverInterface) {
                 $Imagick->readImageBlob($src->getImageBlob());
+            } elseif ($src instanceof ImagickImageGraphicsEngine) {
+                $Imagick->destroy();
+                $Imagick = $src->getImage();
+            } elseif ($src instanceof GdImageGraphicsEngine) {
+                $Imagick->readImageBlob($src->blob());
             } elseif (strpos($src, 'http') === 0) {
                 $stream = @file_get_contents($src, null);
                 if (empty($stream)) {
@@ -139,17 +161,6 @@ trait ImagickTrait
 
         }
         return $Imagick;
-    }
-
-    /**
-     * 创建画布
-     */
-    public function createIm($w, $h, $rgba, $alpha = false, $type = null)
-    {
-        $color = $this->createColor($rgba);
-        $image = $this->createImagick();
-        $image->newImage($w, $h, $color, $type ?: $this->type);//设置画布的信息以及画布的格式
-        return $image;
     }
 
     /**
@@ -262,7 +273,7 @@ trait ImagickTrait
         }
 
         if ($rgbaCount < 3) {
-            $this->linearGradient($source, $rgbaColor, $rgbaCount, $w, $h);
+            $this->linearGradientDefault($source, $rgbaColor, $rgbaCount, $w, $h);
         } else {
 
             $picKey = 0;
@@ -273,9 +284,9 @@ trait ImagickTrait
                     break;
                 }
 
-                $picsC = $this->createIm($w, $chunk, [], true);
+                $picsC = $this->createCanvas($w, $chunk);
 
-                $this->linearGradient($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
+                $this->linearGradientDefault($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
 
                 $source->compositeImage($picsC, ($this->image)::COMPOSITE_DEFAULT, 0, $k * $chunk);
 
@@ -284,7 +295,7 @@ trait ImagickTrait
         }
     }
 
-    protected function linearGradient(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
+    protected function linearGradientDefault(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
     {
         if ($rgbaCount == 1) {
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
@@ -302,7 +313,7 @@ trait ImagickTrait
 
             list($really_dst_x, $really_dst_y) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
 
-            if ($this->type == 'gif') {
+            if ($this->getType() == 'gif') {
                 foreach ($this->image as $frame) {
                     $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
                     // $this->image->nextImage();
@@ -420,12 +431,12 @@ trait ImagickTrait
      * @param $alphas
      * @return void
      */
-    protected function setImageAlpha($pic, $alphas)
+    protected function setImageAlpha($pic, $transparency)
     {
         if (method_exists($pic, 'setImageOpacity')) {
-            $pic->setImageOpacity(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $pic->setImageOpacity(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
         } elseif (method_exists($pic, 'setImageAlpha')) {
-            $pic->setImageAlpha(floor((128 - $alphas) / 127 * 100) / 100); // 透明度
+            $pic->setImageAlpha(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
         }
     }
 
@@ -444,9 +455,40 @@ trait ImagickTrait
 
     protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
     {
+        if (!is_null($rgba)) {
+            $rgba = empty($rgba) ? [255, 255, 255, 127] : $rgba;
+            $rgba = parse_color($rgba);
+        }
         $background = $this->createColor($rgba);
         $image = $this->createImagick();
-        $image->newImage($w, $h, $background, $this->type);//设置画布的信息以及画布的格式
+        $image->newImage($w, $h, $background, $this->getType());//设置画布的信息以及画布的格式
         return $image;
+    }
+
+    public function calculateTextBox($text, $fontSize, $font, $angle)
+    {
+        $draw = $this->createTextImagickDraw();
+        $draw->setFont($font);
+        $draw->setFontSize($fontSize);
+        $rect = $this->getCanvas()->getImage()->queryFontMetrics($draw, $text);
+        return [
+            "left"   => abs($rect['boundingBox']['x1']) - 1,
+            "top"    => abs($rect['boundingBox']['y1']) - 1,
+            "width"  => $rect['textWidth'],
+            "height" => $rect['textHeight'] + abs($rect['descender']),
+            "box"    => $rect
+        ];
+    }
+
+    public function textWidth($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font, $angle);
+        return $calculateTextBox['width'];
+    }
+
+    public function textHeight($text, $fontSize, $font, $angle = 0)
+    {
+        $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font ?: $this->font, $angle);
+        return $calculateTextBox['height'];
     }
 }

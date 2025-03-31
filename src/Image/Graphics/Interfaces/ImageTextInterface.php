@@ -11,7 +11,7 @@ interface ImageTextInterface
 {
     public function addText(TextGraphicsEngineInterface $text);
 
-    public function addImage(ImageGraphicsEngineInterface $text);
+    public function addImage(ImageGraphicsEngineInterface $image);
 
-    public function draw(ImageGraphicsEngineInterface $image, $x = 0, $y = 0);
+    public function draw(ImageGraphicsEngineInterface $canvas, $x = 0, $y = 0);
 }

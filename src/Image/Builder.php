@@ -74,8 +74,17 @@ class Builder
         return $this;
     }
 
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, \Closure $callback = null)
-    {
+    public function buildBg(
+        $w,
+        $h,
+        $rgba = [],
+        $alpha = false,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        \Closure $callback = null
+    ) {
         $query = [];
         if ($callback) {
             $that = clone $this;
@@ -90,70 +99,111 @@ class Builder
         return $this;
     }
 
-    public function buildImage($src, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $alpha = false, $type = 'normal')
-    {
+    public function buildImage(
+        $src,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0,
+        $alpha = false,
+        $type = 'normal'
+    ) {
         $this->setImages($src, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $alpha, $type);
         return $this;
     }
 
     public function buildImageMany($params = [])
     {
+        $defaults = [
+            'dst_x' => 0,
+            'dst_y' => 0,
+            'src_x' => 0,
+            'src_y' => 0,
+            'src_w' => 0,
+            'src_h' => 0,
+            'alpha' => false,
+            'type'  => 'normal'
+        ];
         foreach ($params as $value) {
-            $value['dst_x'] = isset($value['dst_x']) ? $value['dst_x'] : 0;
-            $value['dst_y'] = isset($value['dst_y']) ? $value['dst_y'] : 0;
-            $value['src_x'] = isset($value['src_x']) ? $value['src_x'] : 0;
-            $value['src_y'] = isset($value['src_y']) ? $value['src_y'] : 0;
-            $value['src_w'] = isset($value['src_w']) ? $value['src_w'] : 0;
-            $value['src_h'] = isset($value['src_h']) ? $value['src_h'] : 0;
-            $value['alpha'] = isset($value['alpha']) ?: false;
-            $value['type'] = isset($value['type']) ? $value['type'] : 'normal';
-            $this->setImages($value['src'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h'], $value['alpha'], $value['type']);
+            $value = array_merge($defaults, $value);
+            $this->setImages($value['src'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'],
+                $value['src_w'], $value['src_h'], $value['alpha'], $value['type']);
         }
         return $this;
     }
 
-    public function buildText($content, $dst_x = 0, $dst_y = 0, $fontSize = null, $rgba = null, $max_w = null, $font = null, $weight = null, $space = null, $angle = null)
-    {
+    public function buildText(
+        $content,
+        $dst_x = 0,
+        $dst_y = 0,
+        $fontSize = null,
+        $rgba = null,
+        $max_w = null,
+        $font = null,
+        $weight = null,
+        $space = null,
+        $angle = null
+    ) {
         $this->setTexts($content, $dst_x, $dst_y, $fontSize, $rgba, $max_w, $font, $weight, $space, $angle);
         return $this;
     }
 
     public function buildTextMany($params = [])
     {
+        $defaults = [
+            'dst_x'    => 0,
+            'dst_y'    => 0,
+            'fontSize' => 0,
+            'rgba'     => [],
+            'max_w'    => 0,
+            'font'     => '',
+            'weight'   => 1,
+            'space'    => 0,
+            'angle'    => 0,
+        ];
         foreach ($params as $value) {
-            $value['dst_x'] = isset($value['dst_x']) ? $value['dst_x'] : 0;
-            $value['dst_y'] = isset($value['dst_y']) ? $value['dst_y'] : 0;
-            $value['fontSize'] = isset($value['font']) ? $value['font'] : 0;
-            $value['rgba'] = isset($value['rgba']) ? $value['rgba'] : [];
-            $value['max_w'] = isset($value['max_w']) ? $value['max_w'] : 0;
-            $value['font'] = isset($value['font_family']) ? $value['font_family'] : '';
-            $value['weight'] = isset($value['weight']) ? $value['weight'] : 1;
-            $value['space'] = isset($value['space']) ? $value['space'] : 0;
-            $value['angle'] = isset($value['angle']) ? $value['angle'] : 0;
-            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['fontSize'], $value['rgba'], $value['max_w'], $value['font'], $value['weight'], $value['space'], $value['angle']);
+            $value = array_merge($defaults, $value);
+            $this->setTexts($value['content'], $value['dst_x'], $value['dst_y'], $value['fontSize'], $value['rgba'],
+                $value['max_w'], $value['font'], $value['weight'], $value['space'], $value['angle']);
         }
         return $this;
     }
 
-    public function buildQr($text, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $size = 4, $margin = 1, $level = 'L')
-    {
+    public function buildQr(
+        $text,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        $src_w = 0,
+        $src_h = 0,
+        $size = 4,
+        $margin = 1,
+        $level = 'L'
+    ) {
         $this->setQrs($text, $level, $size, $margin, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
         return $this;
     }
 
     public function buildQrMany($params = [])
     {
+        $defaults = [
+            'dst_x'  => 0,
+            'dst_y'  => 0,
+            'src_x'  => 0,
+            'src_y'  => 0,
+            'src_w'  => 0,
+            'src_h'  => 0,
+            'size'   => 4,
+            'margin' => 1,
+            'level'  => 'L',
+        ];
         foreach ($params as $value) {
-            $value['dst_x'] = isset($value['dst_x']) ? $value['dst_x'] : 0;
-            $value['dst_y'] = isset($value['dst_y']) ? $value['dst_y'] : 0;
-            $value['src_x'] = isset($value['src_x']) ? $value['src_x'] : 0;
-            $value['src_y'] = isset($value['src_y']) ? $value['src_y'] : 0;
-            $value['src_w'] = isset($value['src_w']) ? $value['src_w'] : 0;
-            $value['src_h'] = isset($value['src_h']) ? $value['src_h'] : 0;
-            $value['size'] = isset($value['size']) ? $value['size'] : 4;
-            $value['margin'] = isset($value['margin']) ? $value['margin'] : 1;
-            $value['level'] = isset($value['level']) ? $value['level'] : 'L';
-            $this->setQrs($value['text'], $value['level'], $value['size'], $value['margin'], $value['dst_x'], $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h']);
+            $value = array_merge($defaults, $value);
+            $this->setQrs($value['text'], $value['level'], $value['size'], $value['margin'], $value['dst_x'],
+                $value['dst_y'], $value['src_x'], $value['src_y'], $value['src_w'], $value['src_h']);
         }
         return $this;
     }
@@ -166,8 +216,18 @@ class Builder
         return $this;
     }
 
-    public function buildArc($cx = 0, $cy = 0, $w = 0, $h = 0, $s = 0, $e = 0, $rgba = [], $type = '', $style = '', $weight = 1)
-    {
+    public function buildArc(
+        $cx = 0,
+        $cy = 0,
+        $w = 0,
+        $h = 0,
+        $s = 0,
+        $e = 0,
+        $rgba = [],
+        $type = '',
+        $style = '',
+        $weight = 1
+    ) {
         $arc = [$cx, $cy, $w, $h, $s, $e, $rgba, $type, $style, $weight];
         $this->arcs = $arc;
         $this->query->setQuery('arc', $arc);
@@ -183,50 +243,42 @@ class Builder
 
     public function getPoster($path = '')
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getPoster($query, $path);
+        return $this->extension->getPoster($this->query->getQuery(), $path);
     }
 
     public function setPoster()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->setPoster($query);
+        return $this->extension->setPoster($this->query->getQuery());
     }
 
-    public function stream()
+    public function stream($type = '')
     {
-        $query = $this->query->getQuery();
-        return $this->extension->stream($query);
+        return $this->extension->stream($this->query->getQuery(), $type);
     }
 
     public function baseData()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->baseData($query);
+        return $this->extension->baseData($this->query->getQuery());
     }
 
-    public function getIm()
+    public function getCanvas()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getIm($query);
+        return $this->extension->getCanvas($this->query->getQuery());
     }
 
-    public function getImInfo()
+    public function getCanvasInfo()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getImInfo($query);
+        return $this->extension->getCanvasInfo($this->query->getQuery());
     }
 
     public function blob()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->blob($query);
+        return $this->extension->blob($this->query->getQuery());
     }
 
     public function tmp()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->tmp($query);
+        return $this->extension->tmp($this->query->getQuery());
     }
 
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)

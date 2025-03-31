@@ -12,60 +12,49 @@ use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
 
 class Text extends ImagickTextGraphicsEngine implements TextGraphicsEngineInterface
 {
-    public function draw($canvas, $x, $y)
+    public function draw(Canvas $canvas, $x, $y)
     {
-        $lines = $this->autoWrap($canvas->getWidth() - $x * 2, $this->content);
+        $this->setCanvas($canvas);
+        $maxWidth = $this->getMaxWidth() ?: $canvas->getWidth();
+        $color = $this->createColor($this->fontColor);
+        $characters = $this->singleImageTextSplit($this, $color);
+        list($lines, $maxTextWidth, $maxTextHeight, $textWidths) = $this->autoWrap($characters, $maxWidth, false,
+            false, true);
+        $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $canvas->getWidth());
+        $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $canvas->getHeight());
 
         foreach ($lines as $lineIndex => $line) {
-            $lineY = $y + $lineIndex * $this->fontSize * $this->lineHeight;
-            $draw = $this->createImagickDraw();
-            $draw->setFont($this->font);
-            $draw->setFontSize($this->fontSize);
-            $draw->setFillColor($this->createColor($this->fontColor));
-
-            // 计算对齐偏移量
-            $metrics = $canvas->getImage()->queryFontMetrics($draw, $line);
-            $textWidth = abs($metrics['textWidth'] + $metrics['descender']);
+            $lineY = $distY + $lineIndex * $this->lineHeight;
+            $textWidth = $textWidths[$lineIndex];
             switch ($this->textAlign) {
                 case 'center':
-                    $offsetX = ($canvas->getWidth() - $textWidth) / 2;
+                    $offsetX = $distX + ($maxTextWidth - $textWidth) / 2;
                     break;
                 case 'right':
-                    $offsetX = $canvas->getWidth() - $textWidth - $x;
+                    $offsetX = $maxTextWidth - $textWidth + $distX;
                     break;
                 default:
-                    $offsetX = $x;
+                    $offsetX = $distX;
             }
 
-            $canvas->getImage()->annotateImage($draw, $offsetX, $lineY, 0, $line);
+            $draw = $this->createImagickDraw();
+            $draw->setFont($this->getFont());
+            $draw->setFontSize($this->getFontSize());
+            $draw->setFillColor($color);
+            for ($index = 0; $index < $this->getFontWeight(); $index++) {
+                list($offsetX, $lineY) = calc_font_weight($index, $this->getFontWeight(), $this->getFontSize(),
+                    $offsetX, $lineY);
+                $canvas->getImage()->annotateImage($draw, $offsetX, $lineY, $this->getFontAngle(), $line);
+            }
         }
     }
 
-    private function autoWrap($maxWidth, $text)
+    protected function addLineCharacters($lines, $line, $char)
     {
-        $words = explode(' ', $text);
-        $lines = [];
-        $currentLine = '';
-
-        foreach ($words as $word) {
-            $testLine = $currentLine ? "$currentLine $word" : $word;
-            $draw = $this->createImagickDraw();
-            $draw->setFont($this->font);
-            $draw->setFontSize($this->fontSize);
-            $metrics = $this->createImagick()->queryFontMetrics($draw, $testLine);
-
-            if ($metrics['textWidth'] > $maxWidth) {
-                $lines[] = $currentLine;
-                $currentLine = $word;
-            } else {
-                $currentLine = $testLine;
-            }
+        if (!isset($lines[$line])) {
+            $lines[$line] = '';
         }
-
-        if ($currentLine) {
-            $lines[] = $currentLine;
-        }
-
+        $lines[$line] .= $char['text'];
         return $lines;
     }
 }

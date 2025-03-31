@@ -6,9 +6,7 @@
  */
 
 use Kkokk\Poster\Facades\Poster;
-require '../../vendor/autoload.php';
 
-$path = __DIR__ . '/../poster/1.png';
+require '../../vendor/autoload.php';
 $id = "1001";
-$qr = Poster::Qr('http://www.baidu.com?in=' . $id, $path);
-print_r($qr);
+$qr = Poster::Qr('http://www.baidu.com?in=' . $id);

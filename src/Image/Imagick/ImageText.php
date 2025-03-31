@@ -1,21 +1,19 @@
 <?php
 /**
- * @author  : lang
- * @email   : 732853989@qq.com
- * @date    : 2024/11/30
- * @time    : 17:01
- * @fileName: Texts.php
+ * User: lang
+ * Date: 2025/3/24
+ * Time: 17:33
  */
 
-namespace Kkokk\Poster\Image\Gd;
+namespace Kkokk\Poster\Image\Imagick;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Image\Graphics\GdImageTextGraphicsEngine;
-use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
-use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
+use Kkokk\Poster\Image\Graphics\ImagickImageTextGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageTextInterface;
+use Kkokk\Poster\Image\Graphics\Interfaces\TextGraphicsEngineInterface;
+use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 
-class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
+class ImageText extends ImagickImageTextGraphicsEngine implements ImageTextInterface
 {
     /** @var array|Text[] */
     protected $contents = [];
@@ -23,7 +21,7 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
     public function addText(TextGraphicsEngineInterface $text)
     {
         if (!$text instanceof Text) {
-            throw new PosterException('The parameter of the addText method must be Kkokk\Poster\Image\Gd\Text');
+            throw new PosterException('The parameter of the addText method must be Kkokk\Poster\Image\Imagick\Text');
         }
         $this->contents[] = $text;
         return $this;
@@ -32,7 +30,7 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
     public function addImage(ImageGraphicsEngineInterface $image)
     {
         if (!$image instanceof Image) {
-            throw new PosterException('The parameter of the addImage method must be Kkokk\Poster\Image\Gd\Image');
+            throw new PosterException('The parameter of the addImage method must be Kkokk\Poster\Image\Imagick\Image');
         }
         $this->contents[] = $image;
         return $this;
@@ -40,17 +38,18 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
 
     public function draw(ImageGraphicsEngineInterface $canvas, $x = 0, $y = 0)
     {
+        $this->setCanvas($canvas);
         $characters = [];
         $maxWidth = $this->getMaxWidth() ?: $canvas->getWidth();
         foreach ($this->contents as $content) {
             $textColor = null;
             if ($content instanceof TextGraphicsEngineInterface) {
-                $textColor = $this->createColor($canvas->getImage(), $content->getFontColor());
+                $textColor = $this->createColor($content->getFontColor());
             }
             $characters = array_merge($characters, $this->singleImageTextSplit($content, $textColor));
         }
 
-        list($lines, $maxTextWidth, $maxTextHeight, $textWidths) = $this->autoWrap($characters, $maxWidth);
+        list($lines, $maxTextWidth, $maxTextHeight, $textWidths) = $this->autoWrap($characters, $maxWidth, false);
         $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $canvas->getWidth());
         $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $canvas->getHeight());
         foreach ($lines as $lineIndex => $lineCharacters) {
@@ -71,14 +70,14 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
             foreach ($lineCharacters as $char) {
                 $lineY = $distY + $lineHeight;
                 if ($char['type'] == 'text') {
+                    $draw = $this->createImagickDraw();
+                    $draw->setFont($char['font']);
+                    $draw->setFontSize($char['size']);
+                    $draw->setFillColor($char['color']);
                     for ($index = 0; $index < $char['weight']; $index++) {
                         list($offsetX, $lineY) = calc_font_weight($index, $char['weight'], $char['size'],
                             $offsetX, $lineY);
-                        imagettftext($canvas->getImage(), $char['size'], $char['angle'], intval($offsetX),
-                            intval($lineY),
-                            $char['color'],
-                            $char['font'],
-                            $char['text']);
+                        $canvas->getImage()->annotateImage($draw, $offsetX, $lineY, $char['angle'], $char['text']);
                     }
                     $offsetX += $char['width'] + $char['space'];
                 } else {

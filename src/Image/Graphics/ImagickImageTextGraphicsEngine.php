@@ -9,9 +9,10 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Graphics\Traits\ImagickTextTrait;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
 class ImagickImageTextGraphicsEngine extends ImageTextGraphicsEngine
 {
-    use ImagickTrait;
+    use ImagickTrait, ImagickTextTrait;
 }

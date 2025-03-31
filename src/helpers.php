@@ -21,7 +21,7 @@ if (!function_exists('ll')) {
     }
 }
 
-if (!function_exists('gd_image_create')) {
+if (!function_exists('gd_image_save')) {
     /**
      * 获取 GD 图片创建函数
      * User: lang
@@ -31,21 +31,18 @@ if (!function_exists('gd_image_create')) {
      * @return string
      * @throws \Kkokk\Poster\Exception\PosterException
      */
-    function gd_image_create($type)
+    function gd_image_save($image, $type, $outputPath = null, $quality = 100)
     {
-        $imageType = [
-            'gif'  => 'imagegif',
-            'jpeg' => 'imagejpeg',
-            'jpg'  => 'imagejpeg',
-            'png'  => 'imagepng',
-            'wbmp' => 'imagewbmp'
-        ];
-
+        $imageType = \Kkokk\Poster\Image\Enums\ImageType::gdImageSaveFunctions();
         if (!isset($imageType[$type])) {
             throw new PosterException('The image type is not supported');
         }
-
-        return $imageType[$type];
+        if (in_array($type, \Kkokk\Poster\Image\Enums\ImageType::setQuantityTypes())) {
+            return $imageType[$type]($image, $outputPath, $quality);
+        }
+        $result = $imageType[$type]($image, $outputPath);
+        !is_resource($image) || imagedestroy($image);
+        return $result;
     }
 }
 
@@ -331,14 +328,14 @@ if (!function_exists('calc_font_weight')) {
     function calc_font_weight($num, $weight, $fontSize, $DstX, $DstY)
     {
         if ($weight % 2 == 0 && $num > 0) {
-            $reallyDstX = $DstX + ($num * 0.25);
-            $reallyDstY = $DstY + $fontSize;
+            $reallyDstX = $DstX + ($num * 0.1);
+            $reallyDstY = $DstY;
         } elseif ($weight % 2 != 0 && $num > 0) {
             $reallyDstX = $DstX;
-            $reallyDstY = $DstY + $fontSize + ($num * 0.25);
+            $reallyDstY = $DstY + ($num * 0.1);
         } else {
             $reallyDstX = $DstX;
-            $reallyDstY = $DstY + $fontSize;
+            $reallyDstY = $DstY;
         }
         return [$reallyDstX, $reallyDstY];
     }
@@ -479,7 +476,7 @@ if (!function_exists('base64_data')) {
         $baseData = '';
         if (is_resource($image) || is_object($image)) {
             ob_start();
-            gd_image_create($type)($image);
+            gd_image_save($image, $type);
             $data = ob_get_contents();
             ob_end_clean();
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -488,30 +485,6 @@ if (!function_exists('base64_data')) {
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($image);
         }
         return $baseData;
-    }
-}
-
-if (!function_exists('poster_image_out_put')) {
-    /**
-     * 输出图片
-     * User: lang
-     * Date: 2024/11/28
-     * Time: 10:19
-     * @param $im
-     * @param $dir
-     * @param $type
-     * @param $quality
-     * @return true
-     */
-    function poster_image_out_put($im, $dir = '', $type = 'png', $quality = 75)
-    {
-        if ($type == 'jpg' || $type == 'jpeg') {
-            gd_image_create($type)($im, $dir, $quality);
-        } else {
-            gd_image_create($type)($im, $dir);
-        }
-
-        return true;
     }
 }
 

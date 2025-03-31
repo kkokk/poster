@@ -7,6 +7,8 @@
 
 namespace Kkokk\Poster\Image\Gd;
 
+require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
+
 use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 
 class Qr extends GdImageGraphicsEngine

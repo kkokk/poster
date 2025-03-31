@@ -9,7 +9,7 @@
 
 namespace Kkokk\Poster\Image\Graphics\Traits;
 
-trait GdTextTrait
+trait ImagickTextTrait
 {
     use TextTrait;
 }

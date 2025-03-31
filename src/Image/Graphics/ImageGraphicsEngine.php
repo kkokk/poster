@@ -7,9 +7,8 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
-require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'PHPQrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php');
-
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Enums\ImageType;
 
 class ImageGraphicsEngine
 {
@@ -35,11 +34,21 @@ class ImageGraphicsEngine
     protected $filename;
 
     /** @var string 图片类型 */
-    protected $type = 'png';
+    protected $type = '';
+
+    /** @var string 默认图片类型 */
+    protected $defaultType = 'png';
+
+    /**
+     * @var int jpeg | webp 图片质量 0 - 100 默认75
+     */
+    protected $quantity = 75;
 
     public function config($configs = [])
     {
-        isset($configs['path']) && !empty($configs['path']) && $this->setFilePath($configs['path']);
+        !empty($configs['path']) && $this->setFilePath($configs['path']);
+        !empty($configs['type']) && $this->setType($configs['type']);
+        !empty($configs['quantity']) && $this->setQuantity($configs['quantity']);
         return $this;
     }
 
@@ -56,8 +65,7 @@ class ImageGraphicsEngine
     {
         $path = is_array($path) ? $path : [$path];
         $pathFileName = isset($path[0]) ? $path[0] : '';
-        $pathFileName = str_replace(['\\', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
-
+        $pathFileName = str_replace(['\\', '/', DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $pathFileName);
         $fileName = $pathFileName ?: time();
         if (strripos($pathFileName, DIRECTORY_SEPARATOR) !== false) {
             $this->setPathName($pathFileName);
@@ -80,8 +88,8 @@ class ImageGraphicsEngine
     {
         $this->filename = $fileName;
         if (strripos($this->filename, '.') !== false) {
-            $this->type = substr($this->filename, strripos($this->filename, '.') + 1);
-            if (!in_array($this->type, ['jpeg', 'jpg', 'png', 'gif', 'wbmp'])) {
+            $this->setType(substr($this->filename, strripos($this->filename, '.') + 1));
+            if (!in_array($this->getType(), ImageType::types())) {
                 throw new PosterException('The file naming format is incorrect');
             }
         }
@@ -110,10 +118,26 @@ class ImageGraphicsEngine
      */
     public function setPath($pathFileName)
     {
+        $this->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
         // 绝对路径 or 相对路径
         $absolute = is_absolute($pathFileName);
-        $this->path = get_document_root();
-        $this->path = $absolute ? '' : ($this->path ?: __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR);
+        if ($absolute) {
+            $this->path = '';
+        } elseif (get_document_root()) {
+            $this->path = get_document_root();
+        }
+    }
+
+    public function setType($type, $force = false)
+    {
+        if (empty($this->type) || $force) {
+            $this->type = $type;
+        }
+    }
+
+    public function setQuantity($quantity)
+    {
+        $this->quantity = $quantity;
     }
 
     // 获取图片资源
@@ -132,5 +156,30 @@ class ImageGraphicsEngine
     public function getHeight()
     {
         return $this->height;
+    }
+
+    public function getType()
+    {
+        return $this->type ?: $this->defaultType;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getPathName()
+    {
+        return $this->pathname;
+    }
+
+    public function getFileName()
+    {
+        return $this->filename;
+    }
+
+    public function getQuantity()
+    {
+        return $this->quantity;
     }
 }

@@ -20,6 +20,9 @@ class Image extends ImagickImageGraphicsEngine
 
     public function rotate($angle, $bgColor = [255, 255, 255, 127])
     {
+        if ($angle == 0) {
+            return $this;
+        }
         // 旋转图片
         $this->image->rotateImage($this->createColor($bgColor), $angle);
 
@@ -28,7 +31,7 @@ class Image extends ImagickImageGraphicsEngine
         $rotatedHeight = $this->image->getImageHeight();
 
         // 创建与原图相同大小的裁剪区域
-        $croppedImage = $this->createCanvas($this->width, $this->height, [255, 255, 255, 127]);
+        $croppedImage = $this->createCanvas($this->width, $this->height);
 
         // 计算偏移（将旋转后的图像中心对齐到裁剪区域中心）
         $offsetX = ($rotatedWidth - $this->width) / 2;

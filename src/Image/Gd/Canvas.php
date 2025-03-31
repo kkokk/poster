@@ -38,7 +38,7 @@ class Canvas extends GdImageGraphicsEngine
         $this->image = $image;
         $this->width = $sourceWidth;
         $this->height = $sourceHeight;
-        $this->type = $type;
+        $this->setType($type);
 
         if ($width && $height) {
             $this->scale($width, $height, $bestFit);
@@ -54,19 +54,33 @@ class Canvas extends GdImageGraphicsEngine
         return $this;
     }
 
-    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0)
+    public function linearGradient($rgbaColor, $to)
+    {
+        $rgbaCount = count($rgbaColor);
+        $this->calcColorDirection($this->image, $rgbaColor, $rgbaCount, $to, $this->width, $this->height);
+        return $this;
+    }
+
+    public function addImage(ImageGraphicsEngineInterface $image, $x = 0, $y = 0, $srcX = 0, $srcY = 0)
     {
         # 处理目标 x 轴
         $x = calc_dst_x($x, $this->width, $image->getWidth());
         # 处理目标 y 轴
         $y = calc_dst_Y($y, $this->height, $image->getHeight());
-        imagecopy($this->image, $image->getImage(), $x, $y, 0, 0, $image->getWidth(), $image->getHeight());
+        imagecopy($this->image, $image->getImage(), intval($x), intval($y), intval($srcX), intval($srcY),
+            intval($image->getWidth()), intval($image->getHeight()));
         return $this;
     }
 
-    public function addText($text, $x = 0, $y = 0)
+    public function addText(Text $text, $x = 0, $y = 0)
     {
-        $text->draw($this->image, $x, $y);
+        $text->draw($this, $x, $y);
+        return $this;
+    }
+
+    public function addImageText(ImageText $imageText, $x = 0, $y = 0)
+    {
+        $imageText->draw($this, $x, $y);
         return $this;
     }
 }
