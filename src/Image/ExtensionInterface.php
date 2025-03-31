@@ -147,7 +147,7 @@ interface ExtensionInterface
      * Date: 2023/8/10
      * Time: 16:00
      * @param $query
-     * @return mixed
+     * @return \Kkokk\Poster\Image\Graphics\ImageGraphicsEngine
      */
     public function getCanvas($query);
 

@@ -40,11 +40,11 @@ class CaptchaGenerator
         return base64_data($im, $type);
     }
 
-    public function imOutput($im, $type = 'png', $quality = 75, $filename = 'im')
+    public function imOutput($image, $type = 'png', $quality = 75, $filename = 'im')
     {
         $yes = 0; // 控制是否生成图片，测试时方便查看
-        $dir = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
-        return $yes && poster_image_out_put($im, $dir, $type, $quality);
+        $outputPath = __DIR__ . '/../../../tests/poster/' . $filename . '.' . $this->configs['im_type'];
+        return $yes && gd_image_save($image, $type, $outputPath, $quality);
     }
 
     public function getCross($p1, $p2, $p)

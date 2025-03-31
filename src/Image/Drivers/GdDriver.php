@@ -108,6 +108,7 @@ class GdDriver extends Driver implements DriverInterface
         }
 
         $this->canvas->addImage($mask, $dstX, $dstY, $srcX, $srcY);
+        $this->destroyImage($mask->getImage());
     }
 
     /**
@@ -144,6 +145,7 @@ class GdDriver extends Driver implements DriverInterface
         }
 
         $this->canvas->addImage($image, $dstX, $dstY, $srcX, $srcY);
+        $this->destroyImage($image->getImage());
     }
 
     /**
@@ -303,6 +305,7 @@ class GdDriver extends Driver implements DriverInterface
             $qr->scale($srcWidth, $srcHeight);
         }
         $this->canvas->addImage($qr, $dstX, $dstY, $srcX, $srcY);
+        $this->destroyImage($qr->getImage());
     }
 
     /**

@@ -8,6 +8,7 @@
 namespace Kkokk\Poster\Image\Graphics;
 
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
+use Kkokk\Poster\Image\Imagick\Image;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
 class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
@@ -161,6 +162,27 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
     public function borderRadius($radius = 0)
     {
         $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
+        return $this;
+    }
+
+    public function applyMask($mask)
+    {
+        $width = $this->width;
+        $height = $this->height;
+        // 加载蒙版图片并转换为灰度
+        $maskImage = (new Image($mask))->scale($width, $height);
+
+        $maskImage->getImage()->evaluateImage(($maskImage->getImage())::EVALUATE_MULTIPLY, 1,
+            ($maskImage->getImage())::CHANNEL_ALPHA);
+        // $maskImage->getImage()->modulateImage(100, 0, 100); // 确保是纯灰度蒙版
+        // $maskImage->getImage()->negateImage(true);          // 反转蒙版，使白色为不透明，黑色为透明
+        //
+        // // 应用 Alpha 通道蒙版
+        // $this->image->setImageAlphaChannel(($this->image)::ALPHACHANNEL_ACTIVATE);
+        $this->image->compositeImage($maskImage->getImage(), ($this->image)::COMPOSITE_COPYOPACITY, 0, 0);
+
+        // 释放资源
+        $this->destroyImage($maskImage->getImage());
         return $this;
     }
 

@@ -12,6 +12,8 @@ namespace Kkokk\Poster\Image\Traits;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Html\Drivers\DriverInterface;
 use Kkokk\Poster\Image\Enums\ImageType;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 trait ImagickTrait
 {
@@ -137,6 +139,11 @@ trait ImagickTrait
         if ($src) {
             if ($src instanceof DriverInterface) {
                 $Imagick->readImageBlob($src->getImageBlob());
+            } elseif ($src instanceof ImagickImageGraphicsEngine) {
+                $Imagick->destroy();
+                $Imagick = $src->getImage();
+            } elseif ($src instanceof GdImageGraphicsEngine) {
+                $Imagick->readImageBlob($src->blob());
             } elseif (strpos($src, 'http') === 0) {
                 $stream = @file_get_contents($src, null);
                 if (empty($stream)) {

@@ -10,6 +10,8 @@ namespace Kkokk\Poster\Image\Traits;
 
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
+use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 trait GdTrait
 {
@@ -35,11 +37,11 @@ trait GdTrait
                 $this->filename = $this->filename . '.' . $this->getType();
             }
             gd_image_save(
-                $this->image, $type,
+                $this->image,
+                $type,
                 $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename,
                 $this->getQuantity()
             );
-
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
         if (PHP_SAPI === 'cli') {
@@ -81,6 +83,10 @@ trait GdTrait
     {
         if ($src instanceof DriverInterface) {
             return $this->returnImageInfoByBlob($src->getImageBlob());
+        } elseif ($src instanceof GdImageGraphicsEngine) {
+            return [$src->getImage(), $src->getWidth(), $src->getHeight(), $src->getType()];
+        } elseif ($src instanceof ImagickImageGraphicsEngine) {
+            return $this->returnImageInfoByBlob($src->blob());
         } elseif (strpos($src, 'http') === 0) {
             return $this->returnImageInfoBySrc($src);
         } elseif (is_file_path($src)) {
@@ -401,7 +407,7 @@ trait GdTrait
      */
     protected function setPixelRadius($im, $w, $h, $radius)
     {
-        $newIm = $this->createCanvas($w, $h);;
+        $newImage = $this->createCanvas($w, $h);;
 
         $maxRadius = $w > $h ? $h / 2 : $w / 2;
 
@@ -416,40 +422,40 @@ trait GdTrait
                     && (($x >= $leftBottomRadius || $y <= ($h - $leftBottomRadius)))
                     && (($x <= ($w - $rightBottomRadius)) || $y <= ($h - $rightBottomRadius))) {
                     //不在四角的范围内,直接画
-                    imagesetpixel($newIm, $x, $y, $color);
+                    imagesetpixel($newImage, $x, $y, $color);
                 } else {
                     // 上左
                     $y_x = $leftTopRadius;
                     $y_y = $leftTopRadius;
                     if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($leftTopRadius * $leftTopRadius))) {
-                        imagesetpixel($newIm, $x, $y, $color);
+                        imagesetpixel($newImage, $x, $y, $color);
                     }
 
                     // 上右
                     $y_x = $w - $rightTopRadius;
                     $y_y = $rightTopRadius;
                     if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($rightTopRadius * $rightTopRadius))) {
-                        imagesetpixel($newIm, $x, $y, $color);
+                        imagesetpixel($newImage, $x, $y, $color);
                     }
 
                     //下左
                     $y_x = $leftBottomRadius;
                     $y_y = $h - $leftBottomRadius;
                     if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($leftBottomRadius * $leftBottomRadius))) {
-                        imagesetpixel($newIm, $x, $y, $color);
+                        imagesetpixel($newImage, $x, $y, $color);
                     }
 
                     //下右
                     $y_x = $w - $rightBottomRadius;
                     $y_y = $h - $rightBottomRadius;
                     if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($rightBottomRadius * $rightBottomRadius))) {
-                        imagesetpixel($newIm, $x, $y, $color);
+                        imagesetpixel($newImage, $x, $y, $color);
                     }
                 }
             }
         }
 
-        return $newIm;
+        return $newImage;
     }
 
     /**
