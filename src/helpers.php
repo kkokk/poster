@@ -21,7 +21,7 @@ if (!function_exists('ll')) {
     }
 }
 
-if (!function_exists('gd_image_create')) {
+if (!function_exists('gd_image_save')) {
     /**
      * 获取 GD 图片创建函数
      * User: lang
@@ -31,21 +31,16 @@ if (!function_exists('gd_image_create')) {
      * @return string
      * @throws \Kkokk\Poster\Exception\PosterException
      */
-    function gd_image_create($type)
+    function gd_image_save($image, $type, $outputPath = null, $quality = 100)
     {
-        $imageType = [
-            'gif'  => 'imagegif',
-            'jpeg' => 'imagejpeg',
-            'jpg'  => 'imagejpeg',
-            'png'  => 'imagepng',
-            'wbmp' => 'imagewbmp'
-        ];
-
+        $imageType = \Kkokk\Poster\Image\Enums\ImageType::gdImageSaveFunctions();
         if (!isset($imageType[$type])) {
             throw new PosterException('The image type is not supported');
         }
-
-        return $imageType[$type];
+        if (in_array($type, \Kkokk\Poster\Image\Enums\ImageType::setQuantityTypes())) {
+            return $imageType[$type]($image, $outputPath, $quality);
+        }
+        return $imageType[$type]($image, $outputPath);
     }
 }
 
@@ -479,7 +474,7 @@ if (!function_exists('base64_data')) {
         $baseData = '';
         if (is_resource($image) || is_object($image)) {
             ob_start();
-            gd_image_create($type)($image);
+            gd_image_save($type)($image);
             $data = ob_get_contents();
             ob_end_clean();
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -506,9 +501,9 @@ if (!function_exists('poster_image_out_put')) {
     function poster_image_out_put($im, $dir = '', $type = 'png', $quality = 75)
     {
         if ($type == 'jpg' || $type == 'jpeg') {
-            gd_image_create($type)($im, $dir, $quality);
+            gd_image_save($type)($im, $dir, $quality);
         } else {
-            gd_image_create($type)($im, $dir);
+            gd_image_save($type)($im, $dir);
         }
 
         return true;

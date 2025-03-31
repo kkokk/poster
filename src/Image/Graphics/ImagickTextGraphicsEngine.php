@@ -17,8 +17,10 @@ class ImagickTextGraphicsEngine extends TextGraphicsEngine implements TextGraphi
 {
     use ImagickTrait, ImagickTextTrait;
 
-    public function getLineHeight($fontSize = null)
+    public function setFontSize($fontSize)
     {
-        return round((($fontSize ?: $this->fontSize) * 3) / 4 * 1.5);
+        $this->fontSize = $fontSize;
+        $this->lineHeight = round((($fontSize ?: $this->fontSize) * 3) / 4 * 1.5);
+        return $this;
     }
 }

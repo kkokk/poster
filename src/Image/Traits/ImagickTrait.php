@@ -11,6 +11,7 @@ namespace Kkokk\Poster\Image\Traits;
 
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Image\Enums\ImageType;
 
 trait ImagickTrait
 {
@@ -39,6 +40,9 @@ trait ImagickTrait
      */
     protected function returnImage($type, $outfile = true)
     {
+        if (in_array($type, ImageType::setQuantityTypes())) {
+            $this->image->setImageCompressionQuality($this->getQuantity());
+        }
         if ($outfile) {
             dir_exists($this->path . $this->pathname);
             if (strripos($this->filename, '.') === false) {
@@ -62,18 +66,24 @@ trait ImagickTrait
         echo $imageBlob;
     }
 
-    protected function getBlob($im)
+    protected function getBlob($image)
     {
-        return $im->getImageBlob();
+        if (in_array($this->getType(), ImageType::setQuantityTypes())) {
+            $image->setImageCompressionQuality($this->getQuantity());
+        }
+        return $image->getImageBlob();
     }
 
-    protected function getTmp($type, $im)
+    protected function getTmp($type, $image)
     {
+        if (in_array($type, ImageType::setQuantityTypes())) {
+            $image->setImageCompressionQuality($this->getQuantity());
+        }
         $output = tempnam(sys_get_temp_dir(), uniqid('imagickImage'));
         if ($type == 'gif') {
-            $im->writeImages($output, true);
+            $image->writeImages($output, true);
         } else {
-            $im->writeImage($output);
+            $image->writeImage($output);
         }
         return $output;
     }
@@ -85,8 +95,12 @@ trait ImagickTrait
             throw new PosterException("Unable to set the remote source {$source}");
         }
 
+        if (in_array($this->getType(), ImageType::setQuantityTypes())) {
+            $this->image->setImageCompressionQuality($this->getQuantity());
+        }
+
         if (!empty($source)) {
-            if ($this->type == 'gif') {
+            if ($this->getType() == 'gif') {
                 return $this->image->writeImages($source, true);
             }
             return $this->image->writeImage($source);
@@ -292,7 +306,7 @@ trait ImagickTrait
 
             list($really_dst_x, $really_dst_y) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
 
-            if ($this->type == 'gif') {
+            if ($this->getType() == 'gif') {
                 foreach ($this->image as $frame) {
                     $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
                     // $this->image->nextImage();
@@ -440,7 +454,7 @@ trait ImagickTrait
         }
         $background = $this->createColor($rgba);
         $image = $this->createImagick();
-        $image->newImage($w, $h, $background, $this->type);//设置画布的信息以及画布的格式
+        $image->newImage($w, $h, $background, $this->getType());//设置画布的信息以及画布的格式
         return $image;
     }
 

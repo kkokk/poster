@@ -44,8 +44,17 @@ class Extension implements ExtensionInterface
         return $this->query()->buildImDst($src, $w, $h);
     }
 
-    public function buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, \Closure $callback = null)
-    {
+    public function buildBg(
+        $w,
+        $h,
+        $rgba = [],
+        $alpha = false,
+        $dst_x = 0,
+        $dst_y = 0,
+        $src_x = 0,
+        $src_y = 0,
+        \Closure $callback = null
+    ) {
         return $this->query()->buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $callback);
     }
 
@@ -64,9 +73,9 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->setData();
     }
 
-    public function stream($query)
+    public function stream($query, $type)
     {
-        return $this->getDriverInstance($query)->getStream();
+        return $this->getDriverInstance($query)->getStream($type);
     }
 
     public function baseData($query)
@@ -79,7 +88,8 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->getCanvas();
     }
 
-    public function getCanvasInfo($query){
+    public function getCanvasInfo($query)
+    {
         return $this->getDriverInstance($query)->getCanvasInfo();
     }
 
@@ -93,7 +103,8 @@ class Extension implements ExtensionInterface
         return $this->getDriverInstance($query)->tmp();
     }
 
-    public function crop($x = 0, $y = 0, $width = 0, $height = 0) {
+    public function crop($x = 0, $y = 0, $width = 0, $height = 0)
+    {
         return $this->query()->crop($x, $y, $width, $height);
     }
 

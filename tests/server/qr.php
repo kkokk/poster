@@ -9,4 +9,4 @@ use Kkokk\Poster\Facades\Poster;
 
 require '../../vendor/autoload.php';
 $id = "1001";
-$qr = Poster::Qr('http://www.baidu.com?i22222222222222222222222n=' . $id);
+$qr = Poster::Qr('http://www.baidu.com?in=' . $id);

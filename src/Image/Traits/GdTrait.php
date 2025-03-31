@@ -32,10 +32,13 @@ trait GdTrait
         if ($outfile) {
             dir_exists($this->path . $this->pathname);
             if (strripos($this->filename, '.') === false) {
-                $this->filename = $this->filename . '.' . $this->type;
+                $this->filename = $this->filename . '.' . $this->getType();
             }
-            gd_image_create($type)($this->image,
-                $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename);
+            gd_image_save(
+                $this->image, $type,
+                $this->path . $this->pathname . DIRECTORY_SEPARATOR . $this->filename,
+                $this->getQuantity()
+            );
 
             return ['url' => $this->pathname . DIRECTORY_SEPARATOR . $this->filename];
         }
@@ -43,21 +46,21 @@ trait GdTrait
             return $this->getBlob($type, $this->image);
         }
 
-        header('Content-Type:Image/' . $this->type);
-        gd_image_create($type)($this->image);
+        header('Content-Type:Image/' . $this->getType());
+        gd_image_save($this->image, $type, null, $this->getQuantity());
     }
 
-    protected function getBlob($type, $im)
+    protected function getBlob($type, $image)
     {
         ob_start();
-        gd_image_create($type)($im);
+        gd_image_save($image, $type, null, $this->getQuantity());
         return ob_get_clean();
     }
 
-    protected function getTmp($type, $im)
+    protected function getTmp($type, $image)
     {
         $output = tempnam(sys_get_temp_dir(), uniqid('gdImage'));
-        gd_image_create($type)($im, $output);
+        gd_image_save($image, $type, $output, $this->getQuantity());
         return $output;
     }
 
@@ -68,7 +71,7 @@ trait GdTrait
         }
 
         if (!empty($source)) {
-            return gd_image_create($this->type)($this->image, $source);
+            return gd_image_save($this->image, $this->getType(), $source, $this->getQuantity());
         }
 
         throw new PosterException("Source not found {$source}");

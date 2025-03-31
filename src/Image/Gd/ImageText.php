@@ -23,7 +23,7 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
     public function addText(TextGraphicsEngineInterface $text)
     {
         if (!$text instanceof Text) {
-            throw new PosterException('must be Kkokk\Poster\Image\Gd\Text');
+            throw new PosterException('The parameter of the addText method must be Kkokk\Poster\Image\Gd\Text');
         }
         $this->contents[] = $text;
         return $this;
@@ -32,7 +32,7 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
     public function addImage(ImageGraphicsEngineInterface $image)
     {
         if (!$image instanceof Image) {
-            throw new PosterException('must be Kkokk\Poster\Image\Gd\Image');
+            throw new PosterException('The parameter of the addImage method must be Kkokk\Poster\Image\Gd\Image');
         }
         $this->contents[] = $image;
         return $this;

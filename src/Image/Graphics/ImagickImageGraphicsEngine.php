@@ -34,19 +34,19 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
             $this->setFilePath($path);
         }
         $this->setDPI();
-        return $this->returnImage($this->type);
+        return $this->returnImage($this->getType());
     }
 
-    public function getStream()
+    public function getStream($type = '')
     {
         $this->setDPI();
-        return $this->returnImage($this->type, false);
+        return $this->returnImage($type ?: $this->getType(), false);
     }
 
     public function getBaseData()
     {
         $this->setDPI();
-        return base64_data($this->image->getImageBlob(), $this->type);
+        return base64_data($this->image->getImageBlob(), $this->getType());
     }
 
     public function blob()
@@ -57,7 +57,7 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
 
     public function tmp()
     {
-        return $this->getTmp($this->type, $this->image);
+        return $this->getTmp($this->getType(), $this->image);
     }
 
     public function setData()

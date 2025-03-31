@@ -243,50 +243,42 @@ class Builder
 
     public function getPoster($path = '')
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getPoster($query, $path);
+        return $this->extension->getPoster($this->query->getQuery(), $path);
     }
 
     public function setPoster()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->setPoster($query);
+        return $this->extension->setPoster($this->query->getQuery());
     }
 
-    public function stream()
+    public function stream($type = '')
     {
-        $query = $this->query->getQuery();
-        return $this->extension->stream($query);
+        return $this->extension->stream($this->query->getQuery(), $type);
     }
 
     public function baseData()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->baseData($query);
+        return $this->extension->baseData($this->query->getQuery());
     }
 
     public function getCanvas()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getCanvas($query);
+        return $this->extension->getCanvas($this->query->getQuery());
     }
 
     public function getCanvasInfo()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->getCanvasInfo($query);
+        return $this->extension->getCanvasInfo($this->query->getQuery());
     }
 
     public function blob()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->blob($query);
+        return $this->extension->blob($this->query->getQuery());
     }
 
     public function tmp()
     {
-        $query = $this->query->getQuery();
-        return $this->extension->tmp($query);
+        return $this->extension->tmp($this->query->getQuery());
     }
 
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)

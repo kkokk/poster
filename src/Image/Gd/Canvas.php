@@ -38,7 +38,7 @@ class Canvas extends GdImageGraphicsEngine
         $this->image = $image;
         $this->width = $sourceWidth;
         $this->height = $sourceHeight;
-        $this->type = $type;
+        $this->setType($type);
 
         if ($width && $height) {
             $this->scale($width, $height, $bestFit);
@@ -67,7 +67,8 @@ class Canvas extends GdImageGraphicsEngine
         $x = calc_dst_x($x, $this->width, $image->getWidth());
         # 处理目标 y 轴
         $y = calc_dst_Y($y, $this->height, $image->getHeight());
-        imagecopy($this->image, $image->getImage(), intval($x), intval($y), intval($srcX), intval($srcY), intval($image->getWidth()), intval($image->getHeight()));
+        imagecopy($this->image, $image->getImage(), intval($x), intval($y), intval($srcX), intval($srcY),
+            intval($image->getWidth()), intval($image->getHeight()));
         return $this;
     }
 

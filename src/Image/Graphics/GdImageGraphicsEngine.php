@@ -19,27 +19,27 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         if ($path) {
             $this->setFilePath($path);
         }
-        return $this->returnImage($this->type);
+        return $this->returnImage($this->getType());
     }
 
-    public function getStream()
+    public function getStream($type = '')
     {
-        return $this->returnImage($this->type, false);
+        return $this->returnImage($type ?: $this->getType(), false);
     }
 
     public function getBaseData()
     {
-        return base64_data($this->image, $this->type);
+        return base64_data($this->image, $this->getType());
     }
 
     public function blob()
     {
-        return $this->getBlob($this->type, $this->image);
+        return $this->getBlob($this->getType(), $this->image);
     }
 
     public function tmp()
     {
-        return $this->getTmp($this->type, $this->image);
+        return $this->getTmp($this->getType(), $this->image);
     }
 
     public function setData()
@@ -61,7 +61,8 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
             }
         }
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight), intval($this->width), intval($this->height));
+        imagecopyresized($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight),
+            intval($this->width), intval($this->height));
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;
@@ -83,7 +84,8 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         }
 
         $resizedImage = $this->createCanvas($newWidth, $newHeight);
-        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight), intval($this->width), intval($this->height));
+        imagecopyresampled($resizedImage, $this->image, 0, 0, 0, 0, intval($newWidth), intval($newHeight),
+            intval($this->width), intval($this->height));
         $this->image = $resizedImage;
         $this->width = $newWidth;
         $this->height = $newHeight;

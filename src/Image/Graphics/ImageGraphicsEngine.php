@@ -8,6 +8,7 @@
 namespace Kkokk\Poster\Image\Graphics;
 
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Enums\ImageType;
 
 class ImageGraphicsEngine
 {
@@ -33,11 +34,21 @@ class ImageGraphicsEngine
     protected $filename;
 
     /** @var string 图片类型 */
-    protected $type = 'png';
+    protected $type = '';
+
+    /** @var string 默认图片类型 */
+    protected $defaultType = 'png';
+
+    /**
+     * @var int jpeg | webp 图片质量 0 - 100 默认75
+     */
+    protected $quantity = 75;
 
     public function config($configs = [])
     {
         !empty($configs['path']) && $this->setFilePath($configs['path']);
+        !empty($configs['type']) && $this->setType($configs['type']);
+        !empty($configs['quantity']) && $this->setQuantity($configs['quantity']);
         return $this;
     }
 
@@ -77,8 +88,8 @@ class ImageGraphicsEngine
     {
         $this->filename = $fileName;
         if (strripos($this->filename, '.') !== false) {
-            $this->type = substr($this->filename, strripos($this->filename, '.') + 1);
-            if (!in_array($this->type, ['jpeg', 'jpg', 'png', 'gif', 'wbmp'])) {
+            $this->setType(substr($this->filename, strripos($this->filename, '.') + 1));
+            if (!in_array($this->getType(), ImageType::types())) {
                 throw new PosterException('The file naming format is incorrect');
             }
         }
@@ -117,6 +128,18 @@ class ImageGraphicsEngine
         }
     }
 
+    public function setType($type, $force = false)
+    {
+        if (empty($this->type) || $force) {
+            $this->type = $type;
+        }
+    }
+
+    public function setQuantity($quantity)
+    {
+        $this->quantity = $quantity;
+    }
+
     // 获取图片资源
     public function getImage()
     {
@@ -137,7 +160,7 @@ class ImageGraphicsEngine
 
     public function getType()
     {
-        return $this->type;
+        return $this->type ?: $this->defaultType;
     }
 
     public function getPath()
@@ -153,5 +176,10 @@ class ImageGraphicsEngine
     public function getFileName()
     {
         return $this->filename;
+    }
+
+    public function getQuantity()
+    {
+        return $this->quantity;
     }
 }

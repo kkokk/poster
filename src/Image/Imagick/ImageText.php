@@ -21,7 +21,7 @@ class ImageText extends ImagickImageTextGraphicsEngine implements ImageTextInter
     public function addText(TextGraphicsEngineInterface $text)
     {
         if (!$text instanceof Text) {
-            throw new PosterException('must be Kkokk\Poster\Image\Imagick\Text');
+            throw new PosterException('The parameter of the addText method must be Kkokk\Poster\Image\Imagick\Text');
         }
         $this->contents[] = $text;
         return $this;
@@ -29,8 +29,8 @@ class ImageText extends ImagickImageTextGraphicsEngine implements ImageTextInter
 
     public function addImage(ImageGraphicsEngineInterface $image)
     {
-        if (!$image instanceof Text) {
-            throw new PosterException('must be Kkokk\Poster\Image\Imagick\Image');
+        if (!$image instanceof Image) {
+            throw new PosterException('The parameter of the addImage method must be Kkokk\Poster\Image\Imagick\Image');
         }
         $this->contents[] = $image;
         return $this;

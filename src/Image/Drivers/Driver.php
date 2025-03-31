@@ -47,9 +47,9 @@ class Driver
         return $this->canvas->getData($path ?: $this->path);
     }
 
-    public function getStream()
+    public function getStream($type)
     {
-        return $this->canvas->getStream();
+        return $this->canvas->getStream($type);
     }
 
     public function getBaseData()

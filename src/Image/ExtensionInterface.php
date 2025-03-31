@@ -125,9 +125,10 @@ interface ExtensionInterface
      * Date: 2023/3/29
      * Time: 15:37
      * @param $query
+     * @param $type
      * @return resource
      */
-    public function stream($query);
+    public function stream($query, $type);
 
     /**
      * 获取 base64 字符串

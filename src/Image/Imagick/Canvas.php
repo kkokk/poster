@@ -36,7 +36,7 @@ class Canvas extends ImagickImageGraphicsEngine
         $sourceHeight = $image->getImageHeight();
 
         $this->image = $image;
-        $this->type = strtolower($image->getImageFormat());
+        $this->setType(strtolower($image->getImageFormat()));
 
         if ($width && $height) {
             $this->scale($width, $height, $bestFit);
@@ -68,7 +68,7 @@ class Canvas extends ImagickImageGraphicsEngine
         // 裁剪图片
         $this->cropImage($image->getImage(), $srcX, $srcY);
         // 合并图片
-        if ($this->type == 'gif') {
+        if ($this->getType() == 'gif') {
             // 每帧长宽不一致问题, 水印会不一致
             foreach ($this->image as $frame) {
                 $frame->compositeImage($image->getImage(), ($this->image)::COMPOSITE_DEFAULT, $x, $y);
