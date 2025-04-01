@@ -10,9 +10,15 @@ namespace Kkokk\Poster\Image\Graphics;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Enums\ImageType;
 
+/**
+ * @template ImageInstance
+ */
 class ImageGraphicsEngine
 {
-    /** 画布 */
+    /**
+     * 画布
+     * @var ImageInstance
+     */
     protected $image;
 
     /** 源文件 */
@@ -140,7 +146,14 @@ class ImageGraphicsEngine
         $this->quantity = $quantity;
     }
 
-    // 获取图片资源
+    /**
+     * 获取图片资源
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:35
+     * @return ImageInstance
+     */
     public function getImage()
     {
         return $this->image;
