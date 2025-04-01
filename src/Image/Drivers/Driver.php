@@ -32,6 +32,11 @@ class Driver
         return $this->canvas;
     }
 
+    public function getImage()
+    {
+        return $this->canvas->getImage();
+    }
+
     public function getWidth()
     {
         return $this->canvas->getWidth();
@@ -130,6 +135,17 @@ class Driver
         } else {
             return $qr->getStream();
         }
+    }
+
+    public function execute($query = [], Driver $driver = null)
+    {
+        if (empty($driver)) {
+            $driver = $this;
+        }
+        foreach ($query as $item) {
+            $driver->run($item, $driver);
+        }
+        return $driver;
     }
 
     public function run($item, Driver $driver)

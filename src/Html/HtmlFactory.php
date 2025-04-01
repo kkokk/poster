@@ -8,7 +8,7 @@
 namespace Kkokk\Poster\Html;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Html\Drivers\WkDriver;
+use Kkokk\Poster\Html\Drivers\WkHtmlDriver;
 
 class HtmlFactory
 {
@@ -21,7 +21,7 @@ class HtmlFactory
     {
         switch ($name) {
             case 'wk':
-                return new WkDriver();
+                return new WkHtmlDriver();
         }
 
         throw new PosterException("Unsupported driver [{$name}].");

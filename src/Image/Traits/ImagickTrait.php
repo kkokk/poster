@@ -8,9 +8,8 @@
 
 namespace Kkokk\Poster\Image\Traits;
 
-
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Html\Drivers\HtmlDriverInterface;
 use Kkokk\Poster\Image\Enums\ImageType;
 use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
@@ -137,7 +136,7 @@ trait ImagickTrait
     {
         $Imagick = new \Imagick();
         if ($src) {
-            if ($src instanceof DriverInterface) {
+            if ($src instanceof HtmlDriverInterface) {
                 $Imagick->readImageBlob($src->getImageBlob());
             } elseif ($src instanceof ImagickImageGraphicsEngine) {
                 $Imagick->destroy();
@@ -304,48 +303,6 @@ trait ImagickTrait
             $rgb1 = "rgb(" . $rgbaColor[0][0] . "," . $rgbaColor[0][1] . "," . $rgbaColor[0][2] . ")";
             $rgb2 = "rgb(" . $rgbaColor[1][0] . "," . $rgbaColor[1][1] . "," . $rgbaColor[1][2] . ")";
             $source->newPseudoImage($w, $h, "gradient:$rgb1-$rgb2");
-        }
-    }
-
-    protected function fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents)
-    {
-        for ($i = 0; $i < $weight; $i++) {
-
-            list($really_dst_x, $really_dst_y) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
-
-            if ($this->getType() == 'gif') {
-                foreach ($this->image as $frame) {
-                    $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-                    // $this->image->nextImage();
-                }
-            } else {
-                $this->image->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-            }
-        }
-    }
-
-    protected function fontWeightArr($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contentsArr, $color)
-    {
-        $DstX_old = $DstX;
-        foreach ($contentsArr as $v) {
-
-            $contents = $v['value'];
-
-            if ($contents == "\n") {
-                $DstX = $DstX_old;
-                $DstY += 1.75 * $fontSize;
-                continue;
-            }
-
-            if (!empty($v['color'])) {
-                $draw->setFillColor($v['color']);
-            } else {
-                $draw->setFillColor($color);
-            }
-
-            $this->fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents);
-
-            $DstX += $v['w'];
         }
     }
 

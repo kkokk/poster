@@ -117,7 +117,6 @@ class ClickGenerator extends CaptchaGenerator implements CaptchaGeneratorInterfa
 
     public function get($expire = 0)
     {
-
         $data = $this->draw();
 
         $this->imOutput(

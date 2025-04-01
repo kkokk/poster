@@ -7,7 +7,7 @@
 
 namespace Kkokk\Poster\Html\Drivers;
 
-interface DriverInterface
+interface HtmlDriverInterface
 {
     public function render($query);
 

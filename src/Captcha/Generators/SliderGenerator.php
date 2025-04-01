@@ -16,18 +16,18 @@ class SliderGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
     use SliderTrait;
 
     protected $configs = [
-        'src' => '',
-        'im_width' => 340,
-        'im_height' => 251,
-        'im_type' => 'png', // png 默认 jpg quality 质量
-        'quality' => 80,    // jpg quality 质量
-        'type' => '4', // 默认四边形 3 三角形 5 五边形 6 六边形
-        'bg_width' => 340,
-        'bg_height' => 191,
-        'slider_width' => 50,
+        'src'           => '',
+        'im_width'      => 340,
+        'im_height'     => 251,
+        'im_type'       => 'png', // png 默认 jpg quality 质量
+        'quality'       => 80,    // jpg quality 质量
+        'type'          => '4', // 默认四边形 3 三角形 5 五边形 6 六边形
+        'bg_width'      => 340,
+        'bg_height'     => 191,
+        'slider_width'  => 50,
         'slider_height' => 50,
         'slider_border' => 2,
-        'slider_bg' => 1,
+        'slider_bg'     => 1,
     ];  // 验证码图片配置
 
     /**
@@ -40,7 +40,9 @@ class SliderGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
      */
     public function config($params = [])
     {
-        if (empty($params)) return $this;
+        if (empty($params)) {
+            return $this;
+        }
         $this->configs['src'] = isset($params['src']) ? $params['src'] : $this->configs['src'];
         $this->configs['im_width'] = isset($params['im_width']) ? $params['im_width'] : $this->configs['im_width'];
         $this->configs['im_height'] = isset($params['im_height']) ? $params['im_height'] : $this->configs['im_height'];
@@ -76,11 +78,13 @@ class SliderGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
         $res = [
             'img' => $baseData,
             'key' => $key,
-            'y' => $data['y'],
+            'y'   => $data['y'],
         ];
 
         $setCache = $this->setCache($key, $data['x'], $expire);
-        if (!$setCache) $res['secret'] = $data['x'];
+        if (!$setCache) {
+            $res['secret'] = $data['x'];
+        }
 
         return $res;
     }
@@ -92,8 +96,8 @@ class SliderGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
      * Email: 732853989@qq.com
      * Date: 2022/12/7
      * Time: 11:44
-     * @param $key
-     * @param $value
+     * @param     $key
+     * @param     $value
      * @param int $leeway
      * @return bool
      */
@@ -101,7 +105,9 @@ class SliderGenerator extends CaptchaGenerator implements CaptchaGeneratorInterf
     {
         $x = $this->getCache($key) ?: $secret;
 
-        if (empty($x)) return false;
+        if (empty($x)) {
+            return false;
+        }
 
         $leeway = $leeway ?: $this->leeway;
 

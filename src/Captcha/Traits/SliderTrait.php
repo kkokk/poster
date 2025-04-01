@@ -81,10 +81,6 @@ trait SliderTrait
                     $rgbColor = imagecolorat($this->im, $i, $j);
                     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 抠图
                 }
-                // $isCross1 = $cross1 * $cross2 * $cross3 == 0;
-                // if($isCross1) {
-                //     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 边框
-                // }
             }
         }
 
@@ -169,13 +165,6 @@ trait SliderTrait
 
         for ($i = 0; $i < $bg_width; $i++) {
             for ($j = 0; $j < $bg_height; $j++) {
-                // 矩形抠图
-                // if (($i < $x2 && $i >= $x1) && ($j < $y2 && $j >= $y1)) {
-                //     $rgbColor = imagecolorat($this->im, $i, $j);
-                //     imagesetpixel($ims, $i - $x1 + $border / 2, $j - $y1 + $border / 2, $rgbColor); // 抠图
-                // }
-
-
                 // 利用叉积抠图 p1 p2 p3 可以抠多边形
                 // 任意坐标点
                 $p = [$i, $j];

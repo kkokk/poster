@@ -16,7 +16,7 @@ use Kkokk\Poster\Html\Builder;
  * @package Kkokk\Poster\Facades
  * @class Html
  * @author 73285 2023-08-09
- *
+ * @extends Facade<\Kkokk\Poster\Html\HtmlManager>
  * @see Builder
  */
 class Html extends Facade
