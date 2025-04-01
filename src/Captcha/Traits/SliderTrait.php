@@ -8,6 +8,9 @@
 
 namespace Kkokk\Poster\Captcha\Traits;
 
+use Kkokk\Poster\Image\Drivers\GdDriver;
+use Kkokk\Poster\Image\Drivers\ImagickDriver;
+
 trait SliderTrait
 {
     public function draw()
@@ -19,38 +22,40 @@ trait SliderTrait
     // 实现图片绘制
     public function draw3()
     {
+        $imageWidth = $this->configs['im_width'];
+        $imageHeight = $this->configs['im_height'];
 
-        $im_width = $this->configs['im_width'];
-        $im_height = $this->configs['im_height'];
+        $this->driver->Im($imageWidth, $imageHeight, []);
+        $this->driver->CopyImage($this->configs['src']);
 
-        $this->im = $this->PosterDriver->createIm($im_width, $im_height, [], true);
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_height'];
 
-        $this->drawImage($this->configs['src']); // 添加bg图片
-
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_height'];
-
-        $slider_width = $this->configs['slider_width'];
-        $slider_height = $this->configs['slider_height'];
+        $sliderWidth = $this->configs['slider_width'];
+        $sliderHeight = $this->configs['slider_height'];
         $border = $this->configs['slider_border'];
 
-        $w = $slider_width;
-        $h = $slider_height;
+        $w = $sliderWidth;
+        $h = $sliderHeight;
 
-        $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
+        if ($this->driver instanceof GdDriver) {
+            $bgColor = $this->driver->createColor($this->driver->getImage(), [0, 0, 0, 60]);
+            $borderColor = $this->driver->createColor($this->driver->getImage(), [255, 255, 255]);
+        }
+        if ($this->driver instanceof ImagickDriver) {
+            $bgColor = $this->driver->createColor([0, 0, 0, 60]);
+            $borderColor = $this->driver->createColor([255, 255, 255]);
+        }
 
-        $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
+        $ims = $this->driver->newCanvas($sliderWidth, $sliderHeight); // 创建抠图背景
 
-        $x1 = mt_rand($slider_width * 2, $bg_width - $w - 10);
+        $x1 = mt_rand($sliderWidth * 2, $bgWidth - $w - 10);
         $x2 = $x1 + $w;
 
-        $y1 = mt_rand(0, $bg_height - $h);
+        $y1 = mt_rand(0, $bgHeight - $h);
         $y2 = $y1 + $h;
 
         $halfBorder = $border / 2;
-
-        $borderColor = $this->PosterDriver->createColor($this->im, [255, 255, 255]);
-
         $points = [
             $x1 + $w / 2,
             $y1,
@@ -65,15 +70,15 @@ trait SliderTrait
         $p2 = [$points[2], $points[3]];
         $p3 = [$points[4], $points[5]];
 
-        for ($i = 0; $i < $bg_width; $i++) {
-            for ($j = 0; $j < $bg_height; $j++) {
+        for ($i = 0; $i < $bgWidth; $i++) {
+            for ($j = 0; $j < $bgHeight; $j++) {
                 // 利用叉积抠图 p1 p2 p3 可以抠多边形
                 // 任意坐标点
                 $p = [$i, $j];
 
-                $cross1 = $this->getCross($p1, $p2, $p);
-                $cross2 = $this->getCross($p2, $p3, $p);
-                $cross3 = $this->getCross($p3, $p1, $p);
+                $cross1 = cross_product($p1, $p2, $p);
+                $cross2 = cross_product($p2, $p3, $p);
+                $cross3 = cross_product($p3, $p1, $p);
 
                 $isCross = $cross1 > 0 && $cross2 > 0 && $cross3 > 0;
 
@@ -81,10 +86,6 @@ trait SliderTrait
                     $rgbColor = imagecolorat($this->im, $i, $j);
                     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 抠图
                 }
-                // $isCross1 = $cross1 * $cross2 * $cross3 == 0;
-                // if($isCross1) {
-                //     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 边框
-                // }
             }
         }
 
@@ -106,8 +107,8 @@ trait SliderTrait
         $maxCount = max($maxCount, 1);
         while ($bgCount < $maxCount) {
             // 额外滑块背景
-            $x = mt_rand($slider_width * 2, $bg_width - $w);
-            $y = mt_rand(0, $bg_height - $h);
+            $x = mt_rand($sliderWidth * 2, $bgWidth - $w);
+            $y = mt_rand(0, $bgHeight - $h);
             $points = [
                 $x + $w / 2,
                 $y,
@@ -131,32 +132,31 @@ trait SliderTrait
 
     public function draw4()
     {
+        $imageWidth = $this->configs['im_width'];
+        $imageHeight = $this->configs['im_height'];
 
-        $im_width = $this->configs['im_width'];
-        $im_height = $this->configs['im_height'];
-
-        $this->im = $this->PosterDriver->createIm($im_width, $im_height, [], true);
+        $this->im = $this->PosterDriver->createIm($imageWidth, $imageHeight, [], true);
 
         $this->drawImage($this->configs['src']); // 添加bg图片
 
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_height'];
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_height'];
 
-        $slider_width = $this->configs['slider_width'];
-        $slider_height = $this->configs['slider_height'];
+        $sliderWidth = $this->configs['slider_width'];
+        $sliderHeight = $this->configs['slider_height'];
         $border = $this->configs['slider_border'];
 
-        $w = $slider_width - $border;
-        $h = $slider_height - $border;
+        $w = $sliderWidth - $border;
+        $h = $sliderHeight - $border;
 
         $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
-        $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], false); // 创建抠图背景
+        $ims = $this->PosterDriver->createIm($sliderWidth, $sliderHeight, [], false);   // 创建抠图背景
 
-        $x1 = mt_rand($slider_width * 2, $bg_width - $w - 10);
+        $x1 = mt_rand($sliderWidth * 2, $bgWidth - $w - 10);
         $x2 = $x1 + $w;
 
-        $y1 = mt_rand(0, $bg_height - $h);
+        $y1 = mt_rand(0, $bgHeight - $h);
         $y2 = $y1 + $h;
 
         $halfBorder = $border / 2;
@@ -167,22 +167,15 @@ trait SliderTrait
         $p3 = [$x2 + $halfBorder, $y1 + $halfBorder - 1];                               // 右上
         $p4 = [$x1 + $halfBorder - 1, $y1 + $halfBorder - 1];                           // 左上
 
-        for ($i = 0; $i < $bg_width; $i++) {
-            for ($j = 0; $j < $bg_height; $j++) {
-                // 矩形抠图
-                // if (($i < $x2 && $i >= $x1) && ($j < $y2 && $j >= $y1)) {
-                //     $rgbColor = imagecolorat($this->im, $i, $j);
-                //     imagesetpixel($ims, $i - $x1 + $border / 2, $j - $y1 + $border / 2, $rgbColor); // 抠图
-                // }
-
-
+        for ($i = 0; $i < $bgWidth; $i++) {
+            for ($j = 0; $j < $bgHeight; $j++) {
                 // 利用叉积抠图 p1 p2 p3 可以抠多边形
                 // 任意坐标点
                 $p = [$i, $j];
 
                 // 叉积计算 点在四条平行线内部则是在矩形内 p1->p2 p1->p3 参考点 p1  叉积大于0点p3在p2逆时针方向 等于0 三点一线 小于0 点p3在p2顺时针防线
-                $isCross = $this->getCross($p1, $p2, $p) * $this->getCross($p3, $p4, $p) > 0 && $this->getCross($p2,
-                        $p3, $p) * $this->getCross($p4, $p1, $p) > 0;
+                $isCross = cross_product($p1, $p2, $p) * cross_product($p3, $p4, $p) > 0 && cross_product($p2,
+                        $p3, $p) * cross_product($p4, $p1, $p) > 0;
                 if ($isCross) {
                     $rgbColor = imagecolorat($this->im, $i, $j);
                     imagesetpixel($ims, $i - $x1, $j - $y1, $rgbColor); // 抠图
@@ -190,20 +183,20 @@ trait SliderTrait
             }
         }
 
-        imagefilledrectangle($this->im, $x1, $y1, $x1 + $slider_width, $y1 + $slider_height, $bgColor);
+        imagefilledrectangle($this->im, $x1, $y1, $x1 + $sliderWidth, $y1 + $sliderHeight, $bgColor);
 
         $bgCount = 1;
         $maxCount = min($this->configs['slider_bg'], 4);
         $maxCount = max($maxCount, 1);
         while ($bgCount < $maxCount) {
             // 额外滑块背景
-            $x = mt_rand(30, $bg_width - $w);
-            $y = mt_rand(0, $bg_height - $h);
-            imagefilledrectangle($this->im, $x, $y, $x + $slider_width, $y + $slider_height, $bgColor);
+            $x = mt_rand(30, $bgWidth - $w);
+            $y = mt_rand(0, $bgHeight - $h);
+            imagefilledrectangle($this->im, $x, $y, $x + $sliderWidth, $y + $sliderHeight, $bgColor);
             $bgCount++;
         }
 
-        imagecopy($this->im, $ims, 5, 196, 0, 0, $slider_width, $slider_width);
+        imagecopy($this->im, $ims, 5, 196, 0, 0, $sliderWidth, $sliderWidth);
 
         $this->destroyImage($ims);
 
@@ -216,31 +209,31 @@ trait SliderTrait
     public function draw5()
     {
 
-        $im_width = $this->configs['im_width'];
-        $im_height = $this->configs['im_height'];
+        $imageWidth = $this->configs['im_width'];
+        $imageHeight = $this->configs['im_height'];
 
-        $this->im = $this->PosterDriver->createIm($im_width, $im_height, [], true);
+        $this->im = $this->PosterDriver->createIm($imageWidth, $imageHeight, [], true);
 
         $this->drawImage($this->configs['src']); // 添加bg图片
 
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_height'];
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_height'];
 
-        $slider_width = $this->configs['slider_width'];
-        $slider_height = $this->configs['slider_height'];
+        $sliderWidth = $this->configs['slider_width'];
+        $sliderHeight = $this->configs['slider_height'];
         $border = $this->configs['slider_border'];
 
-        $w = $slider_width;
-        $h = $slider_height;
+        $w = $sliderWidth;
+        $h = $sliderHeight;
 
         $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
-        $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
+        $ims = $this->PosterDriver->createIm($sliderWidth, $sliderHeight, [], true); // 创建抠图背景
 
-        $x1 = mt_rand($slider_width * 2, $bg_width - $w - 10);
+        $x1 = mt_rand($sliderWidth * 2, $bgWidth - $w - 10);
         $x2 = $x1 + $w;
 
-        $y1 = mt_rand(0, $bg_height - $h);
+        $y1 = mt_rand(0, $bgHeight - $h);
         $y2 = $y1 + $h;
 
         $halfBorder = $border / 2;
@@ -267,17 +260,17 @@ trait SliderTrait
         $p4 = [$points[6], $points[7]];
         $p5 = [$points[8], $points[9]];
 
-        for ($i = 0; $i < $bg_width; $i++) {
-            for ($j = 0; $j < $bg_height; $j++) {
+        for ($i = 0; $i < $bgWidth; $i++) {
+            for ($j = 0; $j < $bgHeight; $j++) {
                 // 利用叉积抠图 p1 p2 p3 可以抠多边形
                 // 任意坐标点
                 $p = [$i, $j];
 
-                $cross1 = $this->getCross($p1, $p2, $p);
-                $cross2 = $this->getCross($p2, $p3, $p);
-                $cross3 = $this->getCross($p3, $p4, $p);
-                $cross4 = $this->getCross($p4, $p5, $p);
-                $cross5 = $this->getCross($p5, $p1, $p);
+                $cross1 = cross_product($p1, $p2, $p);
+                $cross2 = cross_product($p2, $p3, $p);
+                $cross3 = cross_product($p3, $p4, $p);
+                $cross4 = cross_product($p4, $p5, $p);
+                $cross5 = cross_product($p5, $p1, $p);
 
                 $isCross = $cross1 > 0 && $cross2 > 0 && $cross3 > 0 && $cross4 > 0 && $cross5 > 0;
 
@@ -310,8 +303,8 @@ trait SliderTrait
         $maxCount = max($maxCount, 1);
         while ($bgCount < $maxCount) {
             // 额外滑块背景
-            $x = mt_rand($slider_width * 2, $bg_width - $w);
-            $y = mt_rand(0, $bg_height - $h);
+            $x = mt_rand($sliderWidth * 2, $bgWidth - $w);
+            $y = mt_rand(0, $bgHeight - $h);
             $points = [
                 $x + $w / 2,
                 $y,
@@ -340,31 +333,31 @@ trait SliderTrait
     public function draw6()
     {
 
-        $im_width = $this->configs['im_width'];
-        $im_height = $this->configs['im_height'];
+        $imageWidth = $this->configs['im_width'];
+        $imageHeight = $this->configs['im_height'];
 
-        $this->im = $this->PosterDriver->createIm($im_width, $im_height, [], true);
+        $this->im = $this->PosterDriver->createIm($imageWidth, $imageHeight, [], true);
 
         $this->drawImage($this->configs['src']); // 添加bg图片
 
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_height'];
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_height'];
 
-        $slider_width = $this->configs['slider_width'];
-        $slider_height = $this->configs['slider_height'];
+        $sliderWidth = $this->configs['slider_width'];
+        $sliderHeight = $this->configs['slider_height'];
         $border = $this->configs['slider_border'];
 
-        $w = $slider_width;
-        $h = $slider_height;
+        $w = $sliderWidth;
+        $h = $sliderHeight;
 
         $bgColor = $this->PosterDriver->createColor($this->im, [0, 0, 0, 60]);
 
-        $ims = $this->PosterDriver->createIm($slider_width, $slider_height, [], true); // 创建抠图背景
+        $ims = $this->PosterDriver->createIm($sliderWidth, $sliderHeight, [], true); // 创建抠图背景
 
-        $x1 = mt_rand($slider_width * 2, $bg_width - $w - 10);
+        $x1 = mt_rand($sliderWidth * 2, $bgWidth - $w - 10);
         $x2 = $x1 + $w;
 
-        $y1 = mt_rand(0, $bg_height - $h);
+        $y1 = mt_rand(0, $bgHeight - $h);
         $y2 = $y1 + $h;
 
         $halfBorder = $border / 2;
@@ -394,18 +387,18 @@ trait SliderTrait
         $p5 = [$points[8], $points[9]];
         $p6 = [$points[10], $points[11]];
 
-        for ($i = 0; $i < $bg_width; $i++) {
-            for ($j = 0; $j < $bg_height; $j++) {
+        for ($i = 0; $i < $bgWidth; $i++) {
+            for ($j = 0; $j < $bgHeight; $j++) {
                 // 利用叉积抠图 p1 p2 p3 可以抠多边形
                 // 任意坐标点
                 $p = [$i, $j];
 
-                $cross1 = $this->getCross($p1, $p2, $p);
-                $cross2 = $this->getCross($p2, $p3, $p);
-                $cross3 = $this->getCross($p3, $p4, $p);
-                $cross4 = $this->getCross($p4, $p5, $p);
-                $cross5 = $this->getCross($p5, $p6, $p);
-                $cross6 = $this->getCross($p6, $p1, $p);
+                $cross1 = cross_product($p1, $p2, $p);
+                $cross2 = cross_product($p2, $p3, $p);
+                $cross3 = cross_product($p3, $p4, $p);
+                $cross4 = cross_product($p4, $p5, $p);
+                $cross5 = cross_product($p5, $p6, $p);
+                $cross6 = cross_product($p6, $p1, $p);
 
                 $isCross = $cross1 > 0 && $cross2 > 0 && $cross3 > 0 && $cross4 > 0 && $cross5 > 0 && $cross6 > 0;
 
@@ -440,8 +433,8 @@ trait SliderTrait
         $maxCount = max($maxCount, 1);
         while ($bgCount < $maxCount) {
             // 额外滑块背景
-            $x = mt_rand($slider_width * 2, $bg_width - $w);
-            $y = mt_rand(0, $bg_height - $h);
+            $x = mt_rand($sliderWidth * 2, $bgWidth - $w);
+            $y = mt_rand(0, $bgHeight - $h);
             $points = [
                 $x + $w / 4,
                 $y,

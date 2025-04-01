@@ -8,13 +8,13 @@
 namespace Kkokk\Poster\Html;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Html\Drivers\HtmlDriverInterface;
 
 class Html implements HtmlInterface
 {
     protected $driver;
 
-    function __construct(DriverInterface $driver)
+    function __construct(HtmlDriverInterface $driver)
     {
         $this->driver = $driver;
     }

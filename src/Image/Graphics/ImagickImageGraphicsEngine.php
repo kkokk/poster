@@ -11,12 +11,15 @@ use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Imagick\Image;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
+/**
+ * User: lang
+ * @extends ImageGraphicsEngine<\Imagick>
+ * @package Kkokk\Poster\Image\Graphics
+ * @class   ImagickImageGraphicsEngine
+ */
 class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use ImagickTrait;
-
-    /** @var \Imagick */
-    protected $image;
 
     /** @var int[] 默认 x y 分辨率 默认是 [72, 72] */
     protected $dpi = [];
@@ -29,6 +32,17 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return parent::config($configs);
     }
 
+    /**
+     * 生成图片并保存
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:43
+     * @param $path
+     * @return string|string[]|null
+     * @throws \ImagickException
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getData($path = '')
     {
         if ($path) {
@@ -38,29 +52,76 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this->returnImage($this->getType());
     }
 
+    /**
+     * 获取图片流
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:43
+     * @param $type
+     * @return string|string[]|null
+     * @throws \ImagickException
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getStream($type = '')
     {
         $this->setDPI();
         return $this->returnImage($type ?: $this->getType(), false);
     }
 
+    /**
+     * 获取图片 base64 编码
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:43
+     * @return string
+     * @throws \ImagickException
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getBaseData()
     {
         $this->setDPI();
         return base64_data($this->image->getImageBlob(), $this->getType());
     }
 
+    /**
+     * 获取图片二进制流
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:43
+     * @return mixed
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function blob()
     {
         $this->setDPI();
         return $this->getBlob($this->image);
     }
 
+    /**
+     * 临时文件
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @return false|string
+     */
     public function tmp()
     {
         return $this->getTmp($this->getType(), $this->image);
     }
 
+    /**
+     * 设置图片
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @return bool
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function setData()
     {
         $this->setDPI();
@@ -112,8 +173,13 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
     /**
      * 圆形剪裁
      * User: lang
-     * Date: 2024/11/27
-     * Time: 14:02
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @return $this
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     * @throws \Kkokk\Poster\Exception\PosterException
      */
     public function circle()
     {
@@ -143,6 +209,18 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this;
     }
 
+    /**
+     * 裁剪图片
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     * @return $this
+     */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
         $x = calc_dst_x($x, $this->width, $width);
@@ -153,36 +231,72 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this;
     }
 
+    /**
+     * 设置透明度
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @param $transparency
+     * @return $this
+     */
     public function transparent($transparency)
     {
         $this->setImageAlpha($this->image, $transparency);
         return $this;
     }
 
+    /**
+     * 设置圆角
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:42
+     * @param $radius
+     * @return $this
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function borderRadius($radius = 0)
     {
         $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
         return $this;
     }
 
+    /**
+     * 应用蒙版
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:41
+     * @param $mask
+     * @return $this
+     * @throws \ImagickException
+     */
     public function applyMask($mask)
     {
         $width = $this->width;
         $height = $this->height;
         // 加载蒙版图片并转换为灰度
         $maskImage = (new Image($mask))->scale($width, $height);
+        // 确保蒙版是灰度图
+        if ($maskImage->getImage()->getImageColorspace() != ($this->image)::COLORSPACE_GRAY) {
+            $maskImage->getImage()->transformImageColorspace(($this->image)::COLORSPACE_GRAY);
+        }
 
-        $maskImage->getImage()->evaluateImage(($maskImage->getImage())::EVALUATE_MULTIPLY, 1,
-            ($maskImage->getImage())::CHANNEL_ALPHA);
-        // $maskImage->getImage()->modulateImage(100, 0, 100); // 确保是纯灰度蒙版
-        // $maskImage->getImage()->negateImage(true);          // 反转蒙版，使白色为不透明，黑色为透明
-        //
-        // // 应用 Alpha 通道蒙版
-        // $this->image->setImageAlphaChannel(($this->image)::ALPHACHANNEL_ACTIVATE);
+        // 获取源图片的alpha通道
+        $imageClone = clone $this->image;
+        $imageClone->separateImageChannel(($this->image)::CHANNEL_ALPHA);
+
+        // 将蒙版和源图片的alpha通道相乘
+        $maskImage->getImage()->compositeImage($imageClone, ($this->image)::COMPOSITE_MULTIPLY, 0, 0);
+
         $this->image->compositeImage($maskImage->getImage(), ($this->image)::COMPOSITE_COPYOPACITY, 0, 0);
 
         // 释放资源
         $this->destroyImage($maskImage->getImage());
+        $this->destroyImage($imageClone);
         return $this;
     }
 

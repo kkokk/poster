@@ -323,14 +323,8 @@ class GdDriver extends Driver implements DriverInterface
         $this->canvas->crop($x, $y, $width, $height);
     }
 
-    public function execute($query = [], Driver $driver = null)
+    public function newCanvas($width, $height, $background = [])
     {
-        if (empty($driver)) {
-            $driver = $this;
-        }
-        foreach ($query as $item) {
-            $driver->run($item, $driver);
-        }
-        return $driver;
+        return new Canvas($width, $height, $background);
     }
 }

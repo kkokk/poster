@@ -13,10 +13,10 @@ use Kkokk\Poster\Exception\PosterException;
  * User: lang
  * 注意 使用的是 -webkit 语法
  * @package Kkokk\Poster\Html\Drivers
- * @class   WkDriver
+ * @class   WkHtmlDriver
  * @author  73285 2023-08-10
  */
-class WkDriver extends Driver implements DriverInterface
+class WkHtmlDriver extends Driver implements HtmlDriverInterface
 {
     /**
      *  文件类型，常规图片png、jpg等，和pdf

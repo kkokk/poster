@@ -9,7 +9,7 @@
 namespace Kkokk\Poster\Image\Traits;
 
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Html\Drivers\HtmlDriverInterface;
 use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
@@ -81,7 +81,7 @@ trait GdTrait
 
     protected function createImage($src = '')
     {
-        if ($src instanceof DriverInterface) {
+        if ($src instanceof HtmlDriverInterface) {
             return $this->returnImageInfoByBlob($src->getImageBlob());
         } elseif ($src instanceof GdImageGraphicsEngine) {
             return [$src->getImage(), $src->getWidth(), $src->getHeight(), $src->getType()];
@@ -738,7 +738,7 @@ trait GdTrait
         !is_resource($resource) || imagedestroy($resource);
     }
 
-    protected function createCanvas($w, $h, $rgba = [])
+    public function createCanvas($w, $h, $rgba = [])
     {
         $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {

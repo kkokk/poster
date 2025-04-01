@@ -9,13 +9,22 @@
 
 namespace Kkokk\Poster\Captcha;
 
+use Kkokk\Poster\Cache\AbstractAdapter;
 use Kkokk\Poster\Captcha\Generators\CaptchaGenerator;
+use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 
 class CaptchaManager
 {
     protected $channels = [];
 
     protected $factory;
+
+    protected $defaultDriver = 'gd';
+
+    /**
+     * @var AbstractAdapter
+     */
+    protected $cacheAdapter = null;
 
     function __construct()
     {
@@ -41,20 +50,36 @@ class CaptchaManager
         return $this->channels[$name];
     }
 
-    protected function configure(CaptchaGenerator $generator)
+    public function driver($driver = null)
+    {
+        if ($driver) {
+            $this->defaultDriver = $driver;
+        }
+        return $this;
+    }
+
+    public function setCache(AbstractAdapter $cacheAdapter)
+    {
+        $this->cacheAdapter = $cacheAdapter;
+        return $this;
+    }
+
+    protected function configure(CaptchaStrategyInterface $generator)
     {
         return $generator;
     }
 
     protected function parseChannelName($name)
     {
-        if (empty($name)) return $this->supportedGenerators()[0];
+        if (empty($name)) {
+            return $this->supportedGenerators()[0];
+        }
         return $name;
     }
 
     protected function makeGenerator($name)
     {
-        return $this->factory->make($name);
+        return $this->factory->make($name, $this->defaultDriver, $this->cacheAdapter);
     }
 
     /**
@@ -71,7 +96,7 @@ class CaptchaManager
      * 将方法动态传递给默认方法。
      *
      * @param string $method
-     * @param array $parameters
+     * @param array  $parameters
      * @return mixed
      */
     public function __call($method, $parameters)

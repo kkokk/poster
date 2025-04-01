@@ -11,10 +11,26 @@ use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\GdTrait;
 
+/**
+ * User: lang
+ * @extends ImageGraphicsEngine<Resource>
+ * @package Kkokk\Poster\Image\Graphics
+ * @class   GdImageGraphicsEngine
+ */
 class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphicsEngineInterface
 {
     use GdTrait;
 
+    /**
+     * 生成图片并保存
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:50
+     * @param $path
+     * @return false|string|string[]|null
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getData($path = '')
     {
         if ($path) {
@@ -23,31 +39,87 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this->returnImage($this->getType());
     }
 
+    /**
+     * 获取图片流
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:50
+     * @param $type
+     * @return false|string|string[]|null
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getStream($type = '')
     {
         return $this->returnImage($type ?: $this->getType(), false);
     }
 
+    /**
+     * 获取图片 base64 编码
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Email: 732853989@qq.com
+     * Time: 9:50
+     * @return string
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function getBaseData()
     {
         return base64_data($this->image, $this->getType());
     }
 
+    /**
+     * 获取图片二进制流
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:51
+     * @return false|string
+     */
     public function blob()
     {
         return $this->getBlob($this->getType(), $this->image);
     }
 
+    /**
+     * 临时文件
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:51
+     * @return false|string
+     */
     public function tmp()
     {
         return $this->getTmp($this->getType(), $this->image);
     }
 
+    /**
+     * 设置图片
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:51
+     * @return string
+     * @throws \Kkokk\Poster\Exception\PosterException
+     */
     public function setData()
     {
         return $this->setImage($this->source);
     }
 
+    /**
+     * 缩放
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:47
+     * @param $newWidth
+     * @param $newHeight
+     * @param $bestFit
+     * @return $this
+     */
     public function thumb($newWidth, $newHeight, $bestFit = false)
     {
         if ($newWidth == 0 || $newHeight == 0) {
@@ -71,6 +143,17 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 缩放保持较高质量
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:47
+     * @param $newWidth
+     * @param $newHeight
+     * @param $bestFit
+     * @return $this
+     */
     public function scale($newWidth, $newHeight, $bestFit = false)
     {
         if ($newWidth == 0 || $newHeight == 0) {
@@ -95,7 +178,14 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
-    // 圆形裁剪
+    /**
+     * 圆形裁剪
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:47
+     * @return $this
+     */
     public function circle()
     {
         $size = min($this->width, $this->height);
@@ -121,6 +211,18 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 裁剪图片
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:47
+     * @param $x
+     * @param $y
+     * @param $width
+     * @param $height
+     * @return $this
+     */
     public function crop($x = 0, $y = 0, $width = 0, $height = 0)
     {
         $x = calc_dst_x($x, $this->width, $width);
@@ -133,6 +235,15 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 设置透明度
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:48
+     * @param $transparency
+     * @return $this
+     */
     public function transparent($transparency)
     {
         $mask = $this->setImageAlpha($this->image, $this->width, $this->height, $transparency);
@@ -141,6 +252,15 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 设置圆角
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:48
+     * @param $radius
+     * @return $this
+     */
     public function borderRadius($radius = 0)
     {
         $radiusImage = $this->setPixelRadius($this->image, $this->width, $this->height, $radius);
@@ -149,6 +269,15 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 应用蒙版
+     * User: lang
+     * Date: 2025/4/1
+     * Email: 732853989@qq.com
+     * Time: 9:48
+     * @param $mask
+     * @return $this
+     */
     public function applyMask($mask)
     {
         imagealphablending($this->image, false);
@@ -159,19 +288,21 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $maskColor = imagecolorat($maskImage->getImage(), $x, $y) & 0xFF; // 取 R 分量作为透明度
-                $fgColor = imagecolorat($this->image, $x, $y);
+                $imageColor = imagecolorat($this->image, $x, $y);
                 // 提取 RGBA 组件
-                $r = ($fgColor >> 16) & 0xFF;
-                $g = ($fgColor >> 8) & 0xFF;
-                $b = $fgColor & 0xFF;
-                $alpha = 127 - ($maskColor / 255) * 127; // 计算透明度
-                $newColor = imagecolorallocatealpha($this->image, $r, $g, $b, round($alpha));
+                $r = ($imageColor >> 16) & 0xFF;
+                $g = ($imageColor >> 8) & 0xFF;
+                $b = $imageColor & 0xFF;
+                $alpha = round(127 - ($maskColor / 255) * 127); // 计算透明度
+                $newColor = imagecolorallocatealpha($this->image, $r, $g, $b, $alpha);
                 imagesetpixel($this->image, $x, $y, $newColor);
             }
         }
         $this->destroyImage($maskImage->getImage());
         return $this;
     }
+
+    public function crossProduct(){}
 
     public function __destruct()
     {

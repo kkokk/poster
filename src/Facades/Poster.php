@@ -18,7 +18,7 @@ use Kkokk\Poster\Image\Builder;
  * @method static Builder buildImDst($src, $w = 0, $h = 0);
  * @method static Builder buildBg($w, $h, $rgba = [], $alpha = false, $dst_x = 0, $dst_y = 0, $src_x = 0, $src_y = 0, $func = '');
  * @method static array Qr($text, $outfile = false, $level = 'L', $size = 4, $margin = 1, $saveAndPrint = 0);
- *
+ * @extends Facade<\Kkokk\Poster\Image\PosterManager>
  * @see \Kkokk\Poster\Image\PosterManager
  * @see \Kkokk\Poster\Image\Extension
  */

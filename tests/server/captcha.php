@@ -5,10 +5,10 @@
  * Time: 10:15
  */
 
-use Kkokk\Poster\PosterManager;
 require '../../vendor/autoload.php';
 
+use Kkokk\Poster\Facades\Captcha;
 
-$res = PosterManager::Captcha()->type('click')->get();
+$res = Captcha::type('input')->config(['debug' => true])->get();
 
 print_r($res);

@@ -8,21 +8,26 @@
 
 namespace Kkokk\Poster\Captcha;
 
+use Kkokk\Poster\Cache\CacheRepository;
 use Kkokk\Poster\Captcha\Generators;
+use Kkokk\Poster\Captcha\Strategies\Input\InputCaptcha;
 use Kkokk\Poster\Exception\PosterException;
+use Kkokk\Poster\Image\Drivers\GdDriver;
+use Kkokk\Poster\Image\Drivers\ImagickDriver;
 
 class CaptchaGeneratorFactory
 {
-    public function make($name)
+    public function make($name, $driver, $cacheAdapter)
     {
-        return $this->createGenerator($name);
+        return $this->createGenerator($name, $driver, $cacheAdapter);
     }
 
-    protected function createGenerator($name)
+    protected function createGenerator($name, $driver, $cacheAdapter)
     {
+        $cacheRepository = new CacheRepository($cacheAdapter);
         switch ($name) {
             case 'input':
-                return new Generators\InputGenerator(); // 输入类验证
+                return new InputCaptcha($this->createDriver($driver), $cacheRepository); // 输入类验证
             case 'click':
                 return new Generators\ClickGenerator(); // 点击验证
             case 'rotate':
@@ -32,5 +37,17 @@ class CaptchaGeneratorFactory
         }
 
         throw new PosterException("Unsupported Captcha Generator [{$name}].");
+    }
+
+    protected function createDriver($driver)
+    {
+        switch ($driver) {
+            case 'gd':
+                return new GdDriver();
+            case 'imagick':
+                return new ImagickDriver();
+        }
+
+        throw new PosterException("Unsupported Captcha Driver [{$driver}].");
     }
 }

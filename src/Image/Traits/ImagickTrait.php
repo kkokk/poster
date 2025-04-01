@@ -8,9 +8,8 @@
 
 namespace Kkokk\Poster\Image\Traits;
 
-
 use Kkokk\Poster\Exception\PosterException;
-use Kkokk\Poster\Html\Drivers\DriverInterface;
+use Kkokk\Poster\Html\Drivers\HtmlDriverInterface;
 use Kkokk\Poster\Image\Enums\ImageType;
 use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
@@ -137,7 +136,7 @@ trait ImagickTrait
     {
         $Imagick = new \Imagick();
         if ($src) {
-            if ($src instanceof DriverInterface) {
+            if ($src instanceof HtmlDriverInterface) {
                 $Imagick->readImageBlob($src->getImageBlob());
             } elseif ($src instanceof ImagickImageGraphicsEngine) {
                 $Imagick->destroy();
@@ -307,48 +306,6 @@ trait ImagickTrait
         }
     }
 
-    protected function fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents)
-    {
-        for ($i = 0; $i < $weight; $i++) {
-
-            list($really_dst_x, $really_dst_y) = calc_font_weight($i, $weight, $fontSize, $DstX, $DstY);
-
-            if ($this->getType() == 'gif') {
-                foreach ($this->image as $frame) {
-                    $frame->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-                    // $this->image->nextImage();
-                }
-            } else {
-                $this->image->annotateImage($draw, $really_dst_x, $really_dst_y, $angle, $contents);
-            }
-        }
-    }
-
-    protected function fontWeightArr($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contentsArr, $color)
-    {
-        $DstX_old = $DstX;
-        foreach ($contentsArr as $v) {
-
-            $contents = $v['value'];
-
-            if ($contents == "\n") {
-                $DstX = $DstX_old;
-                $DstY += 1.75 * $fontSize;
-                continue;
-            }
-
-            if (!empty($v['color'])) {
-                $draw->setFillColor($v['color']);
-            } else {
-                $draw->setFillColor($color);
-            }
-
-            $this->fontWeight($draw, $weight, $fontSize, $angle, $DstX, $DstY, $contents);
-
-            $DstX += $v['w'];
-        }
-    }
-
     /**
      * 画圆角
      * Author: lang
@@ -453,11 +410,10 @@ trait ImagickTrait
         empty($Imagick) || $Imagick->destroy();
     }
 
-    protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
+    protected function createCanvas($w, $h, $rgba = [])
     {
         if (!is_null($rgba)) {
             $rgba = empty($rgba) ? [255, 255, 255, 127] : $rgba;
-            $rgba = parse_color($rgba);
         }
         $background = $this->createColor($rgba);
         $image = $this->createImagick();

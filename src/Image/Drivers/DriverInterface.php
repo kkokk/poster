@@ -196,18 +196,6 @@ interface DriverInterface
     );
 
     /**
-     * 执行画图
-     * Author: lang
-     * Email: 732853989@qq.com
-     * Date: 2023/3/29
-     * Time: 15:48
-     * @param array       $query
-     * @param Driver|null $driver
-     * @return Driver
-     */
-    public function execute($query = [], Driver $driver = null);
-
-    /**
      * 裁剪
      * Author: lang
      * Date: 2024/3/12
