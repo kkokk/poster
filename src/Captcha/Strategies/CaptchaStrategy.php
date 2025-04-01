@@ -46,7 +46,7 @@ class CaptchaStrategy
         return $this;
     }
 
-    public function create($filename = 'im')
+    public function create($filename = 'captcha')
     {
         if ($this->configs['debug']) {
             $outputPath = POSTER_BASE_PATH . '/../tests/poster/' . $filename . '.' . $this->configs['im_type'];
@@ -58,7 +58,7 @@ class CaptchaStrategy
             );
         }
         $baseData = $this->driver->getBaseData();
-        $key = uniqid('input:' . $this->configs['type'] . mt_rand(0, 9999), true);
+        $key = uniqid($filename . '-' . $this->configs['type']) . mt_rand(0, 9999);
         return [$key, $baseData];
     }
 

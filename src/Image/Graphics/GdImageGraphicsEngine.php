@@ -302,6 +302,8 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    public function crossProduct(){}
+
     public function __destruct()
     {
         $this->destroyImage();

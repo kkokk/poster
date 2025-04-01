@@ -738,7 +738,7 @@ trait GdTrait
         !is_resource($resource) || imagedestroy($resource);
     }
 
-    protected function createCanvas($w, $h, $rgba = [])
+    public function createCanvas($w, $h, $rgba = [])
     {
         $image = imagecreatetruecolor($w, $h);
         if (!is_null($rgba)) {

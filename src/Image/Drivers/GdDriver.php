@@ -322,4 +322,9 @@ class GdDriver extends Driver implements DriverInterface
     {
         $this->canvas->crop($x, $y, $width, $height);
     }
+
+    public function newCanvas($width, $height, $background = [])
+    {
+        return new Canvas($width, $height, $background);
+    }
 }

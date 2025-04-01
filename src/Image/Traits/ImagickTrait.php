@@ -410,11 +410,10 @@ trait ImagickTrait
         empty($Imagick) || $Imagick->destroy();
     }
 
-    protected function createCanvas($w, $h, $rgba = [255, 255, 255, 127])
+    protected function createCanvas($w, $h, $rgba = [])
     {
         if (!is_null($rgba)) {
             $rgba = empty($rgba) ? [255, 255, 255, 127] : $rgba;
-            $rgba = parse_color($rgba);
         }
         $background = $this->createColor($rgba);
         $image = $this->createImagick();
