@@ -17,7 +17,7 @@ use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 /**
  * @method static CaptchaManager extension(string $driver = null)
  * @method static CaptchaManager setCache(AbstractAdapter $cacheAdapter)
- * @method static CaptchaStrategy type(string $channel = null)
+ * @method static CaptchaStrategy|CaptchaStrategyInterface type(string $channel = null)
  * @method static CaptchaStrategyInterface config($params = [])
  * @method static CaptchaGeneratorInterface check($key, $value, $leeway = 0, $secret = null)
  * @method static CaptchaGeneratorInterface get($expire = 0)

@@ -56,7 +56,7 @@ class CaptchaStrategy
         ]);
     }
 
-    public function create($filename = 'captcha')
+    protected function create($filename = 'captcha')
     {
         $baseData = $this->driver->getBaseData();
         if ($this->configs['debug']) {
@@ -71,7 +71,7 @@ class CaptchaStrategy
         return [$key, $baseData];
     }
 
-    public function put($key, $value, $expire = 0)
+    protected function put($key, $value, $expire = 0)
     {
         try {
             $this->cache->put($key, $value, $expire ?: $this->expire);
@@ -82,7 +82,7 @@ class CaptchaStrategy
         return true;
     }
 
-    public function getChar($type)
+    protected function getChar($type)
     {
         switch ($type) {
             case 'text':
@@ -112,7 +112,7 @@ class CaptchaStrategy
      * @param $height
      * @return void
      */
-    public function drawLine($width = 0, $height = 0)
+    protected function drawLine($width = 0, $height = 0)
     {
         $lineCount = $this->configs['line_count'];
         if ($lineCount > 0) {
@@ -138,7 +138,7 @@ class CaptchaStrategy
      * @param int $height
      * @throws PosterException
      */
-    public function drawChar($width = 0, $height = 0)
+    protected function drawChar($width = 0, $height = 0)
     {
         $charCount = $this->configs['char_count'];
 
