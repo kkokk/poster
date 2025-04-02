@@ -9,6 +9,7 @@ require '../../vendor/autoload.php';
 
 use Kkokk\Poster\Facades\Captcha;
 
-$res = Captcha::type('input')->config(['debug' => true])->get();
+$res = Captcha::extension('imagick')->type('input')->config(['debug' => true])->get();
 
-print_r($res);
+echo $res['secret'];
+echo "<img src='{$res['img']}' />";

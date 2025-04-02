@@ -40,6 +40,7 @@ class Image extends GdImageGraphicsEngine
         imagecopy($croppedImage, $rotatedImage, 0, 0, intval($offsetX), intval($offsetY), intval($this->width),
             intval($this->height));
 
+        $this->destroyImage();
         // 更新图像资源
         $this->image = $croppedImage;
         return $this;

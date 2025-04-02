@@ -10,7 +10,10 @@ namespace Kkokk\Poster\Captcha;
 
 use Kkokk\Poster\Cache\CacheRepository;
 use Kkokk\Poster\Captcha\Generators;
+use Kkokk\Poster\Captcha\Strategies\Click\ClickCaptcha;
 use Kkokk\Poster\Captcha\Strategies\Input\InputCaptcha;
+use Kkokk\Poster\Captcha\Strategies\Rotate\RotateCaptcha;
+use Kkokk\Poster\Captcha\Strategies\Slider\SliderCaptcha;
 use Kkokk\Poster\Exception\PosterException;
 use Kkokk\Poster\Image\Drivers\GdDriver;
 use Kkokk\Poster\Image\Drivers\ImagickDriver;
@@ -24,16 +27,17 @@ class CaptchaGeneratorFactory
 
     protected function createGenerator($name, $driver, $cacheAdapter)
     {
+        $resolveDriver = $this->createDriver($driver);
         $cacheRepository = new CacheRepository($cacheAdapter);
         switch ($name) {
             case 'input':
-                return new InputCaptcha($this->createDriver($driver), $cacheRepository); // 输入类验证
+                return new InputCaptcha($resolveDriver, $cacheRepository); // 输入类验证
             case 'click':
-                return new Generators\ClickGenerator(); // 点击验证
+                return new ClickCaptcha($resolveDriver, $cacheRepository); // 点击验证
             case 'rotate':
-                return new Generators\RotateGenerator(); // 旋转验证
+                return new RotateCaptcha($resolveDriver, $cacheRepository); // 旋转验证
             case 'slider':
-                return new Generators\SliderGenerator(); // 滑块验证
+                return new SliderCaptcha($resolveDriver, $cacheRepository); // 滑块验证
         }
 
         throw new PosterException("Unsupported Captcha Generator [{$name}].");

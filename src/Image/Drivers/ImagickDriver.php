@@ -117,6 +117,9 @@ class ImagickDriver extends Driver implements DriverInterface
         if ($type == 'circle') {
             $image->circle();
         }
+
+        $this->canvas->addImage($image, $dstX, $dstY, $srcX, $srcY);
+        $this->destroyImage($image->getImage());
     }
 
     public function CopyText(
@@ -131,7 +134,7 @@ class ImagickDriver extends Driver implements DriverInterface
         $space = null,
         $angle = null
     ) {
-        if (empty($content)) {
+        if (empty($content) && $content != 0) {
             return;
         }
 
@@ -182,6 +185,12 @@ class ImagickDriver extends Driver implements DriverInterface
                 break;
             case 'filled_rectangle':
             case 'filledRectangle':
+                $draw->rectangle($x1, $y1, $x2, $y2);
+                break;
+            case 'only_filled_rectangle':
+            case 'onlyFilledRectangle':
+                $draw->setStrokeColor($this->createColor('none'));
+                $draw->setFillColor($this->createColor($rgba));
                 $draw->rectangle($x1, $y1, $x2, $y2);
                 break;
             default:
@@ -281,5 +290,20 @@ class ImagickDriver extends Driver implements DriverInterface
     public function newCanvas($width, $height, $background = [])
     {
         return new Canvas($width, $height, $background);
+    }
+
+    public function newImage($src)
+    {
+        return new Image($src);
+    }
+
+    public function newImageText()
+    {
+        return new ImageText();
+    }
+
+    public function newText()
+    {
+        return new Text();
     }
 }

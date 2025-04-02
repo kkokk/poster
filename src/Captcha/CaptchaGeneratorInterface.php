@@ -8,7 +8,7 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Captcha\Generators\CaptchaGenerator;
+use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 
 interface CaptchaGeneratorInterface
 {
@@ -19,7 +19,7 @@ interface CaptchaGeneratorInterface
      * Date: 2023/3/10
      * Time: 11:53
      * @param array $params
-     * @return CaptchaGenerator
+     * @return CaptchaStrategyInterface
      */
     public function config($params = []);
 
@@ -29,10 +29,10 @@ interface CaptchaGeneratorInterface
      * Email: 732853989@qq.com
      * Date: 2023/3/10
      * Time: 11:53
-     * @param string $key key值
-     * @param string|int|array $value 比对值
-     * @param int $leeway 误差
-     * @param null $secret 没有缓存的时候，传用户自行储存的密码
+     * @param string           $key    key值
+     * @param string|int|array $value  比对值
+     * @param int              $leeway 误差
+     * @param null             $secret 没有缓存的时候，传用户自行储存的密码
      * @return boolean
      */
     public function check($key, $value, $leeway = 0, $secret = null);

@@ -10,7 +10,7 @@
 namespace Kkokk\Poster\Captcha;
 
 use Kkokk\Poster\Cache\AbstractAdapter;
-use Kkokk\Poster\Captcha\Generators\CaptchaGenerator;
+use Kkokk\Poster\Captcha\Strategies\CaptchaStrategy;
 use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 
 class CaptchaManager
@@ -37,7 +37,7 @@ class CaptchaManager
      * Date: 2023/3/29
      * Time: 14:58
      * @param null $name
-     * @return CaptchaGenerator
+     * @return CaptchaStrategy|CaptchaStrategyInterface
      */
     public function type($name = null)
     {
@@ -50,7 +50,7 @@ class CaptchaManager
         return $this->channels[$name];
     }
 
-    public function driver($driver = null)
+    public function extension($driver = null)
     {
         if ($driver) {
             $this->defaultDriver = $driver;

@@ -8,6 +8,7 @@
 namespace Kkokk\Poster\Image\Graphics;
 
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
+use Kkokk\Poster\Image\Imagick\Canvas;
 use Kkokk\Poster\Image\Imagick\Image;
 use Kkokk\Poster\Image\Traits\ImagickTrait;
 
@@ -298,6 +299,80 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         $this->destroyImage($maskImage->getImage());
         $this->destroyImage($imageClone);
         return $this;
+    }
+
+    public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
+    {
+        $croppedImage = new Canvas($width, $height);
+        $draw = $this->createImagickDraw();
+        for ($i = 0; $i < $this->getWidth(); $i++) {
+            for ($j = 0; $j < $this->getHeight(); $j++) {
+                $shouldProcessPixel = is_null($crossCondition) || $crossCondition([$i, $j]);
+                if ($shouldProcessPixel) {
+                    // 获取颜色
+                    $pixel = $this->image->getImagePixelColor($i, $j);
+                    $draw->setFillColor($pixel);
+                    $draw->point($i - $x1, $j - $y1);
+                }
+            }
+        }
+        $croppedImage->getImage()->drawImage($draw);
+        $this->destroyImage($draw);
+        return $croppedImage;
+    }
+
+    public function drawImagePolygon($points, $color, $thickness = 1)
+    {
+        $draw = $this->createImagickDraw();
+        // 颜色
+        $draw->setStrokeColor($this->createColor($color));
+        // 线条宽度
+        $draw->setStrokeWidth($thickness);
+        // 不填充
+        $draw->setFillColor($this->createColor('none'));
+        $imagickPoints = $this->pointsToImagick($points);
+        // 画线
+        $draw->polyline($imagickPoints);
+        // 闭合多边形
+        if ($imagickPoints[0] !== end($imagickPoints)) {
+            $draw->line($imagickPoints[count($imagickPoints) - 1]['x'], $imagickPoints[count($imagickPoints) - 1]['y'],
+                $imagickPoints[0]['x'], $imagickPoints[0]['y']);
+        }
+        // 应用到图像
+        $this->image->drawImage($draw);
+        $this->destroyImage($draw);
+        return $this;
+    }
+
+    public function drawImageFilledPolygon($points, $color)
+    {
+        $imagickPoints = $this->pointsToImagick($points);
+        $draw = $this->createImagickDraw();
+        // 设置填充颜色
+        $draw->setFillColor($this->createColor($color));
+        // 绘制填充多边形
+        $draw->polygon($imagickPoints);
+        // 将绘制内容应用到图像
+        $this->image->drawImage($draw);
+        $this->destroyImage($draw);
+        return $this;
+    }
+
+    /**
+     * 转换 GD 格式数组为 Imagick 格式
+     * User: lang
+     * Date: 2025/4/2
+     * Time: 10:43
+     * @param $points
+     * @return array
+     */
+    protected function pointsToImagick($points)
+    {
+        $imagickPoints = [];
+        for ($i = 0; $i < count($points); $i += 2) {
+            $imagickPoints[] = ['x' => $points[$i], 'y' => $points[$i + 1]];
+        }
+        return $imagickPoints;
     }
 
     public function __destruct()
