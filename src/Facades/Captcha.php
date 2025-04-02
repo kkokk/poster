@@ -8,7 +8,7 @@
 
 namespace Kkokk\Poster\Facades;
 
-use Kkokk\Poster\Cache\AbstractAdapter;
+use Kkokk\Poster\Cache\AbstractCacheAdapter;
 use Kkokk\Poster\Captcha\CaptchaGeneratorInterface;
 use Kkokk\Poster\Captcha\CaptchaManager;
 use Kkokk\Poster\Captcha\Strategies\CaptchaStrategy;
@@ -16,7 +16,7 @@ use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 
 /**
  * @method static CaptchaManager extension(string $driver = null)
- * @method static CaptchaManager setCache(AbstractAdapter $cacheAdapter)
+ * @method static CaptchaManager setCache(AbstractCacheAdapter $cacheAdapter)
  * @method static CaptchaStrategy|CaptchaStrategyInterface type(string $channel = null)
  * @method static CaptchaStrategyInterface config($params = [])
  * @method static CaptchaGeneratorInterface check($key, $value, $leeway = 0, $secret = null)

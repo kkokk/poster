@@ -9,7 +9,7 @@ namespace Kkokk\Poster\Cache;
 
 use Kkokk\Poster\Exception\PosterException;
 
-class MemcacheAdapter extends AbstractAdapter
+class MemcacheCacheAdapter extends AbstractCacheAdapter
 {
     /**
      * @var \Memcache

@@ -9,7 +9,7 @@
 
 namespace Kkokk\Poster\Captcha;
 
-use Kkokk\Poster\Cache\AbstractAdapter;
+use Kkokk\Poster\Cache\AbstractCacheAdapter;
 use Kkokk\Poster\Captcha\Strategies\CaptchaStrategy;
 use Kkokk\Poster\Captcha\Strategies\CaptchaStrategyInterface;
 
@@ -22,7 +22,7 @@ class CaptchaManager
     protected $defaultDriver = 'gd';
 
     /**
-     * @var AbstractAdapter
+     * @var AbstractCacheAdapter
      */
     protected $cacheAdapter = null;
 
@@ -58,7 +58,7 @@ class CaptchaManager
         return $this;
     }
 
-    public function setCache(AbstractAdapter $cacheAdapter)
+    public function setCache(AbstractCacheAdapter $cacheAdapter)
     {
         $this->cacheAdapter = $cacheAdapter;
         return $this;

@@ -7,7 +7,7 @@
 
 namespace Kkokk\Poster\Cache;
 
-class SessionAdapter extends AbstractAdapter
+class SessionCacheAdapter extends AbstractCacheAdapter
 {
     protected $session;
 

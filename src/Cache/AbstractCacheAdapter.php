@@ -7,7 +7,7 @@
 
 namespace Kkokk\Poster\Cache;
 
-abstract class AbstractAdapter implements CacheInterface
+abstract class AbstractCacheAdapter implements CacheInterface
 {
     public function configure()
     {

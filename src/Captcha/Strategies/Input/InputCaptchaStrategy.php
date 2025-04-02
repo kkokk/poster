@@ -25,4 +25,9 @@ class InputCaptchaStrategy extends CaptchaStrategy
         'line_count'  => 5,  // 干扰线数量
         'char_count'  => 10,  // 干扰字符数量
     ];
+
+    protected function drawCharFontSize()
+    {
+        return round($this->configs['font_size'] / 1.5);
+    }
 }
