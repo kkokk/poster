@@ -11,38 +11,25 @@ namespace Kkokk\Poster\Captcha\Traits;
 
 trait ClickTrait
 {
-    public function draw()
+    protected function draw()
     {
-        $im_width = $this->configs['im_width'];
-        $im_height = $this->configs['im_height'];
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_height'];
+        $imageWidth = $this->configs['im_width'];
+        $imageHeight = $this->configs['im_height'];
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_height'];
 
-        $this->im = $this->PosterDriver->createIm($bg_width, $bg_height, [], true);
-        $bg = $this->PosterDriver->createIm($im_width, $im_height, [], true);
+        $this->driver->Im($imageWidth, $imageHeight, [], true);
+        $bgImage = $this->configs['src'] ?: $this->getBackgroundImage();
+        $this->driver->CopyImage($bgImage, 0, 0, 0, 0, $bgWidth, $bgHeight);
 
-        $this->drawImage($this->configs['src'], true);
+        $this->drawLine($bgWidth, $bgHeight); // 干扰线
 
-        imagecopy($bg, $this->im, 0, 0, 0, 0, $bg_width, $bg_height);
+        $this->drawChar($bgWidth, $bgHeight); // 干扰字符
 
-        $this->im = $bg;
-
-        $this->drawLine($bg_width, $bg_height); // 干扰线
-
-        $this->drawChar($bg_width, $bg_height); // 干扰字符
-
-        $data = $this->drawText(); // 字
-
-        return $data;
+        return $this->drawText(); // 字
     }
 
-    // 计算 三个点的叉乘 |p1 p2| X |p1 p| = (p2.x - p1.x) * (p.y - p1.y) -(p.x - p1.x) * (p2.y - p1.y)
-    public function getCross($p1, $p2, $p)
-    {
-        return ($p1[0] - $p[0]) * ($p2[1] - $p[1]) - ($p2[0] - $p[0]) * ($p1[1] - $p[1]);
-    }
-
-    public function getContents($contentsLen)
+    protected function getContents($contentsLen)
     {
         $contents = [];
         if ($this->configs['contents']) {
@@ -58,52 +45,52 @@ trait ClickTrait
         return $contents;
     }
 
-    public function getSpace($contentsLen)
+    protected function getSpace($contentsLen)
     {
-        $font = $this->configs['font_size'] + 15;
-        $bg_width = $this->configs['bg_width'];
-        $bg_height = $this->configs['bg_width'];
+        $fontSize = $this->configs['font_size'] + 15;
+        $bgWidth = $this->configs['bg_width'];
+        $bgHeight = $this->configs['bg_width'];
         switch ($contentsLen) {
             case 2:
                 $space[] = [
-                    mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($font, $bg_height - $font / 2 - 12),
+                    mt_rand($fontSize, round($bgWidth / 2 - $fontSize)),
+                    mt_rand($fontSize, round($bgHeight - $fontSize / 2 - 12)),
                 ];
                 $space[] = [
-                    mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($font, $bg_height - $font / 2 - 12),
+                    mt_rand(round($bgWidth / 2), $bgWidth - $fontSize),
+                    mt_rand($fontSize, round($bgHeight - $fontSize / 2 - 12)),
                 ];
                 break;
             case 3:
                 $space[] = [
-                    mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($font, $bg_height / 2),
+                    mt_rand($fontSize, round($bgWidth / 2 - $fontSize)),
+                    mt_rand($fontSize, round($bgHeight / 2)),
                 ];
                 $space[] = [
-                    mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($font, $bg_height / 2),
+                    mt_rand(round($bgWidth / 2), $bgWidth - $fontSize),
+                    mt_rand($fontSize, round($bgHeight / 2)),
                 ];
                 $space[] = [
-                    mt_rand($font, $bg_width - $font),
-                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
+                    mt_rand($fontSize, $bgWidth - $fontSize),
+                    mt_rand(round($bgHeight / 2 + $fontSize), round($bgHeight - $fontSize / 2 - 12)),
                 ];
                 break;
             default:
                 $space[] = [
-                    mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($font, $bg_height / 2),
+                    mt_rand($fontSize, round($bgWidth / 2 - $fontSize)),
+                    mt_rand($fontSize, round($bgHeight / 2)),
                 ];
                 $space[] = [
-                    mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($font, $bg_height / 2),
+                    mt_rand(round($bgWidth / 2), $bgWidth - $fontSize),
+                    mt_rand($fontSize, round($bgHeight / 2)),
                 ];
                 $space[] = [
-                    mt_rand($font, $bg_width / 2 - $font),
-                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
+                    mt_rand($fontSize, round($bgWidth / 2 - $fontSize)),
+                    mt_rand(round($bgHeight / 2 + $fontSize), round($bgHeight - $fontSize / 2 - 12)),
                 ];
                 $space[] = [
-                    mt_rand($bg_width / 2, $bg_width - $font),
-                    mt_rand($bg_height / 2 + $font, $bg_height - $font / 2 - 12),
+                    mt_rand(round($bgWidth / 2), $bgWidth - $fontSize),
+                    mt_rand(round($bgHeight / 2 + $fontSize), round($bgHeight - $fontSize / 2 - 12)),
                 ];
                 break;
         }
@@ -113,15 +100,13 @@ trait ClickTrait
 
     public function drawText()
     {
-        $font_family = $this->configs['font_family'];
-        $font = $this->configs['font_size'];
+        $font = $this->configs['font_family'];
+        $fontSize = $this->configs['font_size'];
 
         $contentsLen = $this->configs['font_count'] ?: mt_rand(2, 4);
         $contentsLen = $contentsLen < 2 ? 2 : ($contentsLen > 4 ? 4 : $contentsLen);
 
         $contents = $this->getContents($contentsLen);
-
-        $color = $this->PosterDriver->createColor($this->im, [255, 255, 255, 1]);
 
         $spaces = $this->getSpace($contentsLen);
 
@@ -133,7 +118,12 @@ trait ClickTrait
             $spaceKey = mt_rand(0, count($spaces) - 1);
             $space = array_splice($spaces, $spaceKey, 1);
             $angle = mt_rand(-80, 80);                                            // 旋转角度
-            $fontBox = imagettfbbox($font, $angle, $font_family, $v['contents']); // 计算文字方框坐标
+            $fontBox = $this->driver->getCanvas()->imageFontBox(
+                $v['contents'],
+                $fontSize,
+                $font,
+                $angle
+            );                                                                    // 计算文字方框坐标
             $x = $space[0][0];                                                    // 起始x坐标
             $y = $space[0][1];                                                    // 起始y坐标
             $contents[$k]['point'] = [
@@ -147,25 +137,32 @@ trait ClickTrait
                 $y + $fontBox[7], // 左上角，Y 位置
                 $angle, // 旋转角度
             ];
-            imagettftext($this->im, $font, $angle, $x, $y, $color, $font_family, $v['contents']);
+            $this->driver->CopyText($v['contents'], $x, $y, $fontSize, [255, 255, 255, 1], null, $font, null, null,
+                $angle);
             // 加粗字体
             $ttfCount = 6;
             for ($j = 1; $j <= $ttfCount; $j++) {
                 // 随机颜色
-                $ttfColor = $this->PosterDriver->createColor($this->im,
-                    [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1]);
-                imagettftext($this->im, $font - ($j * 2), $angle, $x + $j, $y - $j, $ttfColor, $font_family,
-                    $v['contents']);
+                $ttfColor = [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1];
+                $this->driver->CopyText($v['contents'], $x + $j, $y - $j, $fontSize - ($j * 2), $ttfColor, null, $font,
+                    null, null, $angle);
             }
         }
 
-        // 显示字体为黑色
-        $color = $this->PosterDriver->createColor($this->im, [0, 0, 0, 1]);
+        // 显示字体大小
+        $viewFont = 22;
+        // 计算文字长宽
+        $fontBox = $this->driver->getCanvas()->imageFontBox(
+            $content,
+            $viewFont,
+            $font
+        );
+        // 显示字体y坐标
+        $viewHeight = 296;
 
-        $viewFont = 22;                                                // 显示字体大小
-        $fontBox = imagettfbbox($viewFont, 0, $font_family, $content); // 计算文字长宽
-        $viewHeight = 296;                                             // 显示字体y坐标
-        imagettftext($this->im, $viewFont, 0, 10, $viewHeight, $color, $font_family, $content);
+        $text = $this->driver->newText();
+        $text->setText($content)->setFont($font)->setFontColor([0, 0, 0, 1])->setFontSize($viewFont);
+        $this->driver->getCanvas()->addText($text, 10, $viewHeight);
 
         $content_height = abs($fontBox[7]) + 1;
         return [
@@ -179,9 +176,10 @@ trait ClickTrait
 
     }
 
-    protected function getImBg()
+    protected function getBackgroundImage()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'style' . DIRECTORY_SEPARATOR . 'rotate_bg' . DIRECTORY_SEPARATOR . 'rotate0' . mt_rand(1,
-                5) . '.jpg';
+        return POSTER_BASE_PATH . DIRECTORY_SEPARATOR . 'style' .
+            DIRECTORY_SEPARATOR . 'rotate_bg' .
+            DIRECTORY_SEPARATOR . 'rotate0' . mt_rand(1, 5) . '.jpg';
     }
 }

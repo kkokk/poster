@@ -163,42 +163,22 @@ trait ImagickTrait
     }
 
     /**
-     * 获取颜色值，可设置透明度
-     */
-    protected function createColorAlpha($rgba = [255, 255, 255, 127])
-    {
-
-        if (empty($rgba)) {
-            $rgba = [255, 255, 255, 127];
-        }
-        if (count($rgba) != 4) {
-            throw new PosterException('The length of the rgba parameter is 4');
-        }
-        foreach ($rgba as $k => $value) {
-            if (!is_int($rgba[$k])) {
-                throw new PosterException('The value must be an integer');
-            } elseif ($k < 3 && ($rgba[$k] > 255 || $rgba[$k] < 0)) {
-                throw new PosterException('The color value is between 0-255');
-            } elseif ($k == 3 && ($rgba[$k] > 127 || $rgba[$k] < 0)) {
-                throw new PosterException('The alpha value is between 0-127');
-            }
-        }
-        $rgba[3] = sprintf("%.2f", (128 - $rgba[3]) / 127);
-
-        return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
-    }
-
-    /**
      * 获取颜色值
      */
     protected function createColor($rgba = [255, 255, 255])
     {
+        if (is_string($rgba)) {
+            return new \ImagickPixel($rgba);
+        }
+
         if (empty($rgba)) {
             $rgba = [255, 255, 255];
         }
+
         if (!is_array($rgba)) {
             $rgba = parse_color($rgba);
         }
+
         if (isset($rgba[3]) && !is_null($rgba[3])) {
             $rgba[3] = round(floor((128 - $rgba[3]) / 127 * 100) / 100, 2);
             return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
@@ -446,5 +426,65 @@ trait ImagickTrait
     {
         $calculateTextBox = $this->calculateTextBox($text, $fontSize, $font ?: $this->font, $angle);
         return $calculateTextBox['height'];
+    }
+
+    function imageFontBox($text, $fontSize, $font, $angle = 0)
+    {
+        $draw = $this->createTextImagickDraw();
+        // 设置字体和大小
+        $draw->setFontSize($fontSize);
+        $draw->setFont($font);
+        // 获取字体度量信息
+        $metrics = $this->createImagick()->queryFontMetrics($draw, $text);
+
+        // 计算坐标点（模拟 imagettfbbox）
+        $xMin = 0;
+        $yMin = -$metrics['ascender']; // 基线以上
+        $xMax = $metrics['textWidth'];
+        $yMax = abs($metrics['descender']); // 下降部分为负数，取绝对值
+
+        // 旋转坐标（如果有角度）
+        if ($angle != 0) {
+            $rad = deg2rad($angle);
+            $cos = cos($rad);
+            $sin = sin($rad);
+
+            $points = [
+                [$xMin, $yMin], // 左上
+                [$xMax, $yMin], // 右上
+                [$xMax, $yMax], // 右下
+                [$xMin, $yMax]  // 左下
+            ];
+
+            $rotatedPoints = [];
+            foreach ($points as list($x, $y)) {
+                $rx = $x * $cos - $y * $sin;
+                $ry = $x * $sin + $y * $cos;
+                $rotatedPoints[] = [$rx, $ry];
+            }
+
+            return [
+                round($rotatedPoints[3][0]),
+                round($rotatedPoints[3][1]), // 左下
+                round($rotatedPoints[2][0]),
+                round($rotatedPoints[2][1]), // 右下
+                round($rotatedPoints[1][0]),
+                round($rotatedPoints[1][1]), // 右上
+                round($rotatedPoints[0][0]),
+                round($rotatedPoints[0][1]), // 左上
+            ];
+        }
+
+        // 未旋转时，直接返回
+        return [
+            round($xMin),
+            round($yMax), // 左下
+            round($xMax),
+            round($yMax), // 右下
+            round($xMax),
+            round($yMin), // 右上
+            round($xMin),
+            round($yMin)  // 左上
+        ];
     }
 }

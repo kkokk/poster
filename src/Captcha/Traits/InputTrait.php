@@ -46,7 +46,7 @@ trait InputTrait
                 $color = [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1];
                 $content = $v;
                 $x = mt_rand($k * $equally + 10, ($k + 1) * $equally - $fontSize);
-                $y = mt_rand($fontSize + 10, $imageHeight);
+                $y = mt_rand($fontSize, $imageHeight - 10);
                 $angle = $this->configs['type'] === 'math' ? 0 : mt_rand(0, 45);
                 $this->driver->CopyText($content, $x, $y, $fontSize, $color, null, $font, null, null, $angle);
             }
@@ -57,7 +57,7 @@ trait InputTrait
                 $color = [mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255), 1];
                 $content = mb_substr($contents, $i, 1);
                 $x = mt_rand($i * $equally + 10, ($i + 1) * $equally - $fontSize);
-                $y = mt_rand($fontSize + 10, $imageHeight);
+                $y = mt_rand($fontSize, $imageHeight - 10);
                 $angle = mt_rand(0, 45);
                 $this->driver->CopyText($content, $x, $y, $fontSize, $color, null, $font, null, null, $angle);
             }

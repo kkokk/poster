@@ -9,17 +9,17 @@ namespace Kkokk\Poster\Cache;
 
 use Kkokk\Poster\Exception\PosterException;
 
-class RedisAdapter extends AbstractAdapter
+class PredisCacheAdapter extends AbstractCacheAdapter
 {
     /**
-     * @var \Redis
+     * @var \Predis\Client
      */
     protected $redis;
 
     public function __construct($redis)
     {
-        if (!$redis instanceof \Redis) {
-            throw new PosterException('Expected an instance of Redis');
+        if (!$redis instanceof \Predis\Client) {
+            throw new PosterException('Expected an instance of \Predis\Client');
         }
         $this->redis = $redis;
     }
@@ -27,7 +27,7 @@ class RedisAdapter extends AbstractAdapter
     public function get($key, $default = null)
     {
         $value = $this->redis->get($key);
-        return $value !== false ? $value : $default;
+        return $value !== null ? $value : $default;
     }
 
     public function pull($key, $default = null)

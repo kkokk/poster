@@ -15,7 +15,6 @@ use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 trait GdTrait
 {
-
     /**
      * 返回图片流或者图片
      * User: lang
@@ -752,6 +751,11 @@ trait GdTrait
         }
 
         return $image;
+    }
+
+    public function imageFontBox($text, $fontSize, $font, $angle = 0)
+    {
+        return imagettfbbox($fontSize, $angle, $font, $text);
     }
 
     public function calculateTextBox($text, $fontSize, $font, $angle)

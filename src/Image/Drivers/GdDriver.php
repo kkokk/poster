@@ -178,7 +178,7 @@ class GdDriver extends Driver implements DriverInterface
         $space = null,
         $angle = null
     ) {
-        if (empty($content)) {
+        if (empty($content) && $content != 0) {
             return;
         }
 
@@ -228,6 +228,10 @@ class GdDriver extends Driver implements DriverInterface
             case 'filled_rectangle':
             case 'filledRectangle':
                 imagerectangle($this->canvas->getImage(), $x1, $y1, $x2, $y2, $color);
+                imagefilledrectangle($this->canvas->getImage(), $x1, $y1, $x2, $y2, $color);
+                break;
+            case 'only_filled_rectangle':
+            case 'onlyFilledRectangle':
                 imagefilledrectangle($this->canvas->getImage(), $x1, $y1, $x2, $y2, $color);
                 break;
             default:
@@ -326,5 +330,20 @@ class GdDriver extends Driver implements DriverInterface
     public function newCanvas($width, $height, $background = [])
     {
         return new Canvas($width, $height, $background);
+    }
+
+    public function newImage($src)
+    {
+        return new Image($src);
+    }
+
+    public function newImageText()
+    {
+        return new ImageText();
+    }
+
+    public function newText()
+    {
+        return new Text();
     }
 }

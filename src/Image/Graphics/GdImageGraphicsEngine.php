@@ -7,6 +7,7 @@
 
 namespace Kkokk\Poster\Image\Graphics;
 
+use Kkokk\Poster\Image\Gd\Canvas;
 use Kkokk\Poster\Image\Gd\Image;
 use Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface;
 use Kkokk\Poster\Image\Traits\GdTrait;
@@ -302,7 +303,44 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
-    public function crossProduct(){}
+    public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
+    {
+        $croppedImage = new Canvas($width, $height, []);
+        for ($i = 0; $i < $this->getWidth(); $i++) {
+            for ($j = 0; $j < $this->getHeight(); $j++) {
+                $shouldProcessPixel = is_null($crossCondition) || $crossCondition([$i, $j]);
+                if ($shouldProcessPixel) {
+                    // 获取颜色
+                    $rgbColor = imagecolorat($this->image, $i, $j);
+                    imagesetpixel($croppedImage->getImage(), $i - $x1, $j - $y1, $rgbColor); // 抠图
+                }
+            }
+        }
+        return $croppedImage;
+    }
+
+    public function drawImagePolygon($points, $color, $thickness = 1)
+    {
+        $borderColor = $this->createColor($this->image, $color);
+        imagesetthickness($this->image, $thickness); // 划线的线宽加粗
+        if (version_compare(PHP_VERSION, '8.1.0') === -1) {
+            imagepolygon($this->image, $points, count($points) / 2, $borderColor);
+        } else {
+            imagepolygon($this->image, $points, $borderColor);
+        }
+        return $this;
+    }
+
+    public function drawImageFilledPolygon($points, $color)
+    {
+        $bgColor = $this->createColor($this->image, $color);
+        if (version_compare(PHP_VERSION, '8.1.0') === -1) {
+            imagefilledpolygon($this->image, $points, count($points) / 2, $bgColor);
+        } else {
+            imagefilledpolygon($this->image, $points, $bgColor);
+        }
+        return $this;
+    }
 
     public function __destruct()
     {

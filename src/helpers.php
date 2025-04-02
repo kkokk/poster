@@ -40,9 +40,7 @@ if (!function_exists('gd_image_save')) {
         if (in_array($type, \Kkokk\Poster\Image\Enums\ImageType::setQuantityTypes())) {
             return $imageType[$type]($image, $outputPath, $quality);
         }
-        $result = $imageType[$type]($image, $outputPath);
-        !is_resource($image) || imagedestroy($image);
-        return $result;
+        return $imageType[$type]($image, $outputPath);
     }
 }
 
@@ -480,7 +478,6 @@ if (!function_exists('base64_data')) {
             $data = ob_get_contents();
             ob_end_clean();
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-            imagedestroy($image);
         } elseif (is_string($image)) {
             $baseData = 'data:image/' . $type . ';base64,' . base64_encode($image);
         }

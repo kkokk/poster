@@ -39,7 +39,7 @@ class Image extends ImagickImageGraphicsEngine
 
         // 合成裁剪区域
         $croppedImage->compositeImage($this->image, ($this->image)::COMPOSITE_DEFAULT, -$offsetX, -$offsetY);
-
+        $this->destroyImage();
         // 更新图像资源
         $this->image = $croppedImage;
         return $this;

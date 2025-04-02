@@ -8,12 +8,12 @@
 
 namespace Kkokk\Poster\Facades;
 
-use Kkokk\Poster\Cache\AbstractAdapter;
+use Kkokk\Poster\Cache\AbstractCacheAdapter;
 use Kkokk\Poster\Cache\CacheRepository;
 
 /**
  * User: lang
- * @method static setAdapter(AbstractAdapter $adapter)
+ * @method static setAdapter(AbstractCacheAdapter $adapter)
  * @method static put($key, $default = null, $ttl = 0)
  * @method static get($key, $default = null)
  * @method static pull($key, $default = null)

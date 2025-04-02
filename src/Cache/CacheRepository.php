@@ -27,22 +27,22 @@ use think\facade\Cache as ThinkCache6;
 class CacheRepository
 {
     /**
-     * @var \Kkokk\Poster\Cache\AbstractAdapter|null
+     * @var \Kkokk\Poster\Cache\AbstractCacheAdapter|null
      */
     protected $adapter = null;
 
     public function __construct($adapter = null)
     {
-        if (!$adapter instanceof AbstractAdapter && $adapter !== null) {
-            throw new PosterException('Expected an instance of AbstractAdapter');
+        if (!$adapter instanceof AbstractCacheAdapter && $adapter !== null) {
+            throw new PosterException('Expected an instance of AbstractCacheAdapter');
         }
         $this->adapter = $adapter;
     }
 
     public function setAdapter($adapter)
     {
-        if (!$adapter instanceof AbstractAdapter) {
-            throw new PosterException('Expected an instance of AbstractAdapter');
+        if (!$adapter instanceof AbstractCacheAdapter) {
+            throw new PosterException('Expected an instance of AbstractCacheAdapter');
         }
         $this->adapter = $adapter;
         return $this;

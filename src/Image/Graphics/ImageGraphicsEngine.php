@@ -48,13 +48,13 @@ class ImageGraphicsEngine
     /**
      * @var int jpeg | webp 图片质量 0 - 100 默认75
      */
-    protected $quantity = 75;
+    protected $quality = 75;
 
     public function config($configs = [])
     {
         !empty($configs['path']) && $this->setFilePath($configs['path']);
         !empty($configs['type']) && $this->setType($configs['type']);
-        !empty($configs['quantity']) && $this->setQuantity($configs['quantity']);
+        !empty($configs['quality']) && $this->setQuantity($configs['quality']);
         return $this;
     }
 
@@ -141,9 +141,9 @@ class ImageGraphicsEngine
         }
     }
 
-    public function setQuantity($quantity)
+    public function setQuantity($quality)
     {
-        $this->quantity = $quantity;
+        $this->quality = $quality;
     }
 
     /**
@@ -193,6 +193,6 @@ class ImageGraphicsEngine
 
     public function getQuantity()
     {
-        return $this->quantity;
+        return $this->quality;
     }
 }
