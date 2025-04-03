@@ -354,8 +354,9 @@ trait ImagickTrait
         }
 
         $mask->drawImage($draw);
-        $pic->compositeImage($mask, ($this->image)::COMPOSITE_DSTIN, 0, 0);
-
+        $this->destroyImage($draw);
+        $pic->compositeImage($mask, ($pic)::COMPOSITE_COPYOPACITY, 0, 0);
+        $this->destroyImage($mask);
         return $pic;
     }
 

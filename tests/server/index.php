@@ -21,69 +21,79 @@ $file = 'C:\\\\\\\\///Users\\\////32822\Pictures////\\\\\\\\\\' . '朝天门.jpg
 
 // $file = 'https://img2.baidu.com/it/u=1310029438,409566289&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1541';
 
-// $imageText = (new ImagickImageText())
-//     ->setMaxWidth(300)
-//     ->setFontAlign('left')
-//     ->addText((new ImagickText())
-//         ->setText("床前明月光，")
-//         ->setFontSize(16)
-//         ->setFontColor('#000000')
-//     )
-//     ->addText((new ImagickText())
-//         ->setText("疑似地上霜。")
-//         ->setFontSize(22)
-//         ->setFontColor('#00ff00')
-//     )
-//     ->addText((new ImagickText())
-//         ->setText("举头望明月，")
-//         ->setFontSize(12)
-//         ->setFontColor('#0000ff')
-//     )
-//     ->addText((new ImagickText())
-//         ->setText("低头思故乡。")
-//         ->setFontSize(28)
-//         ->setFontColor('#ff0000')
-//         ->setLineHeight(40)
-//     )
-//     ->addImage((new ImagickImage($file))->scale(50, 30))
-//     ->addText((new ImagickText())
-//         ->setText("图")
-//         ->setFontSize(28)
-//         ->setFontColor('#ff0000')
-//     );
-
-$imageText = (new GdImageText())
+$imageText = (new ImagickImageText())
     ->setMaxWidth(300)
     ->setFontAlign('left')
-    ->addText((new GdText())
+    ->addText((new ImagickText())
         ->setText("床前明月光，")
         ->setFontSize(16)
         ->setFontColor('#000000')
     )
-    ->addText((new GdText())
+    ->addText((new ImagickText())
         ->setText("疑似地上霜。")
         ->setFontSize(22)
         ->setFontColor('#00ff00')
     )
-    ->addText((new GdText())
+    ->addText((new ImagickText())
         ->setText("举头望明月，")
         ->setFontSize(12)
         ->setFontColor('#0000ff')
     )
-    ->addText((new GdText())
+    ->addText((new ImagickText())
         ->setText("低头思故乡。")
         ->setFontSize(28)
         ->setFontColor('#ff0000')
         ->setLineHeight(40)
     )
-    ->addImage((new GdImage($file))->scale(50, 30))
-    ->addText((new GdText())
-        ->setText("图")
+    ->addImage((new ImagickImage($file))->scale(50, 30))
+    ->addText((new ImagickText())
+        ->setText("这")
         ->setFontSize(28)
+        ->setFontColor('#ff0000')
+    )
+    ->addText((new ImagickText())
+        ->setText("是")
+        ->setFontSize(16)
+        ->setFontColor('#0000ff')
+    )
+    ->addText((new ImagickText())
+        ->setText("图")
+        ->setFontSize(22)
         ->setFontColor('#ff0000')
     );
 
-$canvas = Poster::extension('gd')
+// $imageText = (new GdImageText())
+//     ->setMaxWidth(300)
+//     ->setFontAlign('left')
+//     ->addText((new GdText())
+//         ->setText("床前明月光，")
+//         ->setFontSize(16)
+//         ->setFontColor('#000000')
+//     )
+//     ->addText((new GdText())
+//         ->setText("疑似地上霜。")
+//         ->setFontSize(22)
+//         ->setFontColor('#00ff00')
+//     )
+//     ->addText((new GdText())
+//         ->setText("举头望明月，")
+//         ->setFontSize(12)
+//         ->setFontColor('#0000ff')
+//     )
+//     ->addText((new GdText())
+//         ->setText("低头思故乡。")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//         ->setLineHeight(40)
+//     )
+//     ->addImage((new GdImage($file))->scale(50, 30))
+//     ->addText((new GdText())
+//         ->setText("图")
+//         ->setFontSize(28)
+//         ->setFontColor('#ff0000')
+//     );
+
+$canvas = Poster::extension('imagick')
     ->config(['type' => 'png'])
     // ->buildImDst($file)
     ->buildBg(638, 826, [
@@ -101,13 +111,12 @@ $canvas = Poster::extension('gd')
         'radius' => '40',
     ], true, 'center', 'center', 0, 0,
         function (\Kkokk\Poster\Image\Builder $builder) {
-            $builder->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
-            $builder->buildArc(100, 100, 100, 100, 0, 180, [0, 0, 0, 1]);
-            $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年。', 10, 200, 28,
-                [0, 0, 0], 0, '', 6, 10);
-            $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年。', 10, 40);
-            $builder->buildQr('http://www.520yummy.com/poster-doc/guide/', 'center', 'center');
+            // $builder->buildLine(10, 100, 100, 100, [0, 0, 0, 1]);
+            // $builder->buildArc(100, 100, 100, 100, 0, 180, [0, 0, 0, 1]);
+            // $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年。', 10, 200, 28,
+            //     [0, 0, 0], 0, '', 6, 10);
+            // $builder->buildText('明月几时有，把酒问青天，不知天上宫阙，今夕是何年。', 10, 40);
+            $builder->buildQr('http://www.520yummy.com/poster-doc/guide/v3/', 'center', 'center');
         })
-    ->buildText($imageText, 300, 300);
-// ->crop(0, 0, 500, 500)
+    ->buildText($imageText, 'center', 168);
 $canvas->stream();

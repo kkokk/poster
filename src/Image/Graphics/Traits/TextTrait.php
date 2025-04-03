@@ -100,7 +100,7 @@ trait TextTrait
         return [
             $lines,
             max(array_values($textWidths)),
-            array_sum($textHeights) - (($line + 1) * $this->getLineHeight()),
+            array_sum($textHeights),
             $textWidths
         ];
     }
