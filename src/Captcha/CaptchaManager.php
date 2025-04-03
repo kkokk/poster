@@ -50,6 +50,13 @@ class CaptchaManager
         return $this->channels[$name];
     }
 
+    /**
+     * User: lang
+     * Date: 2025/4/3
+     * Time: 9:10
+     * @param $driver
+     * @return CaptchaManager|CaptchaStrategy|CaptchaStrategyInterface
+     */
     public function extension($driver = null)
     {
         if ($driver) {
@@ -58,6 +65,13 @@ class CaptchaManager
         return $this;
     }
 
+    /**
+     * User: lang
+     * Date: 2025/4/3
+     * Time: 9:10
+     * @param $driver
+     * @return CaptchaManager|CaptchaStrategy|CaptchaStrategyInterface
+     */
     public function setCache(AbstractCacheAdapter $cacheAdapter)
     {
         $this->cacheAdapter = $cacheAdapter;
