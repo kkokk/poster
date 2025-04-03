@@ -275,14 +275,14 @@ if (!function_exists('calc_text_dst_y')) {
             ($y2 - $y1)
             : $imageHeight;
         if ($DstY === 'center') {
-            $DstY = ceil(max(0, ($currentImageHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight));
+            $DstY = ceil(max(0, ($currentImageHeight / 2) + ($fontBoxHeight / 2)));
         } elseif (is_array($DstY)) {
             $DstY[1] = isset($DstY[1]) ? $DstY[1] : 0;
             $y1 = $y1 !== null ? $y1 : 0;
             switch ($DstY[0]) {
                 case 'center':
                     $DstY = ceil(max(0,
-                            ($currentImageHeight / 2) + ($fontBoxHeight / 2) - $fontBoxHeight)) + $y1 + $DstY[1];
+                            ($currentImageHeight / 2) + ($fontBoxHeight / 2))) + $y1 + $DstY[1];
                     break;
                 case 'top': // 顶对齐 且 上下偏移
                     $DstY = $y1 + $DstY[1];
