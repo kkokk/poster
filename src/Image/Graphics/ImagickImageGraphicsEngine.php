@@ -301,6 +301,21 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this;
     }
 
+    /**
+     * 抠图
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:14
+     * @param               $x1
+     * @param               $y1
+     * @param               $width
+     * @param               $height
+     * @param \Closure|null $crossCondition
+     * @return \Kkokk\Poster\Image\Imagick\Canvas
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     */
     public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
     {
         $croppedImage = new Canvas($width, $height);
@@ -321,6 +336,19 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $croppedImage;
     }
 
+    /**
+     * 画线
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:14
+     * @param $points
+     * @param $color
+     * @param $thickness
+     * @return $this
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     */
     public function drawImagePolygon($points, $color, $thickness = 1)
     {
         $draw = $this->createImagickDraw();
@@ -344,6 +372,18 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $this;
     }
 
+    /**
+     * 画填充多边形
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:14
+     * @param $points
+     * @param $color
+     * @return $this
+     * @throws \ImagickDrawException
+     * @throws \ImagickException
+     */
     public function drawImageFilledPolygon($points, $color)
     {
         $imagickPoints = $this->pointsToImagick($points);

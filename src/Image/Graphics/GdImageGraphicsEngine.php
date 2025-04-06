@@ -303,6 +303,19 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 抠图
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:13
+     * @param               $x1
+     * @param               $y1
+     * @param               $width
+     * @param               $height
+     * @param \Closure|null $crossCondition
+     * @return \Kkokk\Poster\Image\Gd\Canvas
+     */
     public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
     {
         $croppedImage = new Canvas($width, $height, []);
@@ -319,6 +332,17 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $croppedImage;
     }
 
+    /**
+     * 画多边形
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:14
+     * @param $points
+     * @param $color
+     * @param $thickness
+     * @return $this
+     */
     public function drawImagePolygon($points, $color, $thickness = 1)
     {
         $borderColor = $this->createColor($this->image, $color);
@@ -331,6 +355,16 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 填充多边形
+     * author: lang
+     * email: 732853989@qq.com
+     * date: 2025/4/6
+     * time: 08:14
+     * @param $points
+     * @param $color
+     * @return $this
+     */
     public function drawImageFilledPolygon($points, $color)
     {
         $bgColor = $this->createColor($this->image, $color);
