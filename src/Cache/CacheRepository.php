@@ -55,25 +55,20 @@ class CacheRepository
             return call_user_func_array([$this->adapter, $method], $params);
         }
 
-        try {
-            // 兼容以前写法
-            if (class_exists(LaravelCache::class)) {
-                $connector = LaravelCache::class;
-            } elseif (class_exists(ThinkCache6::class)) {
-                $connector = ThinkCache6::class;
-                $method = str_replace('put', 'set', $method);
-            } elseif (class_exists(ThinkCache5::class)) {
-                $connector = ThinkCache5::class;
-                $method = str_replace('put', 'set', $method);
-            } else {
-                throw new PosterException('No cache driver');
-            }
-
-            return call_user_func_array([$connector, $method], $params);
-        } catch (\Exception $e) {
-            // 无法从缓存检查，返回false
-            return false;
+        // 兼容以前写法
+        if (class_exists(LaravelCache::class)) {
+            $connector = LaravelCache::class;
+        } elseif (class_exists(ThinkCache6::class)) {
+            $connector = ThinkCache6::class;
+            $method = str_replace('put', 'set', $method);
+        } elseif (class_exists(ThinkCache5::class)) {
+            $connector = ThinkCache5::class;
+            $method = str_replace('put', 'set', $method);
+        } else {
+            throw new PosterException('No cache driver');
         }
+
+        return call_user_func_array([$connector, $method], $params);
     }
 
 }
