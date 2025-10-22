@@ -71,6 +71,15 @@ class CaptchaStrategy
         return [$key, $baseData];
     }
 
+    protected function pull($key)
+    {
+        try {
+            return $this->cache->pull($key);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     protected function put($key, $value, $expire = 0)
     {
         try {

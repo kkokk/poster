@@ -21,7 +21,7 @@ class ClickCaptcha extends ClickCaptchaStrategy implements ClickCaptchaInterface
             throw new PosterException('Array format required');
         }
 
-        $contents = $this->cache->pull($key) ?: $secret;
+        $contents = $this->pull($key) ?: $secret;
 
         if (!$contents) {
             return false;

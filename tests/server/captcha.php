@@ -4,10 +4,24 @@
  * Date: 2023/8/25
  * Time: 10:15
  */
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 require '../../vendor/autoload.php';
 
 use Kkokk\Poster\Facades\Captcha;
+
+try {
+
+    $res = Captcha::extension('gd')->type('slider')
+        ->get();
+} catch (\Exception $e) {
+    echo($e->getMessage());
+}
+
+// var_dump($res);
+exit;
 
 $redis = new \Redis();
 $redis->connect('127.0.0.1');
