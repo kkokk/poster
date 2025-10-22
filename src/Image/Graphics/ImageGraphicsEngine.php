@@ -67,7 +67,7 @@ class ImageGraphicsEngine
      * @return void
      * @throws \Kkokk\Poster\Exception\PosterException
      */
-    public function setFilePath($path)
+    protected function setFilePath($path)
     {
         $path = is_array($path) ? $path : [$path];
         $pathFileName = isset($path[0]) ? $path[0] : '';
@@ -90,7 +90,7 @@ class ImageGraphicsEngine
      * @return void
      * @throws \Kkokk\Poster\Exception\PosterException
      */
-    public function setFileName($fileName)
+    protected function setFileName($fileName)
     {
         $this->filename = $fileName;
         if (strripos($this->filename, '.') !== false) {
@@ -109,7 +109,7 @@ class ImageGraphicsEngine
      * @param $pathFileName
      * @return void
      */
-    public function setPathName($pathFileName)
+    protected function setPathName($pathFileName)
     {
         $this->pathname = substr($pathFileName, 0, strripos($pathFileName, DIRECTORY_SEPARATOR));
     }
@@ -122,7 +122,7 @@ class ImageGraphicsEngine
      * @param $pathFileName
      * @return void
      */
-    public function setPath($pathFileName)
+    protected function setPath($pathFileName)
     {
         $this->path = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
         // 绝对路径 or 相对路径

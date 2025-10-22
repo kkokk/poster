@@ -16,7 +16,7 @@ class RotateCaptcha extends RotateCaptchaStrategy implements RotateCaptchaInterf
 
     public function check($key, $value, $leeway = 0, $secret = null)
     {
-        $x = $this->cache->pull($key) ?: $secret;
+        $x = $this->pull($key) ?: $secret;
 
         if (empty($x)) {
             return false;
