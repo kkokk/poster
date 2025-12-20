@@ -67,6 +67,7 @@ class CacheRepository
         } else {
             throw new PosterException('No cache driver');
         }
+
         return call_user_func_array([$connector, $method], $params);
     }
 
