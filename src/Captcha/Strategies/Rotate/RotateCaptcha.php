@@ -23,6 +23,7 @@ class RotateCaptcha extends RotateCaptchaStrategy implements RotateCaptchaInterf
         }
 
         $leeway = $leeway ?: $this->leeway;
+        $value = 360 - $value;
 
         return $x >= ($value - $leeway) && $x <= ($value + $leeway);
     }

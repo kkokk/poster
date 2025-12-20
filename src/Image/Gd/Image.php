@@ -23,7 +23,7 @@ class Image extends GdImageGraphicsEngine
             return $this;
         }
 
-        $rotatedImage = imagerotate($this->image, abs($angle % 360 - 360), $this->createColor($this->image, $bgColor));
+        $rotatedImage = imagerotate($this->image, -$angle, $this->createColor($this->image, $bgColor));
 
         // 获取旋转后图片的尺寸
         $rotatedWidth = imagesx($rotatedImage);
