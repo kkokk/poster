@@ -39,4 +39,3 @@ try {
  unlink($temporary); if (is_file($path)) unlink($path);
 }
 echo "Imagick transparent PNG export paths passed\n";
-
