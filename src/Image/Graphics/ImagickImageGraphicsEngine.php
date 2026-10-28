@@ -22,6 +22,20 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
 {
     use ImagickTrait;
 
+    protected function fitRaster($scaledWidth, $scaledHeight, $x, $y, $width, $height)
+    {
+        $output = clone $this->image;
+        $output->resizeImage($scaledWidth, $scaledHeight, \Imagick::FILTER_LANCZOS, 1);
+        if ($scaledWidth !== $width || $scaledHeight !== $height) {
+            $output->cropImage($width, $height, $x, $y);
+        }
+        // 裁剪后的虚拟画布偏移不能影响后续合成。
+        $output->setImagePage(0, 0, 0, 0);
+        $this->image = $output;
+        $this->width = $width; $this->height = $height;
+        return $this;
+    }
+
     /** @var int[] 默认 x y 分辨率 默认是 [72, 72] */
     protected $dpi = [];
 
@@ -83,7 +97,7 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
     public function getBaseData()
     {
         $this->setDPI();
-        return base64_data($this->image->getImageBlob(), $this->getType());
+        return base64_data($this->getBlob($this->image), $this->getType());
     }
 
     /**
@@ -293,6 +307,10 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         // 将蒙版和源图片的alpha通道相乘
         $maskImage->getImage()->compositeImage($imageClone, ($this->image)::COMPOSITE_MULTIPLY, 0, 0);
 
+        // COPYOPACITY须从灰度亮度读取，不能使用遮罩自带的不透明alpha通道。
+        $maskImage->getImage()->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OFF);
+
+        $this->image->setImageAlphaChannel(\Imagick::ALPHACHANNEL_ACTIVATE);
         $this->image->compositeImage($maskImage->getImage(), ($this->image)::COMPOSITE_COPYOPACITY, 0, 0);
 
         // 释放资源
@@ -318,7 +336,14 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
      */
     public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
     {
-        $croppedImage = new Canvas($width, $height);
+        // 未选中的区域保持透明，已选像素不再与白底合成。
+        $croppedImage = new Canvas($width, $height, []);
+        if ($crossCondition === null && is_int($x1) && is_int($y1)) {
+            // 无回调的整数平移可直接原生合成，避免为每个像素创建MVG指令。
+            // 有回调仍逐点读取：回调可能修改源图，不能预先快照或延后取色。
+            $croppedImage->getImage()->compositeImage($this->image, \Imagick::COMPOSITE_OVER, -$x1, -$y1);
+            return $croppedImage;
+        }
         $draw = $this->createImagickDraw();
         for ($i = 0; $i < $this->getWidth(); $i++) {
             for ($j = 0; $j < $this->getHeight(); $j++) {
@@ -415,6 +440,14 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
         return $imagickPoints;
     }
 
+    /** 显式复制底层图像，副本像素修改不会影响原图。 @return static */
+    public function copy()
+    {
+        if (empty($this->image)) {
+            throw new \Kkokk\Poster\Exception\PosterException('Cannot copy an empty image');
+        }
+        return clone $this;
+    }
     public function __destruct()
     {
         $this->destroyImage();

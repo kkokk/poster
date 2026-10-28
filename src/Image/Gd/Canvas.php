@@ -49,7 +49,7 @@ class Canvas extends GdImageGraphicsEngine
 
     public function background($color = [255, 255, 255, 127])
     {
-        $bgColor = $this->createColor($color);
+        $bgColor = $this->createColor($this->image, $color);
         imagefill($this->image, 0, 0, $bgColor);
         return $this;
     }

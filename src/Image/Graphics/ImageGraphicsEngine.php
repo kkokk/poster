@@ -50,6 +50,61 @@ class ImageGraphicsEngine
      */
     protected $quality = 75;
 
+    protected $remoteImageLoader;
+
+    /**
+     * 显式图片适配；contain不补边，cover的focus表示剩余裁剪距离比例。
+     * @param int $width
+     * @param int $height
+     * @param string $mode contain|cover|fill
+     * @param int|float $focusX 0左至1右
+     * @param int|float $focusY 0上至1下
+     * @return $this
+     * @throws PosterException
+     */
+    public function fit($width, $height, $mode = 'contain', $focusX = 0.5, $focusY = 0.5)
+    {
+        if (!is_int($width) || !is_int($height) || $width <= 0 || $height <= 0
+            || !in_array($mode, ['contain', 'cover', 'fill'], true)) {
+            throw new PosterException('Invalid image fitting dimensions or mode');
+        }
+        foreach ([$focusX, $focusY] as $focus) {
+            if ((!is_int($focus) && !is_float($focus)) || !is_finite((float) $focus) || $focus < 0 || $focus > 1) {
+                throw new PosterException('Image fitting focus must be between 0 and 1');
+            }
+        }
+        if ($this->width <= 0 || $this->height <= 0) throw new PosterException('Image fitting requires a non-empty image');
+        $scaledWidth = $width; $scaledHeight = $height;
+        if ($mode !== 'fill') {
+            $ratio = $mode === 'cover' ? max($width / $this->width, $height / $this->height)
+                : min($width / $this->width, $height / $this->height);
+            // cover向上取整以免留下空边，contain四舍五入并保证至少一像素。
+            $scaledWidth = max(1, $mode === 'cover' ? ceil($this->width * $ratio) : round($this->width * $ratio));
+            $scaledHeight = max(1, $mode === 'cover' ? ceil($this->height * $ratio) : round($this->height * $ratio));
+        }
+        if (!is_finite((float) $scaledWidth) || !is_finite((float) $scaledHeight)
+            || $scaledWidth >= PHP_INT_MAX || $scaledHeight >= PHP_INT_MAX) {
+            throw new PosterException('Image fitting dimensions exceed integer range');
+        }
+        $scaledWidth = (int) $scaledWidth; $scaledHeight = (int) $scaledHeight;
+        $outputWidth = $mode === 'cover' ? $width : $scaledWidth;
+        $outputHeight = $mode === 'cover' ? $height : $scaledHeight;
+        $x = (int) round(($scaledWidth - $outputWidth) * $focusX);
+        $y = (int) round(($scaledHeight - $outputHeight) * $focusY);
+        return $this->fitRaster($scaledWidth, $scaledHeight, $x, $y, $outputWidth, $outputHeight);
+    }
+
+    /** 在 readImage 前注入实例策略；不影响其他图片对象。 */
+    public function setRemoteImageLoader(\Kkokk\Poster\Image\Resources\RemoteImageLoader $loader)
+    {
+        $this->remoteImageLoader = $loader;
+        return $this;
+    }
+
+    protected function getRemoteImageLoader()
+    {
+        return $this->remoteImageLoader ?: new \Kkokk\Poster\Image\Resources\RemoteImageLoader();
+    }
     public function config($configs = [])
     {
         !empty($configs['path']) && $this->setFilePath($configs['path']);

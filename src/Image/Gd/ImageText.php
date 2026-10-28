@@ -41,7 +41,6 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
     public function draw(ImageGraphicsEngineInterface $canvas, $x = 0, $y = 0)
     {
         $characters = [];
-        $maxWidth = $this->getMaxWidth() ?: $canvas->getWidth();
         foreach ($this->contents as $content) {
             $textColor = null;
             if ($content instanceof TextGraphicsEngineInterface) {
@@ -50,43 +49,6 @@ class ImageText extends GdImageTextGraphicsEngine implements ImageTextInterface
             $characters = array_merge($characters, $this->singleImageTextSplit($content, $textColor));
         }
 
-        list($lines, $maxTextWidth, $maxTextHeight, $textWidths) = $this->autoWrap($characters, $maxWidth);
-        $distX = calc_text_dst_x($x, ['max_width' => $maxTextWidth], $canvas->getWidth());
-        $distY = calc_text_dst_y($y, ['max_height' => $maxTextHeight], $canvas->getHeight());
-        foreach ($lines as $lineIndex => $lineCharacters) {
-            // 总宽度（文字宽度 + 间隔 + 字体粗细）
-            $textWidth = $textWidths[$lineIndex];
-            switch ($this->textAlign) {
-                case 'center':
-                    $offsetX = $distX + floor($maxTextWidth - $textWidth) / 2;
-                    break;
-                case 'right':
-                    $offsetX = floor($maxTextWidth - $textWidth) + $distX;
-                    break;
-                default:
-                    $offsetX = $distX;
-            }
-            $lineMaxHeight = max(array_column($lineCharacters, 'lineHeight'));
-            $lineHeight = $lineIndex > 0 ? $lineMaxHeight : 0;
-            foreach ($lineCharacters as $char) {
-                $lineY = $distY + $lineHeight;
-                if ($char['type'] == 'text') {
-                    for ($index = 0; $index < $char['weight']; $index++) {
-                        list($offsetX, $lineY) = calc_font_weight($index, $char['weight'], $char['size'],
-                            $offsetX, $lineY);
-                        imagettftext($canvas->getImage(), $char['size'], $char['angle'], intval($offsetX),
-                            intval($lineY),
-                            $char['color'],
-                            $char['font'],
-                            $char['text']);
-                    }
-                    $offsetX += $char['width'] + $char['space'];
-                } else {
-                    $canvas->addImage($char['image'], intval($offsetX), intval($lineY - $char['height']));
-                    $offsetX += $char['width'];
-                }
-            }
-            $distY += $lineHeight;
-        }
+        $this->drawTextLayout($canvas, $characters, $x, $y);
     }
 }

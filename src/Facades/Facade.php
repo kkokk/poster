@@ -64,12 +64,34 @@ abstract class Facade
             return $model;
         }
 
-        if (!isset($resolvedInstance[$model])) {
-            // 单例
-            static::$resolvedInstance = new self::$store[$model];
+        if (!isset(static::$resolvedInstance[$model])) {
+            // 按模型缓存实例，避免不同 Facade 相互覆盖或丢失配置。
+            static::$resolvedInstance[$model] = new self::$store[$model];
         }
 
-        return static::$resolvedInstance;
+        return static::$resolvedInstance[$model];
+    }
+
+    /**
+     * 创建独立实例，不读取或替换 Facade 中已缓存的配置。
+     *
+     * @return StoreRepository
+     */
+    public static function fresh()
+    {
+        $model = static::getFacadeModel();
+        return new static::$store[$model];
+    }
+
+    /**
+     * 清除当前 Facade 的实例引用，下一次调用使用默认配置。
+     * 已交给调用方的对象仍然有效；不会清空缓存后端的数据。
+     *
+     * @return void
+     */
+    public static function reset()
+    {
+        unset(static::$resolvedInstance[static::getFacadeModel()]);
     }
 
     public static function __callStatic($method, $args)

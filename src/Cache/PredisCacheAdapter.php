@@ -32,19 +32,22 @@ class PredisCacheAdapter extends AbstractCacheAdapter
 
     public function pull($key, $default = null)
     {
-        $value = $this->get($key, $default);
-        $this->forget($key);
-        return $value;
+        // 单个脚本原子读取并删除，兼容尚不支持 GETDEL 的 Redis。
+        // key 通过 KEYS 参数传递，供客户端应用前缀，不能拼入脚本文本。
+        $script = "local value = redis.call('GET', KEYS[1]); "
+            . "if value then redis.call('DEL', KEYS[1]); end; return value";
+        $value = $this->redis->eval($script, 1, $key);
+        return $value !== null && $value !== false ? $value : $default;
     }
 
     public function put($key, $value, $ttl = null)
     {
         if ($ttl === null) {
-            $this->redis->set($key, $value);
+            $result = $this->redis->set($key, $value);
         } else {
-            $this->redis->setex($key, $ttl, $value);
+            $result = $this->redis->setex($key, $ttl, $value);
         }
-        return true;
+        return $result !== null && $result !== false && (string) $result === 'OK';
     }
 
     public function forget($key)

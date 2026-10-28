@@ -41,6 +41,7 @@ trait ImagickTrait
      */
     protected function returnImage($type, $outfile = true)
     {
+        $this->preparePngAlpha($this->image);
         if (in_array($type, ImageType::setQuantityTypes())) {
             $this->image->setImageCompressionQuality($this->getQuantity());
         }
@@ -69,6 +70,7 @@ trait ImagickTrait
 
     protected function getBlob($image)
     {
+        $this->preparePngAlpha($image);
         if (in_array($this->getType(), ImageType::setQuantityTypes())) {
             $image->setImageCompressionQuality($this->getQuantity());
         }
@@ -77,6 +79,7 @@ trait ImagickTrait
 
     protected function getTmp($type, $image)
     {
+        $this->preparePngAlpha($image);
         if (in_array($type, ImageType::setQuantityTypes())) {
             $image->setImageCompressionQuality($this->getQuantity());
         }
@@ -91,6 +94,7 @@ trait ImagickTrait
 
     protected function setImage($source)
     {
+        $this->preparePngAlpha($this->image);
 
         if (strpos($source, 'http') === 0) {
             throw new PosterException("Unable to set the remote source {$source}");
@@ -108,6 +112,17 @@ trait ImagickTrait
         }
 
         throw new PosterException("Source not found {$source}");
+    }
+
+    /**
+     * 使用显式RGBA避免全透明灰度PNG+tRNS在部分GD解码器中丢失透明度。
+     * 仅影响带alpha的PNG编码，不将JPEG/GIF等格式转换为PNG。
+     */
+    protected function preparePngAlpha($image)
+    {
+        if (strtolower($image->getImageFormat()) === 'png' && $image->getImageAlphaChannel()) {
+            $image->setOption('png:color-type', '6');
+        }
     }
 
     /**
@@ -144,10 +159,8 @@ trait ImagickTrait
             } elseif ($src instanceof GdImageGraphicsEngine) {
                 $Imagick->readImageBlob($src->blob());
             } elseif (strpos($src, 'http') === 0) {
-                $stream = @file_get_contents($src, null);
-                if (empty($stream)) {
-                    throw new PosterException('Image resources cannot be empty (' . $src . ')');
-                }
+                $loader = $this->getRemoteImageLoader();
+                $stream = $loader->load($src);
                 $Imagick->readImageBlob($stream);
             } elseif (is_file_path($src)) {
                 if (!file_exists($src)) {
@@ -180,7 +193,8 @@ trait ImagickTrait
         }
 
         if (isset($rgba[3]) && !is_null($rgba[3])) {
-            $rgba[3] = round(floor((128 - $rgba[3]) / 127 * 100) / 100, 2);
+            // GD alpha为0不透明、127透明；保留精度，避免PNG量化后偏差。
+            $rgba[3] = (127 - $rgba[3]) / 127;
             return new \ImagickPixel("rgba($rgba[0], $rgba[1], $rgba[2], $rgba[3])");
         }
 
@@ -207,7 +221,7 @@ trait ImagickTrait
     }
 
     /**
-     * 渐变色，目前只支持两种颜色渐变，暂时只支持从上往下
+     * 多色渐变，支持水平、垂直及对角线方向
      * Author: lang
      * Email: 732853989@qq.com
      * Date: 2023/3/28
@@ -223,57 +237,18 @@ trait ImagickTrait
     protected function calcColorDirection(\Imagick $source, $rgbaColor, $rgbaCount, $to, $w, $h)
     {
 
-        switch ($to) {
-            case '':
-            case 'bottom':
-                break;
-            case 'top':
-                $rgbaColor = array_reverse($rgbaColor);
-                break;
-            case 'left':
-                break;
-            case 'right':
-                break;
-            case 'right bottom':
-            case 'bottom right':
-                break;
-            case 'right top':
-            case 'top right':
-                break;
-            case 'left bottom':
-            case 'bottom left':
-                break;
-            case 'left top':
-            case 'top left':
-                break;
-            default:
-                // code...
-                break;
-        }
-
-        if ($rgbaCount < 3) {
-            $this->linearGradientDefault($source, $rgbaColor, $rgbaCount, $w, $h);
-        } else {
-
-            $picKey = 0;
-            $chunk = ceil($h / ($rgbaCount - 1));
-            foreach ($rgbaColor as $k => $v) {
-
-                if ($k == $rgbaCount - 1) {
-                    break;
-                }
-
-                $picsC = $this->createCanvas($w, $chunk);
-
-                $this->linearGradientDefault($picsC, [$rgbaColor[$k], $rgbaColor[$k + 1]], $rgbaCount, $w, $chunk);
-
-                $source->compositeImage($picsC, ($this->image)::COMPOSITE_DEFAULT, 0, $k * $chunk);
-
-                $picKey++;
+        // 与GD共用色标和方向计算；逐行提交，避免构造整张图的PHP像素数组。
+        $iterator = $source->getPixelIterator();
+        foreach ($iterator as $y => $pixels) {
+            foreach ($pixels as $x => $pixel) {
+                $position = \Kkokk\Poster\Image\Graphics\Gradient::position($x, $y, $w, $h, $to);
+                $rgb = \Kkokk\Poster\Image\Graphics\Gradient::color($rgbaColor, $position);
+                $pixel->setColor('rgb(' . implode(',', $rgb) . ')');
             }
+            $iterator->syncIterator();
         }
+        $iterator->clear();
     }
-
     protected function linearGradientDefault(\Imagick $source, $rgbaColor, $rgbaCount, $w, $h)
     {
         if ($rgbaCount == 1) {
@@ -355,7 +330,8 @@ trait ImagickTrait
 
         $mask->drawImage($draw);
         $this->destroyImage($draw);
-        $pic->compositeImage($mask, ($pic)::COMPOSITE_COPYOPACITY, 0, 0);
+        // 圆角只能减少原alpha，不能将半透明中心覆盖为不透明。
+        $pic->compositeImage($mask, ($pic)::COMPOSITE_DSTIN, 0, 0);
         $this->destroyImage($mask);
         return $pic;
     }
@@ -372,9 +348,9 @@ trait ImagickTrait
     protected function setImageAlpha($pic, $transparency)
     {
         if (method_exists($pic, 'setImageOpacity')) {
-            $pic->setImageOpacity(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
+            $pic->setImageOpacity((127 - $transparency) / 127);
         } elseif (method_exists($pic, 'setImageAlpha')) {
-            $pic->setImageAlpha(floor((128 - $transparency) / 127 * 100) / 100); // 透明度
+            $pic->setImageAlpha((127 - $transparency) / 127);
         }
     }
 

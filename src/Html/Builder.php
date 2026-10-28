@@ -70,6 +70,18 @@ class Builder
         return $this;
     }
 
+    /** 设置已存在的可写临时目录，避免要求 vendor 目录可写。 */
+    public function tempDirectory($directory)
+    {
+        $this->query->buildQuery('tempDirectory', [$directory]);
+        return $this;
+    }
+    /** 设置转换进程的超时秒数，必须为正数。 */
+    public function timeout($seconds)
+    {
+        $this->query->buildQuery('timeout', [$seconds]);
+        return $this;
+    }
     public function render()
     {
         return $this->channel->render($this->query->getQuery());

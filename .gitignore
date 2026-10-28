@@ -2,5 +2,7 @@ tests/crop/
 tests/poster/
 tests/server/static/
 vendor/
+docs/
 composer.lock
 .idea
+AGENTS.md

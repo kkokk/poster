@@ -11,8 +11,11 @@ use Kkokk\Poster\Image\Graphics\GdImageGraphicsEngine;
 
 class Image extends GdImageGraphicsEngine
 {
-    public function __construct($path)
+    public function __construct($path, \Kkokk\Poster\Image\Resources\RemoteImageLoader $loader = null)
     {
+        if ($loader !== null) {
+            $this->setRemoteImageLoader($loader);
+        }
         list($this->image, $this->width, $this->height) = $this->createImage($path);
     }
 

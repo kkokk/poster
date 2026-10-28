@@ -4,6 +4,7 @@ require '../../vendor/autoload.php';
 
 use Kkokk\Poster\Facades\Poster;
 
+$image = 'https://pic.rmb.bdstatic.com/bjh/news/7dfe43f0ddf2f910ed5e68d17b67a35b.png';
 
 // Poster::extension('gd')
 //     ->buildIm(320, 320, [], true)
@@ -13,7 +14,7 @@ use Kkokk\Poster\Facades\Poster;
 // echo "<img style='color:#1900ff;' />";
 
 Poster::extension('imagick')
-    ->buildImDst('C:\lang\custom\poster-doc\docs\public\favicon.png')
+    ->buildImDst($image)
     ->getCanvas()
     ->borderRadius(50)
     ->getStream();

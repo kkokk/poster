@@ -87,7 +87,8 @@ trait GdTrait
         } elseif ($src instanceof ImagickImageGraphicsEngine) {
             return $this->returnImageInfoByBlob($src->blob());
         } elseif (strpos($src, 'http') === 0) {
-            return $this->returnImageInfoBySrc($src);
+            $loader = $this->getRemoteImageLoader();
+            return $this->returnImageInfoByBlob($loader->load($src));
         } elseif (is_file_path($src)) {
             if (!file_exists($src)) {
                 throw new PosterException('Image resources not found (' . $src . ')');
@@ -269,61 +270,13 @@ trait GdTrait
     {
         $to = preg_replace('~\s+~', ' ', trim($to, ' '));
 
-        switch ($to) {
-            case '':
-            case 'bottom':
-                $toi = $h;
-                $toj = $w;
-                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount);
-                break;
-            case 'top':
-                $toi = $h;
-                $toj = $w;
-                $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount);
-                break;
-            case 'left':
-                $toi = $w;
-                $toj = $h;
-                $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
-                break;
-            case 'right':
-                $toi = $w;
-                $toj = $h;
-                $im = $this->linearGradientDefault($im, $toi, $toj, $rgbaColor, $rgbaCount, 'j', 'i');
-                break;
-            case 'right bottom':
-            case 'bottom right':
-                $toi = $w;
-                $toj = $h;
-                $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount);
-                break;
-            case 'right top':
-            case 'top right':
-                $toi = $w;
-                $toj = $h;
-                $rgbaColor = array_reverse($rgbaColor);
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, 0, $toj);
-                break;
-            case 'left bottom':
-            case 'bottom left':
-                $toi = $w;
-                $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount, 0, $toj);
-                break;
-            case 'left top':
-            case 'top left':
-                $toi = $w;
-                $toj = $h;
-                $im = $this->linearGradientLeftTopRightBottomDiagonal($im, $toi, $toj, $rgbaColor, $rgbaCount);
-                break;
-            default:
-                // code...
-                break;
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                $position = \Kkokk\Poster\Image\Graphics\Gradient::position($x, $y, $w, $h, $to);
+                $rgb = \Kkokk\Poster\Image\Graphics\Gradient::color($rgbaColor, $position);
+                imagesetpixel($im, $x, $y, imagecolorallocate($im, $rgb[0], $rgb[1], $rgb[2]));
+            }
         }
-
         return $im;
     }
 
@@ -707,6 +660,10 @@ trait GdTrait
     protected function setImageAlpha($pic, $w, $h, $transparency)
     {
         $mask = $this->createCanvas($w, $h, [255, 255, 255, $transparency]);
+        // 替换alpha时禁用混合，避免原RGB再次混入半透明白底。
+        imagealphablending($mask, false);
+        imagesavealpha($mask, true);
+
 
         for ($x = 0; $x < $w; $x++) {
             for ($y = 0; $y < $h; $y++) {

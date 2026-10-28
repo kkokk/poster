@@ -42,6 +42,9 @@ class SessionCacheAdapter extends AbstractCacheAdapter
         if ($ttl !== null) {
             // 设置过期时间戳
             $this->session[$key . '_expires'] = time() + $ttl;
+        } else {
+            // 无期限覆盖必须清除上次写入的过期时间。
+            unset($this->session[$key . '_expires']);
         }
         return true;
     }

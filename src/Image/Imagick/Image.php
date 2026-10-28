@@ -11,8 +11,11 @@ use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 class Image extends ImagickImageGraphicsEngine
 {
-    public function __construct($path)
+    public function __construct($path, \Kkokk\Poster\Image\Resources\RemoteImageLoader $loader = null)
     {
+        if ($loader !== null) {
+            $this->setRemoteImageLoader($loader);
+        }
         $this->image = $this->createImagick($path);
         $this->width = $this->image->getImageWidth();
         $this->height = $this->image->getImageHeight();

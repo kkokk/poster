@@ -33,6 +33,34 @@ class PosterManager
         return $this->extensions[$name];
     }
 
+    /**
+     * 创建独立扩展及驱动，保留管理器的构造路径，不继承已执行任务的状态。
+     *
+     * @param string|null $name
+     * @return Extension
+     */
+    public function fresh($name = null)
+    {
+        return $this->configure($this->makeExtension($this->parseConnectionName($name)));
+    }
+
+    /**
+     * 移除指定扩展的缓存引用；null 表示移除当前管理器的全部扩展。
+     * 已创建的 Builder 仍使用原扩展，重置不会改变进行中的任务。
+     *
+     * @param string|null $name
+     * @return $this
+     */
+    public function reset($name = null)
+    {
+        if ($name === null) {
+            $this->extensions = [];
+        } else {
+            unset($this->extensions[$this->parseConnectionName($name)]);
+        }
+        return $this;
+    }
+
     protected function configure(Extension $extension)
     {
         return $extension;

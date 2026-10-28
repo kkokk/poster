@@ -22,6 +22,26 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
 {
     use GdTrait;
 
+    protected function fitRaster($scaledWidth, $scaledHeight, $x, $y, $width, $height)
+    {
+        $scaled = $this->createCanvas($scaledWidth, $scaledHeight);
+        // 直接写入alpha，避免透明像素与默认背景混合。
+        imagealphablending($scaled, false);
+        imagesavealpha($scaled, true);
+        imagecopyresampled($scaled, $this->image, 0, 0, 0, 0, $scaledWidth, $scaledHeight, $this->width, $this->height);
+        $output = $scaled;
+        if ($scaledWidth !== $width || $scaledHeight !== $height) {
+            $output = imagecrop($scaled, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height]);
+            if ($output === false) throw new \Kkokk\Poster\Exception\PosterException('Image fitting crop failed');
+            imagesavealpha($output, true);
+        }
+        $this->destroyImage();
+        $this->image = $output;
+        $this->width = $width; $this->height = $height;
+        if ($output !== $scaled) imagedestroy($scaled);
+        return $this;
+    }
+
     /**
      * 生成图片并保存
      * User: lang
@@ -281,20 +301,24 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
      */
     public function applyMask($mask)
     {
+        imagepalettetotruecolor($this->image);
         imagealphablending($this->image, false);
+        imagesavealpha($this->image, true);
         $width = $this->width;
         $height = $this->height;
         $maskImage = (new Image($mask))->scale($width, $height);
         // 遍历每个像素，调整 Alpha 透明度
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
-                $maskColor = imagecolorat($maskImage->getImage(), $x, $y) & 0xFF; // 取 R 分量作为透明度
+                $maskColor = imagecolorat($maskImage->getImage(), $x, $y) & 0xFF; // 灰度遮罩，保留历史蓝通道读取规则
                 $imageColor = imagecolorat($this->image, $x, $y);
                 // 提取 RGBA 组件
                 $r = ($imageColor >> 16) & 0xFF;
                 $g = ($imageColor >> 8) & 0xFF;
                 $b = $imageColor & 0xFF;
-                $alpha = round(127 - ($maskColor / 255) * 127); // 计算透明度
+                // 遮罩只减少不透明度；不能覆盖源alpha使透明像素重新可见。
+                $sourceAlpha = ($imageColor >> 24) & 0x7F;
+                $alpha = (int) round(127 - ($maskColor / 255) * (127 - $sourceAlpha));
                 $newColor = imagecolorallocatealpha($this->image, $r, $g, $b, $alpha);
                 imagesetpixel($this->image, $x, $y, $newColor);
             }
@@ -319,12 +343,14 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
     public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
     {
         $croppedImage = new Canvas($width, $height, []);
+        imagealphablending($croppedImage->getImage(), false);
         for ($i = 0; $i < $this->getWidth(); $i++) {
             for ($j = 0; $j < $this->getHeight(); $j++) {
                 $shouldProcessPixel = is_null($crossCondition) || $crossCondition([$i, $j]);
                 if ($shouldProcessPixel) {
                     // 获取颜色
-                    $rgbColor = imagecolorat($this->image, $i, $j);
+                    $rgba = imagecolorsforindex($this->image, imagecolorat($this->image, $i, $j));
+                    $rgbColor = imagecolorallocatealpha($croppedImage->getImage(), $rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha']);
                     imagesetpixel($croppedImage->getImage(), $i - $x1, $j - $y1, $rgbColor); // 抠图
                 }
             }
@@ -346,7 +372,7 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
     public function drawImagePolygon($points, $color, $thickness = 1)
     {
         $borderColor = $this->createColor($this->image, $color);
-        imagesetthickness($this->image, $thickness); // 划线的线宽加粗
+        imagesetthickness($this->image, intval($thickness)); // GD 使用整数线宽，显式截断避免精度丢失警告
         if (version_compare(PHP_VERSION, '8.1.0') === -1) {
             imagepolygon($this->image, $points, count($points) / 2, $borderColor);
         } else {
@@ -376,6 +402,23 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
         return $this;
     }
 
+    /**
+     * 显式复制像素及透明度；原有对象传入和 clone 行为保持兼容。
+     * @return static
+     */
+    public function copy()
+    {
+        if (empty($this->image)) {
+            throw new \Kkokk\Poster\Exception\PosterException('Cannot copy an empty image');
+        }
+        $image = imagecreatetruecolor($this->width, $this->height);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        imagecopy($image, $this->image, 0, 0, 0, 0, $this->width, $this->height);
+        $copy = clone $this;
+        $copy->image = $image;
+        return $copy;
+    }
     public function __destruct()
     {
         $this->destroyImage();

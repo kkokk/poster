@@ -1,0 +1,6 @@
+# Repository collaboration instructions are excluded from distribution archives.
+AGENTS.md export-ignore
+/docs export-ignore
+/docs/** export-ignore
+/tests export-ignore
+/tests/** export-ignore

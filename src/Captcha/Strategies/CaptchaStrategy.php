@@ -83,9 +83,9 @@ class CaptchaStrategy
     protected function put($key, $value, $expire = 0)
     {
         try {
-            $this->cache->put($key, $value, $expire ?: $this->expire);
+            return $this->cache->put($key, $value, $expire ?: $this->expire) !== false;
         } catch (\Exception $e) {
-            // 报错，则返回密码，自行保存
+            // 写入失败交由原有服务端保存流程处理，不能将 secret 直接返回客户端。
             return false;
         }
         return true;

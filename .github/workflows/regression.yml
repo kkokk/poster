@@ -1,0 +1,31 @@
+name: Regression
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php82:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: gd, mbstring, iconv, imagick
+          coverage: none
+          tools: composer:v2
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: find src tests/regression -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Core regression
+        run: php tests/regression/run.php core
+      - name: Image regression
+        run: php tests/regression/run.php image
+      - name: HTTP regression
+        run: php tests/regression/run.php http
