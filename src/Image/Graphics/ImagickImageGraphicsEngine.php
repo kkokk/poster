@@ -334,8 +334,9 @@ class ImagickImageGraphicsEngine extends ImageGraphicsEngine implements ImageGra
      * @throws \ImagickDrawException
      * @throws \ImagickException
      */
-    public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
+    public function cutout($x1, $y1, $width, $height, $crossCondition = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($crossCondition, 'Closure', '$crossCondition');
         // 未选中的区域保持透明，已选像素不再与白底合成。
         $croppedImage = new Canvas($width, $height, []);
         if ($crossCondition === null && is_int($x1) && is_int($y1)) {

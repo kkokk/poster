@@ -44,6 +44,7 @@ class Extension implements ExtensionInterface
         return $this->query()->buildImDst($src, $w, $h);
     }
 
+    /** @param \Closure|null $callback */
     public function buildBg(
         $w,
         $h,
@@ -53,8 +54,9 @@ class Extension implements ExtensionInterface
         $dst_y = 0,
         $src_x = 0,
         $src_y = 0,
-        \Closure $callback = null
+        $callback = null
     ) {
+        \Kkokk\Poster\Support\ParameterType::nullable($callback, 'Closure', '$callback');
         return $this->query()->buildBg($w, $h, $rgba, $alpha, $dst_x, $dst_y, $src_x, $src_y, $callback);
     }
 

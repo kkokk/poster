@@ -41,7 +41,8 @@ interface ImageGraphicsEngineInterface
 
     public function applyMask($mask);
 
-    public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null);
+    /** @param \Closure|null $crossCondition */
+    public function cutout($x1, $y1, $width, $height, $crossCondition = null);
 
     public function drawImagePolygon($points, $color, $thickness = 1);
 

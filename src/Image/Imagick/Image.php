@@ -11,8 +11,10 @@ use Kkokk\Poster\Image\Graphics\ImagickImageGraphicsEngine;
 
 class Image extends ImagickImageGraphicsEngine
 {
-    public function __construct($path, \Kkokk\Poster\Image\Resources\RemoteImageLoader $loader = null)
+    /** @param \Kkokk\Poster\Image\Resources\RemoteImageLoader|null $loader */
+    public function __construct($path, $loader = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($loader, 'Kkokk\Poster\Image\Resources\RemoteImageLoader', '$loader');
         if ($loader !== null) {
             $this->setRemoteImageLoader($loader);
         }

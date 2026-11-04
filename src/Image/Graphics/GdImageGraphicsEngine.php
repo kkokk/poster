@@ -340,8 +340,9 @@ class GdImageGraphicsEngine extends ImageGraphicsEngine implements ImageGraphics
      * @param \Closure|null $crossCondition
      * @return \Kkokk\Poster\Image\Gd\Canvas
      */
-    public function cutout($x1, $y1, $width, $height, \Closure $crossCondition = null)
+    public function cutout($x1, $y1, $width, $height, $crossCondition = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($crossCondition, 'Closure', '$crossCondition');
         $croppedImage = new Canvas($width, $height, []);
         imagealphablending($croppedImage->getImage(), false);
         for ($i = 0; $i < $this->getWidth(); $i++) {

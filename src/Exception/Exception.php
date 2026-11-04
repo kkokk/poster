@@ -9,8 +9,10 @@ if (interface_exists(\Throwable::class)) {
         const SYSTEM_CODE = 1;
         const ERROR_POSTER_CODE = 2;
 
-        public function __construct($message = "", $code = 0, \Throwable $previous = null)
+        /** @param \Throwable|null $previous */
+        public function __construct($message = "", $code = 0, $previous = null)
         {
+            \Kkokk\Poster\Support\ParameterType::nullable($previous, 'Throwable', '$previous');
             parent::__construct($message, $code, $previous);
         }
 

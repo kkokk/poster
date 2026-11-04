@@ -137,8 +137,10 @@ class Driver
         }
     }
 
-    public function execute($query = [], Driver $driver = null)
+    /** @param Driver|null $driver */
+    public function execute($query = [], $driver = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($driver, 'Kkokk\Poster\Image\Drivers\Driver', '$driver');
         if (empty($driver)) {
             $driver = $this;
         }

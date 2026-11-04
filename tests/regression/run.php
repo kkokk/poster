@@ -2,7 +2,7 @@
 
 // 每个脚本独立进程，隔离函数名、Session、错误处理器和测试替身。
 $groups = [
-    'core' => ['core_defects', 'gd_polygon_thickness', 'cache_namespace', 'cache_write_failure', 'remote_image', 'html_timeout', 'html_temporary', 'environment'],
+    'core' => ['php84_smoke', 'php84_nullable', 'core_defects', 'gd_polygon_thickness', 'cache_namespace', 'cache_write_failure', 'remote_image', 'html_timeout', 'html_temporary', 'environment'],
     'image' => ['task_isolation', 'image_copy', 'image_fit', 'mask_cutout_alpha', 'cutout_native', 'rounded_alpha', 'gradient', 'text_debug'],
     'http' => ['remote_image_http'],
     'html' => ['html_render'],

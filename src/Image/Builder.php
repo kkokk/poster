@@ -74,6 +74,7 @@ class Builder
         return $this;
     }
 
+    /** @param \Closure|null $callback */
     public function buildBg(
         $w,
         $h,
@@ -83,8 +84,9 @@ class Builder
         $dst_y = 0,
         $src_x = 0,
         $src_y = 0,
-        \Closure $callback = null
+        $callback = null
     ) {
+        \Kkokk\Poster\Support\ParameterType::nullable($callback, 'Closure', '$callback');
         $query = [];
         if ($callback) {
             $that = clone $this;

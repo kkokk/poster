@@ -24,8 +24,9 @@ trait TextTrait
      * @return array width/height 为向外取整的布局框，advanceWidth 为未旋转前进宽度
      * @throws PosterException
      */
-    public function measure($maxWidth = null, ImageGraphicsEngineInterface $canvas = null)
+    public function measure($maxWidth = null, $canvas = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($canvas, 'Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface', '$canvas');
         return $this->inspectTextLayout($maxWidth, $canvas, false);
     }
 
@@ -37,8 +38,9 @@ trait TextTrait
      * @return array measure字段及elements（line从0开始，bounds含旋转和模拟加粗）
      * @throws PosterException
      */
-    public function layout($maxWidth = null, ImageGraphicsEngineInterface $canvas = null)
+    public function layout($maxWidth = null, $canvas = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($canvas, 'Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface', '$canvas');
         return $this->inspectTextLayout($maxWidth, $canvas, true);
     }
 
@@ -165,10 +167,12 @@ trait TextTrait
     /**
      * 查找容纳完整文本的最大整数字号，不修改原对象。
      * 仅支持 Text；混排字号比例需要单独的适配契约。
+     * @param ImageGraphicsEngineInterface|null $canvas
      * @return array fontSize/ fits/ metrics；无可用字号时返回最小字号及 fits=false
      */
-    public function fitFontSize($width, $height, $minSize = 8, $maxSize = 72, ImageGraphicsEngineInterface $canvas = null)
+    public function fitFontSize($width, $height, $minSize = 8, $maxSize = 72, $canvas = null)
     {
+        \Kkokk\Poster\Support\ParameterType::nullable($canvas, 'Kkokk\Poster\Image\Graphics\Interfaces\ImageGraphicsEngineInterface', '$canvas');
         if (!$this instanceof TextGraphicsEngineInterface) {
             throw new PosterException('Automatic font size currently supports Text only');
         }

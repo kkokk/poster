@@ -74,7 +74,7 @@ interface ExtensionInterface
         $dst_y = 0,
         $src_x = 0,
         $src_y = 0,
-        \Closure $callback = null
+        $callback = null
     );
 
     /**
